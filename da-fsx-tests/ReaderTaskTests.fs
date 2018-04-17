@@ -1,4 +1,4 @@
-module Tests
+module ReaderTask
 
 open System
 open System.Threading.Tasks
@@ -8,11 +8,11 @@ open FSharpx.Task
 open DA.FSX.ReaderTask
 
 [<Fact>]
-let ``Create ReaderTask from success Result must work`` () =
+let ``Create from success Result must work`` () =
     (1 |> returnM) 0
 
 [<Fact>]
-let ``Create ReaderTask from exception must fail with exception`` () =
+let ``Create from exception must work`` () =
     (new Exception("some exception") |> ofException) 0 
     |> fun x -> x.ContinueWith(fun (t: Task<_>) -> 
         Assert.IsType<AggregateException>(t.Exception) |> ignore
@@ -21,7 +21,7 @@ let ``Create ReaderTask from exception must fail with exception`` () =
     )
     
 [<Fact>]
-let ``mapError for ReaderTask must work`` () =
+let ``mapError must work`` () =
     let me (e: exn) = new Exception(e.Message + "!")
 
     (new Exception("some exception") |> ofException |> mapError me) 0 
