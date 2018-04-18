@@ -20,50 +20,29 @@ type Request = {
     httpMethod: HttpMethod
     payload: Payload 
     headers: Headers
+    queryString: QueryString
 }
 
 let inline str2json<'a> str = JsonConvert.DeserializeObject<'a> str
 
-// let mapRequest<'a> (f: Request -> Task<string>) = f >> (map str2json<'a>)
-
-
-(*
-
-type RequestApiRequest = Request -> Task<string>
-
-type RequestApi = {
-    request : RequestApiRequest
-}
-
-module HttpTask = 
-    
-    open ReaderTask
-
-    open Newtonsoft.Json
-
-    type Http<'T> = ReaderTask<RequestApi, 'T>
-    
-    let request<'T> (request: Request) : Http<'T> = 
-        JsonConvert.DeserializeObject<'T> <!> (fun ({ request = req }) -> req request)
-        
-    let post2<'T> (url: Url) (headers: Headers) (payload: Payload) : Http<'T> = 
-        request<'T>({url = url; headers = headers; httpMethod = POST; payload = payload})
-   
-    let post<'T> (url: Url) (payload: Payload) : Http<'T> = 
-        post2<'T> url [] payload
-
-    let delete<'T> (url: Url) (headers: Headers) (payload: Payload) : Http<'T> = 
-        request<'T>({url = url; headers = headers; httpMethod = DELETE; payload = payload})
-
-    let get<'T> (url: Url) (headers: Headers) : Http<'T> = 
-        request<'T>({url = url; headers = headers; httpMethod = GET; payload = None})
-*)
 
 module WebClient = 
 
     open System.Net
     
+    let private webHeaders (headers: Headers) = 
+        let webHeaders = new WebHeaderCollection()        
+        for (x, y) in headers do webHeaders.Set(x, y)        
+        webHeaders
+
+    let private webQueryString (qs: QueryString) = 
+        let webQs = new System.Collections.Specialized.NameValueCollection()
+        for (x, y) in qs do webQs.Set(x, y)        
+        webQs 
+    
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
+        webClient.Headers <- webHeaders request.headers
+        webClient.QueryString <- webQueryString request.queryString
         webClient.DownloadStringTaskAsync request.url
                 
     let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
