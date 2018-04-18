@@ -17,15 +17,22 @@ type ResponseQs = {
     q: string
 }
 
+type ResponseForm = {
+    x: string
+}
+
 type Response = {
     url: string
     headers: ResponseHeaders
     args: ResponseQs
+    form: ResponseForm
 }
 
 let webClient = new WebClient()
 let ofRequest' = WebClient.ofRequest webClient
 let ofRequest<'a> r = str2json<Response> <!> ofRequest' r
+let ofGet<'a> = fromGetLike >> ofRequest<'a>
+let ofPost<'a> = fromPostLike >> ofRequest<'a>
 
 [<Fact>]
 let ``Get must work`` () =
@@ -72,11 +79,23 @@ let ``Get with query string must work`` () =
     
     let request = {
         url = "https://httpbin.org/get"
-        httpMethod = GET
+        httpMethod = HttpGetLikeMethod.GET
         queryString = [ "q", "1" ]
         headers = [ ]
-        payload = None
     } 
 
-    (fun resp -> resp.args.q |> should equal "1") <!> ofRequest request     
+    (fun resp -> resp.args.q |> should equal "1") <!> ofGet request     
     
+
+    
+[<Fact>]
+let ``Post with payload must work`` () =
+    
+    let request = {
+        url = "https://httpbin.org/post"
+        httpMethod = HttpPostLikeMethod.POST
+        headers = []
+        payload = FormPayload [ "x", "100" ] 
+    } 
+
+    (fun resp -> resp.form.x |> should equal "100") <!> ofPost request     
