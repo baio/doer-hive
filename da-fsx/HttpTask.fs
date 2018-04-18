@@ -22,10 +22,9 @@ type Request = {
     headers: Headers
 }
 
-let inline str2json'<'a> str = JsonConvert.DeserializeObject<'a> str
+let inline str2json<'a> str = JsonConvert.DeserializeObject<'a> str
 
-let inline str2json (t: Task<_>) = str2json' <!> t
-
+// let mapRequest<'a> (f: Request -> Task<string>) = f >> (map str2json<'a>)
 
 
 (*
@@ -67,5 +66,5 @@ module WebClient =
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
         webClient.DownloadStringTaskAsync request.url
                 
-    let inline runRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
-        
+    let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
+    

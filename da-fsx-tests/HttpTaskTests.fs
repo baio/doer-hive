@@ -12,8 +12,12 @@ open WebClient
 
 let webClient = new WebClient()
 
-let runRequest = runRequest webClient
-let chainWebClient = chainWebClient webClient
+type Response = {
+    url: string
+}
+
+let ofRequest' = ofRequest webClient
+let ofRequest<'a> r = str2json<Response> <!> ofRequest' r
 
 [<Fact>]
 let ``Get must work`` () =
@@ -25,4 +29,17 @@ let ``Get must work`` () =
         payload = None
     } 
 
-    runRequest request
+    ofRequest' request
+
+[<Fact>]
+let ``Get with parse response must work`` () =
+    
+    let request = {
+        url = "https://httpbin.org/get"
+        httpMethod = GET
+        headers = []
+        payload = None
+    } 
+
+    (fun resp -> resp.url |> should equal "https://httpbin.org/get") <!> ofRequest request     
+    
