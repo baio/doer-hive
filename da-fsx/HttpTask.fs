@@ -71,21 +71,26 @@ module WebClient =
         xs 
 
     let private seq2coll (s: seq<string * string>) = 
-        seq2coll' (new System.Collections.Specialized.NameValueCollection()) s
+        seq2coll' (NameValueCollection()) s
+
+    let private uploadValues (webClient: WebClient) request body =
+        let method = match request.httpMethod with GET -> "GET" | POST -> "POST" | PUT -> "PUT" | PATCH -> "PATCH" | DELETE -> "DELETE"
+        bytes2str <!> webClient.UploadValuesTaskAsync(request.url, method, body) 
     
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
-        webClient.Headers <- seq2coll' (new WebHeaderCollection()) request.headers
+        let uploadValues = uploadValues webClient request
+
+        webClient.Headers <- seq2coll' (WebHeaderCollection()) request.headers
         webClient.QueryString <- seq2coll request.queryString
         match request.httpMethod with
-        | GET | DELETE ->
+        | GET ->
             webClient.DownloadStringTaskAsync request.url
+        | DELETE ->
+            uploadValues (NameValueCollection())
         | PUT | POST | PATCH ->
             match request.payload with
             | FormPayload payload ->
-                payload 
-                |> seq2coll 
-                |> fun x -> webClient.UploadValuesTaskAsync(request.url, x)
-                |> map(bytes2str)
+                payload |> seq2coll |> uploadValues
             | _ -> failwith "Not impl"
                 
     let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
