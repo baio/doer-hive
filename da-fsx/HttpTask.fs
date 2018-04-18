@@ -72,26 +72,38 @@ module WebClient =
 
     let private seq2coll (s: seq<string * string>) = 
         seq2coll' (NameValueCollection()) s
+    
+    let private getMethod = function GET -> "GET" | POST -> "POST" | PUT -> "PUT" | PATCH -> "PATCH" | DELETE -> "DELETE"
 
     let private uploadValues (webClient: WebClient) request body =
-        let method = match request.httpMethod with GET -> "GET" | POST -> "POST" | PUT -> "PUT" | PATCH -> "PATCH" | DELETE -> "DELETE"
-        bytes2str <!> webClient.UploadValuesTaskAsync(request.url, method, body) 
+        bytes2str <!> webClient.UploadValuesTaskAsync(request.url, getMethod(request.httpMethod), body) 
+
+    let private uploadString (webClient: WebClient) request body =
+        webClient.UploadStringTaskAsync(request.url, getMethod(request.httpMethod), body) 
+
+    let private upload (webClient: WebClient) request =
+        let uploadValues = uploadValues webClient request
+        let uploadString = uploadString webClient request
+        match request.payload with
+        | JsonPayload x -> 
+            webClient.Headers.Add("content-type", "application/json")
+            x |> JsonConvert.SerializeObject |> uploadString
+        | FormPayload x ->
+            x |> seq2coll |> uploadValues
+        | _ -> failwith "Not impl"
     
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
-        let uploadValues = uploadValues webClient request
-
+                
         webClient.Headers <- seq2coll' (WebHeaderCollection()) request.headers
         webClient.QueryString <- seq2coll request.queryString
+        
         match request.httpMethod with
         | GET ->
             webClient.DownloadStringTaskAsync request.url
         | DELETE ->
-            uploadValues (NameValueCollection())
+            uploadValues webClient request (NameValueCollection())
         | PUT | POST | PATCH ->
-            match request.payload with
-            | FormPayload payload ->
-                payload |> seq2coll |> uploadValues
-            | _ -> failwith "Not impl"
+            upload webClient request
                 
     let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
     
