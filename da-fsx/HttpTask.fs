@@ -79,7 +79,7 @@ module WebClient =
         bytes2str <!> webClient.UploadValuesTaskAsync(request.url, getMethod(request.httpMethod), body) 
 
     let private uploadString (webClient: WebClient) request body =
-        webClient.UploadStringTaskAsync(request.url, getMethod(request.httpMethod), body) 
+        webClient.UploadStringTaskAsync(request.url, getMethod(request.httpMethod), body)
 
     let private upload (webClient: WebClient) request =
         let uploadValues = uploadValues webClient request
@@ -90,7 +90,8 @@ module WebClient =
             x |> JsonConvert.SerializeObject |> uploadString
         | FormPayload x ->
             x |> seq2coll |> uploadValues
-        | _ -> failwith "Not impl"
+        | None ->
+            uploadValues (NameValueCollection())
     
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
                 

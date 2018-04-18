@@ -9,6 +9,10 @@ open FSharpx.Task
 open System.Net
 open DA.FSX.HttpTask
 
+type RequestPayload = {
+    lol: Boolean
+}
+
 type ResponseHeaders = {
     test: string
 }
@@ -21,18 +25,23 @@ type ResponseForm = {
     x: string
 }
 
+type ResponseData = {
+    x: string
+}
+
 type Response = {
     url: string
     headers: ResponseHeaders
     args: ResponseQs
     form: ResponseForm
+    json: RequestPayload
 }
 
 let webClient = new WebClient()
 let ofRequest' = WebClient.ofRequest webClient
-let ofRequest<'a> r = str2json<Response> <!> ofRequest' r
-let ofGet<'a> = fromGetLike >> ofRequest<'a>
-let ofPost<'a> = fromPostLike >> ofRequest<'a>
+let ofRequest r = str2json<Response> <!> ofRequest' r
+let ofGet = fromGetLike >> ofRequest
+let ofPost = fromPostLike >> ofRequest
 
 [<Fact>]
 let ``Get must work`` () =
@@ -89,7 +98,7 @@ let ``Get with query string must work`` () =
 
     
 [<Fact>]
-let ``Post with payload must work`` () =
+let ``Post with form-value payload must work`` () =
     
     let request = {
         url = "https://httpbin.org/post"
@@ -99,3 +108,15 @@ let ``Post with payload must work`` () =
     } 
 
     (fun resp -> resp.form.x |> should equal "100") <!> ofPost request     
+
+[<Fact>]
+let ``Post with json payload must work`` () =
+    
+    let request = {
+        url = "https://httpbin.org/post"
+        httpMethod = HttpPostLikeMethod.POST
+        headers = []
+        payload = JsonPayload { lol = true }
+    } 
+
+    (fun resp -> resp.json.lol |> should equal true) <!> ofPost request     
