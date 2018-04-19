@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="Auth0.fs" />
+    <Compile Include="RequestAPI.fs" />
     <Compile Include="API.fs" />
   </ItemGroup>
 

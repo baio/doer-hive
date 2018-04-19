@@ -3,6 +3,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Reader.fs" />
     <Compile Include="Task.fs" />
     <Compile Include="ReaderTask.fs" />
     <Compile Include="HttpTask.fs" />

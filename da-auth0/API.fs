@@ -1,126 +1,78 @@
 ﻿module DA.Auth0.API
 
-open DA.FSX.HttpTask
+open DA.FSX
+open System.Threading.Tasks
+
+open DA.FSX.ReaderTask
+open DA.FSX.Reader
+open FSharpx.Task
 open FSharpx.Reader
+open DA.FSX.HttpTask
+open DA.Auth0.RequestAPI
 
+type HttpRequest = Request -> Task<string>
 
-type API = Reader<Auth0Config, Request>
+// Response DTOs
+
+type UserIdResponse = { user_id : string }
+
+type TokensResponse = {
+    id_token: string
+    access_token: string
+    refresh_token: string
+}
+
+// Domain 
+
+type TokensResult = {
+    idToken: string
+    accessToken: string
+    refreshToken: string
+}
+
+let mapResponse f x = ReaderTask.map(str2json >> f) x
+
+//
+
+let mapUserIdResponse = mapResponse(fun x -> x.user_id)
 
 // create user
 
-type CreateUserInfo = {
-    userId: string
-    orgId: string
-    name: string
-    email: string
-    password: string
-    avatar: string
-    role: string
-}
+let createUser' userInfo (f: HttpRequest) = (f <!> createUser userInfo) |> mapUserIdResponse
 
-type CreateUser = CreateUserInfo -> API
-let createUser: CreateUser = fun userInfo env -> 
-    {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/api/v2/users" (env.clientDomain)
-        payload = JsonPayload userInfo
-        headers = []
-        queryString = []
-    }
-
+let createUser = createUser' >> flat
+   
 // get user
 
-type GetUser = string -> API
-let getUser: GetUser = fun token env -> 
+let getUser token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
+
+// user tokens 
+
+let mapTokensResponse x = x |> mapResponse(fun x -> 
     {
-        httpMethod = GET
-        url = sprintf "https://%s.auth0.com/api/v2/users?fields=user_id" (env.clientDomain)
-        payload = None
-        headers = ["authorization", token]
-        queryString = []
-    }
+        idToken = x.id_token
+        accessToken = x.access_token
+        refreshToken = x.refresh_token
+    })
 
-// get management token
+let getUserTokens' token (f: HttpRequest) = (f <!> getUserTokens token) |> mapTokensResponse
 
-let getManagementToken: API = fun env -> 
-    {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
-        payload = FormPayload  [
-                    "audience", sprintf "https://%s.auth0.com/api/v2/" env.clientDomain
-                    "grant_type", "client_credentials"
-                    "client_id", env.clientId
-                    "client_secret", env.clientSecret
-                ]
-        headers = []
-        queryString = []
-    }
-
-// remove user
-
-type RemoveUser = string -> string -> API
-let removeUser: RemoveUser = fun token userId env -> 
-    {
-        httpMethod = DELETE
-        url = sprintf "https://%s.auth0.com/api/v2/users/%s" env.clientDomain userId
-        payload = None
-        headers = ["authorization", token]
-        queryString = []
-    }
-
-// user token
-
-// https://auth0.com/docs/api/authentication#authorization-code
-// https://auth0.com/docs/api-auth/tutorials/adoption/api-tokens
-// https://auth0.com/docs/tokens/access-token
-// If the audience is set to the unique identifier of a custom API, then the Access Token will be a JSON Web Token (JWT).
-// https://auth0.com/docs/api-auth/tutorials/verify-access-token
-
-// https://community.auth0.com/questions/4367/how-to-obtain-user-jwt-token-from-usernamepassword
-// Cleint grant-type password must be on for the client
-// https://auth0.com/docs/clients/client-grant-types
-
-// In order ro retrieve user_metadata, use custom claims + rules
-// https://auth0.com/docs/api-auth/tutorials/adoption/scope-custom-claims
-// https://auth0.com/docs/rules/current
-(*
-    //Add attributes to the idToken	
-    function (user, context, callback) {
-        var namespace = 'https://doer.auth.com/';
-        user.user_metadata = user.user_metadata || {};
-        context.idToken[namespace + 'name'] = user.user_metadata.name;
-        context.idToken[namespace + 'avatar'] = user.user_metadata.avatar;
-        callback(null, user, context);
-    }
-*)
-(*
-    //Add attributes to the accessToken
-    function (user, context, callback) {
-        var namespace = 'https://doer.auth.com/';
-        user.app_metadata = user.app_metadata || {};
-        context.accessToken[namespace + 'orgId'] = user.app_metadata.orgId;
-        context.accessToken[namespace + 'role'] = user.app_metadata.role;
-        callback(null, user, context);
-    }
-*)
-
-type GetUserTokens = CreateUserInfo -> API
-let getUserTokens: GetUserTokens = fun userInfo env -> 
-    {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
-        payload = FormPayload 
-            [
-                "username", userInfo.email
-                "password", userInfo.password
-                "grant_type", "password"
-                "client_id", env.clientId
-                "client_secret", env.clientSecret
-                "audience", env.audience
-                "scope", "openid profile"
-            ]
-        headers = []
-        queryString = []
-    }
+let getUserTokens = getUserTokens' >> flat
 
 // register user
+
+//open ReaderTask
+
+type RegisterUserResult = {
+    userId: string
+    tokens: TokensResult
+}
+
+let registerUser userInfo =    
+    readerTask {
+        let! userId = createUser userInfo
+        let! tokens = getUserTokens userInfo
+        return { userId = userId; tokens = tokens }
+    }
+    
+
