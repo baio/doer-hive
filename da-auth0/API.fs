@@ -22,6 +22,11 @@ type TokensResponse = {
     refresh_token: string
 }
 
+type ManagementTokenResponse = {
+    token_type: string
+    access_token: string
+}
+
 // Domain 
 
 type TokensResult = {
@@ -32,19 +37,35 @@ type TokensResult = {
 
 let mapResponse f x = ReaderTask.map(str2json >> f) x
 
+// get management token
+
+let mapManagementTokenResponse = mapResponse(fun x -> 
+        x.token_type + " " + x.access_token
+    )
+
+let getManagementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagementTokenResponse
+
+let getManagementToken = getManagementToken' |> flat
+
+
 //
 
 let mapUserIdResponse = mapResponse(fun x -> x.user_id)
 
 // create user
 
-let createUser' userInfo (f: HttpRequest) = (f <!> createUser userInfo) |> mapUserIdResponse
+let createUser' userInfo token (f: HttpRequest) = (f <!> createUser userInfo token) |> mapUserIdResponse
 
-let createUser = createUser' >> flat
-   
+let createUserWithToken userInfo token = createUser' userInfo token |> flat
+
+let createUser userInfo = getManagementToken |> ReaderTask.bind (createUserWithToken userInfo)
+    
 // get user
 
-let getUser token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
+let getUser' token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
+
+let getUser = getUser' >> flat
+
 
 // user tokens 
 
@@ -61,8 +82,6 @@ let getUserTokens = getUserTokens' >> flat
 
 // register user
 
-//open ReaderTask
-
 type RegisterUserResult = {
     userId: string
     tokens: TokensResult
@@ -73,6 +92,10 @@ let registerUser userInfo =
         let! userId = createUser userInfo
         let! tokens = getUserTokens userInfo
         return { userId = userId; tokens = tokens }
-    }
-    
+    }    
 
+// remove user
+
+let removeUser' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
+
+let removeUser userId token = removeUser' userId token |> flat

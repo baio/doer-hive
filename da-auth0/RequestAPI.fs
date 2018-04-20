@@ -11,6 +11,25 @@ type RequestAPI = Auth0Reader<Request>
 
 // create user
 
+type UserMetadata = {
+        name: string
+        avatar: string
+    }
+
+type AppMetadata = {
+    role: string
+    orgId: string
+}
+
+type CreateUserPayload = {
+    user_id: string
+    connection: string
+    email: string
+    password: string
+    user_metadata: UserMetadata
+    app_metadata: AppMetadata
+}
+
 type CreateUserInfo = {
     userId: string
     orgId: string
@@ -21,13 +40,30 @@ type CreateUserInfo = {
     role: string
 }
 
-type CreateUser = CreateUserInfo -> RequestAPI
-let createUser: CreateUser = fun userInfo env -> 
+
+type CreateUser = CreateUserInfo -> string -> RequestAPI
+let createUser: CreateUser = fun userInfo token env -> 
     {
         httpMethod = POST
         url = sprintf "https://%s.auth0.com/api/v2/users" (env.clientDomain)
-        payload = JsonPayload userInfo
-        headers = []
+        payload = JsonPayload 
+            {
+                user_id = sprintf "doer|%s" userInfo.userId
+                connection = "Username-Password-Authentication"
+                email = userInfo.email
+                password = userInfo.password
+                user_metadata =  
+                    {
+                        name = userInfo.name
+                        avatar = userInfo.avatar
+                    }
+                app_metadata = 
+                    {
+                        role = sprintf "%O" userInfo.role
+                        orgId = userInfo.orgId                    
+                    }
+            }
+        headers = ["authorization", token]
         queryString = []
     }
 

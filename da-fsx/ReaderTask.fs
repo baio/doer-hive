@@ -33,6 +33,9 @@ let inline mapError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
 /// Infix map
 let inline (<!>) f x = map f x
 
+/// Infix bind
+let inline (>>=) x f = bind f x
+
 type ReaderTaskBuilder() =
 
     member this.Return x = returnM x
