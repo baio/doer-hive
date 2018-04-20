@@ -162,21 +162,3 @@ let getUserTokens: GetUserTokens = fun userInfo env ->
         queryString = []
     }
 
-// register user
-
-(*
-type Funx<'a> = Request -> System.Threading.Tasks.Task<'a>
-
-// let getUser' (f: Funx<'a>) token = getUser token >>= (fun x _ -> f x)
-
-type Extend<'a> = (Reader<Auth0Config, Request> -> Task<'a>) ->  Reader<Auth0Config, Request> -> Reader<Auth0Config, Task<'a>>
-type Contramap<'a> = (Request -> Task<'a>) -> Auth0Reader<Request> -> Auth0Reader<Task<'a>>
-//let contramap: Contramap<_> = fun f t -> t
-    
-//let xxx y token = y |> contramap (fun x -> getUser token)
-
-type APIX<'a> = (Request -> Task<'a>) -> (Auth0Config -> Request) -> (Auth0Config -> Task<'a>)
-
-let apix: APIX<_> = fun f api -> 
-    fun env -> (api env) |> f 
-*)

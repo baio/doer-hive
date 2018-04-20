@@ -88,14 +88,14 @@ type RegisterUserResult = {
     tokens: TokensResult
 }
 
-(*
-let registerUser userInfo =    
+
+let registerUser userInfo token =    
     readerTask {
-        let! userId = createUser userInfo
+        let! userId = createUser userInfo token
         let! tokens = getUserTokens userInfo
         return { userId = userId; tokens = tokens }
     }    
-*)
+
 
 // remove user
 
