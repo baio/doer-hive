@@ -19,3 +19,4 @@ let getConfig2 fileName directory =
     builder.Build()
 
 let getConfig () = getConfig2 None None
+

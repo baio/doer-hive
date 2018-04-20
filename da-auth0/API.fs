@@ -43,10 +43,11 @@ let mapManagementTokenResponse = mapResponse(fun x ->
         x.token_type + " " + x.access_token
     )
 
-let getManagementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagementTokenResponse
+let managementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagementTokenResponse
 
-let getManagementToken = getManagementToken' |> flat
+let managementToken = managementToken' |> flat
 
+let managementTokenMem = Task.memoize(managementToken)
 
 //
 
@@ -56,9 +57,9 @@ let mapUserIdResponse = mapResponse(fun x -> x.user_id)
 
 let createUser' userInfo token (f: HttpRequest) = (f <!> createUser userInfo token) |> mapUserIdResponse
 
-let createUserWithToken userInfo token = createUser' userInfo token |> flat
+let createUser userInfo token = createUser' userInfo token |> flat
 
-let createUser userInfo = getManagementToken |> ReaderTask.bind (createUserWithToken userInfo)
+// let createUser userInfo = getManagementToken |> ReaderTask.bind (createUserWithToken userInfo)
     
 // get user
 
@@ -87,12 +88,14 @@ type RegisterUserResult = {
     tokens: TokensResult
 }
 
+(*
 let registerUser userInfo =    
     readerTask {
         let! userId = createUser userInfo
         let! tokens = getUserTokens userInfo
         return { userId = userId; tokens = tokens }
     }    
+*)
 
 // remove user
 

@@ -90,3 +90,8 @@ let getConfig azureKeyVaultConfigName secretNames =
     // collect all found
     List.append v4 <!> getConfig2 azureKeyVaultConfigName n5    
 
+
+let getConfigSync azureKeyVaultConfigName secretNames = 
+    let task = getConfig azureKeyVaultConfigName secretNames
+    task.Wait()
+    task.Result
