@@ -9,6 +9,7 @@ open FSharpx.Task
 open FSharpx.Reader
 open DA.FSX.HttpTask
 open DA.Auth0.RequestAPI
+open DA.Auth.Domain
 
 type HttpRequest = Request -> Task<string>
 
@@ -29,11 +30,6 @@ type ManagementTokenResponse = {
 
 // Domain 
 
-type TokensResult = {
-    idToken: string
-    accessToken: string
-    refreshToken: string
-}
 
 let mapResponse f x = ReaderTask.map(str2json >> f) x
 

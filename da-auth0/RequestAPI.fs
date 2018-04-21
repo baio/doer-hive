@@ -4,7 +4,7 @@ open FSharpx.Task
 open System.Threading.Tasks
 open DA.FSX.HttpTask
 open FSharpx.Reader
-
+open DA.Auth.Domain
 
 type Auth0Reader<'a> = Reader<Auth0Config, 'a>
 type RequestAPI = Auth0Reader<Request>
@@ -30,17 +30,6 @@ type CreateUserPayload = {
     app_metadata: AppMetadata
 }
 
-type CreateUserInfo = {
-    userId: string
-    orgId: string
-    name: string
-    email: string
-    password: string
-    avatar: string
-    role: string
-}
-
-
 type CreateUser = CreateUserInfo -> string -> RequestAPI
 let createUser: CreateUser = fun userInfo token env -> 
     {
@@ -48,19 +37,19 @@ let createUser: CreateUser = fun userInfo token env ->
         url = sprintf "https://%s.auth0.com/api/v2/users" (env.clientDomain)
         payload = JsonPayload 
             {
-                user_id = sprintf "doer|%s" userInfo.userId
+                user_id = sprintf "doer|%s" userInfo.UserId
                 connection = "Username-Password-Authentication"
-                email = userInfo.email
-                password = userInfo.password
+                email = userInfo.Email
+                password = userInfo.Password
                 user_metadata =  
                     {
-                        name = userInfo.name
-                        avatar = userInfo.avatar
+                        name = userInfo.Name
+                        avatar = userInfo.Avatar
                     }
                 app_metadata = 
                     {
-                        role = sprintf "%O" userInfo.role
-                        orgId = userInfo.orgId                    
+                        role = sprintf "%O" userInfo.Role
+                        orgId = userInfo.OrgId                    
                     }
             }
         headers = ["authorization", token]
@@ -150,8 +139,8 @@ let getUserTokens: GetUserTokens = fun userInfo env ->
         url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
         payload = FormPayload 
             [
-                "username", userInfo.email
-                "password", userInfo.password
+                "username", userInfo.Email
+                "password", userInfo.Password
                 "grant_type", "password"
                 "client_id", env.clientId
                 "client_secret", env.clientSecret

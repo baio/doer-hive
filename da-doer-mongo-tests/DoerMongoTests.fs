@@ -5,9 +5,11 @@ open System
 open Xunit
 open FsUnit.Xunit
 open FSharpx.Task
+open DA.DataAccess.Domain
 open DA.Doer.Mongo
-open DA.Doer.Orgs
-open DA.Doer.Users
+open API
+open Orgs
+open Users
 
 // tests for local
 let config = {

@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\da-data-access-domain\da-data-access-domain.fsproj" />
     <ProjectReference Include="..\da-fsx\da-fsx.fsproj" />
   </ItemGroup>
 

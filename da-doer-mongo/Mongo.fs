@@ -1,4 +1,4 @@
-﻿module DA.Doer.Mongo
+﻿module DA.Doer.Mongo.API
 
 open MongoDB.Driver
 open FSharpx.Reader

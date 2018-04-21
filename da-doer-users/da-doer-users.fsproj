@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="API.fs" />
     <Compile Include="RegisterOrg.fs" />
+    <Compile Include="Library.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -15,7 +15,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\da-auth-domain\da-auth-domain.fsproj" />
+    <ProjectReference Include="..\da-auth0\da-auth0.fsproj" />
     <ProjectReference Include="..\da-data-access-domain\da-data-access-domain.fsproj" />
+    <ProjectReference Include="..\da-doer-mongo\da-doer-mongo.fsproj" />
+    <ProjectReference Include="..\da-doer-users-api\da-doer-users-api.fsproj" />
     <ProjectReference Include="..\da-fsx\da-fsx.fsproj" />
   </ItemGroup>
 

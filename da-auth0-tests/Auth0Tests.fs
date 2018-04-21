@@ -18,6 +18,7 @@ open DA.FSX.HttpTask.WebClient
 open DA.Auth0
 open RequestAPI
 open API
+open DA.Auth.Domain
 
 let request = chainWebClient (new WebClient())
 let token = managementTokenMem
@@ -57,13 +58,13 @@ let andRemove f = fun token -> readerTask {
 let ``Create user must work`` () =
     
     let userInfo = {
-        userId = "bd296071-f13f-4023-bf91-885ee0729136"
-        orgId = "5538ee3c-d332-44a5-ae3b-610e8b015326"
-        name = "create user 1"
-        email = "create_user_1@gmail.com"
-        password = "PasLslol123"
-        avatar = "http://avatars.com/1"
-        role = "Owner"
+        UserId = "bd296071-f13f-4023-bf91-885ee0729136"
+        OrgId = "5538ee3c-d332-44a5-ae3b-610e8b015326"
+        Name = "create user 1"
+        Email = "create_user_1@gmail.com"
+        Password = "PasLslol123"
+        Avatar = "http://avatars.com/1"
+        Role = "Owner"
     }
 
     let task = createUser userInfo |> andRemove 
@@ -74,13 +75,13 @@ let ``Create user must work`` () =
 let ``Register user must work`` () =
     
     let userInfo = {
-        userId = "bd296071-f13f-4023-bf91-885ee0729136"
-        orgId = "5538ee3c-d332-44a5-ae3b-610e8b015326"
-        name = "register user 1"
-        email = "regsiter_user_1@gmail.com"
-        password = "PasLslol123"
-        avatar = "http://avatars.com/1"
-        role = "Owner"
+        UserId = "bd296071-f13f-4023-bf91-885ee0729136"
+        OrgId = "5538ee3c-d332-44a5-ae3b-610e8b015326"
+        Name = "register user 1"
+        Email = "regsiter_user_1@gmail.com"
+        Password = "PasLslol123"
+        Avatar = "http://avatars.com/1"
+        Role = "Owner"
     }
 
     let task = (registerUser userInfo >> map(fun x -> x.userId)) |> andRemove

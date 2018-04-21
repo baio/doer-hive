@@ -1,16 +1,13 @@
-﻿module DA.Doer.Orgs
+﻿module DA.Doer.Mongo.Orgs
 
 open MongoDB.Bson
 open DA.FSX
 open FSharpx.Reader
-open DA.Doer.Mongo
+open DA.Doer.Mongo.API
+open DA.DataAccess.Domain
 
 let ORGS_COLLECTION_NAME = "orgs"
 
-type OrgDoc = {    
-    Name: string
-    OwnerEmail: string
-}
     
 type OrgDocIns = { 
     Id: BsonObjectId

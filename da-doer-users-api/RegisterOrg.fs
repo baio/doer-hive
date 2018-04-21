@@ -1,7 +1,9 @@
 ﻿module DA.Doer.Users.RegisterUser.API
 
+open DA.Auth.Domain
 open DA.Doer.Users.API
 open DA.FSX
+open DA.DataAccess.Domain
 
 open ReaderTask
 

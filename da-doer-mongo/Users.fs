@@ -1,26 +1,14 @@
-﻿module DA.Doer.Users
+﻿module DA.Doer.Mongo.Users
 
 open MongoDB.Bson
 open DA.FSX
 open FSharpx.Reader
-open DA.Doer.Mongo
-
+open DA.Doer.Mongo.API
+open DA.DataAccess.Domain
 
 // users
 
 let USERS_COLLECTION_NAME = "users"
-
-type UserDoc = {
-    OrgId: string
-    Role: string
-    FirstName: string
-    MidName: string 
-    LastName: string
-    Email: string
-    Phone: string
-    Ancestors: string seq
-    Avatar: string
-}
 
 
 type UserDocIns = {
