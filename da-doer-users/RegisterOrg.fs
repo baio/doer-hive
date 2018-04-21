@@ -6,11 +6,13 @@ open DA.Doer.Mongo
 open DA.Auth0.API
 open DA.FSX.ReaderTask
 
+let request = DA.FSX.HttpTask.WebClient.chainWebClient (new System.Net.WebClient())
+let token = managementTokenMem
+
 // collide the worlds!
-type RegisterOrgConfig = {
-    mongoConfig: DA.Doer.Mongo.API.MongoConfig
-    authConfig: DA.Auth0.API.HttpRequest * DA.Auth0.Auth0Config
-}
+
+type RegisterOrgConfig = 
+    DA.Doer.Mongo.API.MongoConfig * DA.Auth0.Auth0Config
 
 let getDataAccess config = {
     insertDoc = function
@@ -18,10 +20,10 @@ let getDataAccess config = {
         | Org doc -> Orgs.createOrg doc config            
 }
 
-let getAuth config token = {
-    registerUser = fun userInfo -> registerUser userInfo token config
+let getAuth config = {
+    registerUser = fun userInfo -> (token >>= registerUser userInfo) (request, config)
 }
 
-let registerOrg info token = fun (config: RegisterOrgConfig) ->
-    let context = (getDataAccess config.mongoConfig), (getAuth config.authConfig token)
+let registerOrg info = fun (mongoConfig, authConfig) ->
+    let context = (getDataAccess mongoConfig), (getAuth authConfig)
     (API.registerOrg info) context

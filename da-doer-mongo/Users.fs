@@ -41,5 +41,5 @@ let createInsDoc (doc: UserDoc) =
 
 let createUser doc =    
     let insDoc = createInsDoc doc
-    (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(id.ToString())
+    (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.Id.AsObjectId.ToString())
 

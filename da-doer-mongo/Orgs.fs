@@ -21,5 +21,5 @@ let createInsDoc (doc: OrgDoc) =
 
 let createOrg (doc: OrgDoc) =    
     let insDoc = createInsDoc doc
-    (insert insDoc <!> getCollection ORGS_COLLECTION_NAME) |> ReaderTask.mapc(id.ToString())
+    (insert insDoc <!> getCollection ORGS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.Id.AsObjectId.ToString())
    
