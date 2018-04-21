@@ -1,6 +1,6 @@
 ﻿module DA.Doer.Users.RegisterOrg
 
-open DA.Doer.Users.API
+open DA.Doer.Users
 open DA.Doer.Users.RegisterUser
 open DA.Doer.Mongo
 open DA.Auth0.API
@@ -12,7 +12,7 @@ let token = managementTokenMem
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.API.MongoConfig * DA.Auth0.API.APIConfig
+    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.APIConfig
 
 let getDataAccess config = {
     insertDoc = function

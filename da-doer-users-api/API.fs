@@ -1,4 +1,4 @@
-﻿module DA.Doer.Users.API
+﻿namespace DA.Doer.Users
 
 open DA.FSX.ReaderTask
 open System.Threading.Tasks
