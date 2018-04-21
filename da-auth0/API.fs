@@ -47,6 +47,7 @@ let managementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagem
 
 let managementToken = managementToken' |> flat
 
+// TODO: Use inside
 let managementTokenMem: API<string> = Task.memoize(managementToken)
 
 //

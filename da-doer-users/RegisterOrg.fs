@@ -7,7 +7,6 @@ open DA.Auth0.API
 open DA.FSX.ReaderTask
 
 let request = DA.FSX.HttpTask.WebClient.webClientRequest
-let token = managementTokenMem
 
 // collide the worlds!
 
@@ -21,7 +20,7 @@ let getDataAccess config = {
 }
 
 let getAuth config = {
-    registerUser = fun userInfo -> (token >>= registerUser userInfo) config
+    registerUser = fun userInfo -> (managementTokenMem >>= registerUser userInfo) config
 }
 
 let registerOrg info = fun (mongoConfig, authConfig) ->
