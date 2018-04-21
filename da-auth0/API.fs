@@ -13,6 +13,10 @@ open DA.Auth.Domain
 
 type HttpRequest = Request -> Task<string>
 
+type APIConfig = HttpRequest * Auth0Config
+
+type API<'a> = ReaderTask<APIConfig, 'a>
+
 // Response DTOs
 
 type UserIdResponse = { user_id : string }
@@ -43,7 +47,7 @@ let managementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagem
 
 let managementToken = managementToken' |> flat
 
-let managementTokenMem = Task.memoize(managementToken)
+let managementTokenMem: API<string> = Task.memoize(managementToken)
 
 //
 
@@ -78,12 +82,6 @@ let getUserTokens' token (f: HttpRequest) = (f <!> getUserTokens token) |> mapTo
 let getUserTokens = getUserTokens' >> flat
 
 // register user
-
-type RegisterUserResult = {
-    userId: string
-    tokens: TokensResult
-}
-
 
 let registerUser userInfo token =    
     readerTask {

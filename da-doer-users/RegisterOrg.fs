@@ -3,8 +3,14 @@
 open DA.Doer.Users.API
 open DA.Doer.Users.RegisterUser
 open DA.Doer.Mongo
+open DA.Auth0.API
+open DA.FSX.ReaderTask
 
 // collide the worlds!
+type RegisterOrgConfig = {
+    mongoConfig: DA.Doer.Mongo.API.MongoConfig
+    authConfig: DA.Auth0.API.HttpRequest * DA.Auth0.Auth0Config
+}
 
 let getDataAccess config = {
     insertDoc = function
@@ -12,16 +18,10 @@ let getDataAccess config = {
         | Org doc -> Orgs.createOrg doc config            
 }
 
-//
-
-(*
-open DA.Auth0.API
-
-let getAuth token config = {
-    registerUser = DA.Auth0.API.
+let getAuth config token = {
+    registerUser = fun userInfo -> registerUser userInfo token config
 }
-*)
 
-
-let registerOrg token info = 
-    API.registerOrg info
+let registerOrg info token = fun (config: RegisterOrgConfig) ->
+    let context = (getDataAccess config.mongoConfig), (getAuth config.authConfig token)
+    (API.registerOrg info) context
