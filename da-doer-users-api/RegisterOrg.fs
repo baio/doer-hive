@@ -77,12 +77,19 @@ let insertOrg                : RegOrgApi<string> =             insertOrg' |> Rea
 let insertUser   orgId       : RegOrgApi<string> =             insertUser' orgId |> Reader.flat
 
 let registerUser orgId userId: RegOrgApi<RegisterUserResult> = registerUser' userId orgId |> Reader.flat
+
+type RegisterOrgResult = {
+    userId: string
+    orgId: string
+    authUserId: string
+    tokens: TokensResult
+}
         
-let registerOrg (info: RegisterOrgInfo): API<RegisterUserResult> = fun x ->
+let registerOrg (info: RegisterOrgInfo): API<RegisterOrgResult> = fun x ->
     (readerTask {
         let! orgId  = insertOrg
         let! userId = insertUser   orgId
         let! result = registerUser orgId userId
-        return result
+        return { orgId = orgId; userId = userId; authUserId = result.userId; tokens = result.tokens }
     }) (info, x)
     

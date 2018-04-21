@@ -2,9 +2,17 @@ module UsersTests
 
 open System
 open Xunit
+
+
 open DA.Auth0
 open DA.Doer.Mongo.API
 open DA.Doer.Users.RegisterUser.API
+open DA.Doer.Mongo
+open DA.Auth0
+open FSharpx.Task
+open DA.FSX.ReaderTask
+
+let request = DA.FSX.HttpTask.WebClient.webClientRequest
 
 let getConfig () = 
     [
@@ -29,6 +37,16 @@ let mongoConfig = {
     dbName = "local"
 }
 
+let andRemove result (mongo: MongoConfig, auth: DA.Auth0.API.APIConfig) = 
+    [
+        Orgs.removeOrg result.orgId mongo
+        Users.removeUser result.userId mongo       
+        ((API.managementTokenMem >>= API.removeUser result.authUserId) *> returnM "ok") auth
+    ]
+    |> Seq.map(fun x -> (fun () -> x))
+    |> Parallel
+
+
 [<Fact>]
 let ``Register org must work`` () =
     
@@ -49,4 +67,4 @@ let ``Register org must work`` () =
             Password = "LastPas123"
         }
 
-    (DA.Doer.Users.RegisterOrg.registerOrg user) (mongoConfig, authConfig)
+    (DA.Doer.Users.RegisterOrg.registerOrg user >>= andRemove) (mongoConfig, (request, authConfig))

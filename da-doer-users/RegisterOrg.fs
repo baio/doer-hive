@@ -6,13 +6,13 @@ open DA.Doer.Mongo
 open DA.Auth0.API
 open DA.FSX.ReaderTask
 
-let request = DA.FSX.HttpTask.WebClient.chainWebClient (new System.Net.WebClient())
+let request = DA.FSX.HttpTask.WebClient.webClientRequest
 let token = managementTokenMem
 
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.API.MongoConfig * DA.Auth0.Auth0Config
+    DA.Doer.Mongo.API.MongoConfig * DA.Auth0.API.APIConfig
 
 let getDataAccess config = {
     insertDoc = function
@@ -21,7 +21,7 @@ let getDataAccess config = {
 }
 
 let getAuth config = {
-    registerUser = fun userInfo -> (token >>= registerUser userInfo) (request, config)
+    registerUser = fun userInfo -> (token >>= registerUser userInfo) config
 }
 
 let registerOrg info = fun (mongoConfig, authConfig) ->

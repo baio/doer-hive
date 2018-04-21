@@ -43,3 +43,5 @@ let createUser doc =
     let insDoc = createInsDoc doc
     (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.Id.AsObjectId.ToString())
 
+let removeUser (id: string) =    
+    (remove id <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(id)

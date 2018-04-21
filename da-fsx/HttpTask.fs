@@ -107,4 +107,6 @@ module WebClient =
             upload webClient request
                 
     let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
+
+    let webClientRequest = chainWebClient (new WebClient())
     

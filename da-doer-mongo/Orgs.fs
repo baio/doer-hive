@@ -23,3 +23,6 @@ let createOrg (doc: OrgDoc) =
     let insDoc = createInsDoc doc
     (insert insDoc <!> getCollection ORGS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.Id.AsObjectId.ToString())
    
+let removeOrg (id: string) =    
+    (remove id <!> getCollection ORGS_COLLECTION_NAME) |> ReaderTask.mapc(id)
+   

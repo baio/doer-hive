@@ -38,6 +38,22 @@ let inline (<!>) f x = map f x
 /// Infix bind
 let inline (>>=) x f = bind f x
 
+/// infix ap
+let inline lift2 f a b = 
+    a >>= fun aa -> b >>= fun bb -> f aa bb |> returnM
+
+/// Sequential application
+let inline ap x f = lift2 id f x
+
+/// Sequential application
+let inline (<*>) f x = ap x f
+
+let inline ( <*) a b = lift2 (fun z _ -> z) a b
+
+let inline ( *>) a b = lift2 (fun _ z -> z) a b
+
+let inline (!>) a b = a *> returnM b
+
 type ReaderTaskBuilder() =
 
     member this.Return x = returnM x

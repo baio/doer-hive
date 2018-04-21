@@ -4,18 +4,21 @@ module DoerMongoTests
 open System
 open Xunit
 open FsUnit.Xunit
-open FSharpx.Task
 open DA.DataAccess.Domain
 open DA.Doer.Mongo
 open API
 open Orgs
 open Users
+open FSharpx.Task
+open DA.FSX.ReaderTask
+
 
 // tests for local
 let config = {
     connection = "mongodb://localhost"
     dbName = "local"
 }
+    
 
 [<Fact>]
 let ``Create org must work`` () =
@@ -28,7 +31,7 @@ let ``Create org must work`` () =
     
     let assert' = should not' Empty
 
-    assert' <!> (createOrg org) config
+    (assert' <!> (createOrg org >>= removeOrg)) config
 
 [<Fact>]
 let ``Create user must work`` () =
@@ -48,4 +51,4 @@ let ``Create user must work`` () =
     
     let assert' = should not' Empty
 
-    assert' <!> (createUser user) config
+    (assert' <!> (createUser user >>= removeUser)) config
