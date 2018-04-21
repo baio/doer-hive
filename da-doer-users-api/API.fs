@@ -56,4 +56,4 @@ type Auth = {
 }
 
 
-type Api<'a> = ReaderTask<DataAccess * Auth, 'a>
+type API<'a> = ReaderTask<DataAccess * Auth, 'a>

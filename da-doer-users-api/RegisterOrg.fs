@@ -1,4 +1,4 @@
-﻿module DA.Doer.Users.RegisterUser
+﻿module DA.Doer.Users.RegisterUser.API
 
 open DA.Doer.Users.API
 open DA.FSX
@@ -76,7 +76,7 @@ let insertUser   orgId       : RegOrgApi<string> =             insertUser' orgId
 
 let registerUser orgId userId: RegOrgApi<RegisterUserResult> = registerUser' userId orgId |> Reader.flat
         
-let registerOrg (info: RegisterOrgInfo): Api<RegisterUserResult> = fun x ->
+let registerOrg (info: RegisterOrgInfo): API<RegisterUserResult> = fun x ->
     (readerTask {
         let! orgId  = insertOrg
         let! userId = insertUser   orgId
