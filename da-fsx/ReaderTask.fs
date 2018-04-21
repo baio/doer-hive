@@ -15,6 +15,8 @@ let inline returnM x: ReaderTask<_, _> =
 let inline map f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     FSharpx.Reader.map (map f) m
 
+let inline mapc x = map(fun _ -> x)
+
 let inline bind f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     fun env ->
         bind (fun a -> (f a) env) (m env)

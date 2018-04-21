@@ -8,9 +8,13 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "da-fsx-tests", "da-fsx-test
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "da-auth0", "da-auth0\da-auth0.fsproj", "{F2F12CF4-8204-4596-B489-E367F210CAEB}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "da-auth0-tests", "da-auth0-tests\da-auth0-tests.fsproj", "{09DBF0EE-A925-44CA-8E6F-DC687A8DDE5C}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "da-auth0-tests", "da-auth0-tests\da-auth0-tests.fsproj", "{09DBF0EE-A925-44CA-8E6F-DC687A8DDE5C}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "da-config", "da-config\da-config.fsproj", "{849D5D5B-238F-4AE8-B31D-3ED252C1A543}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "da-config", "da-config\da-config.fsproj", "{849D5D5B-238F-4AE8-B31D-3ED252C1A543}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "da-doer-mongo", "da-doer-mongo\da-doer-mongo.fsproj", "{5D202F9A-6636-4FF7-870F-917901B151C5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "da-doer-mongo-tests", "da-doer-mongo-tests\da-doer-mongo-tests.fsproj", "{855DB2C4-9C25-47FE-8535-1560004EA06B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -82,6 +86,30 @@ Global
 		{849D5D5B-238F-4AE8-B31D-3ED252C1A543}.Release|x64.Build.0 = Release|Any CPU
 		{849D5D5B-238F-4AE8-B31D-3ED252C1A543}.Release|x86.ActiveCfg = Release|Any CPU
 		{849D5D5B-238F-4AE8-B31D-3ED252C1A543}.Release|x86.Build.0 = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|x64.Build.0 = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Debug|x86.Build.0 = Debug|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|x64.ActiveCfg = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|x64.Build.0 = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|x86.ActiveCfg = Release|Any CPU
+		{5D202F9A-6636-4FF7-870F-917901B151C5}.Release|x86.Build.0 = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|x64.Build.0 = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Debug|x86.Build.0 = Debug|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|x64.ActiveCfg = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|x64.Build.0 = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|x86.ActiveCfg = Release|Any CPU
+		{855DB2C4-9C25-47FE-8535-1560004EA06B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
