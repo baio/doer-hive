@@ -1,9 +1,9 @@
 ﻿module DA.Doer.Users.RegisterOrg
 
+
 open DA.Doer.Users
-open DA.Doer.Users.RegisterUser
 open DA.Doer.Mongo
-open DA.Auth0.API
+open DA.Auth0
 open DA.FSX.ReaderTask
 
 let request = DA.FSX.HttpTask.WebClient.webClientRequest
@@ -11,7 +11,7 @@ let request = DA.FSX.HttpTask.WebClient.webClientRequest
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.APIConfig
+    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig
 
 let getDataAccess config = {
     insertDoc = function
@@ -25,4 +25,4 @@ let getAuth config = {
 
 let registerOrg info = fun (mongoConfig, authConfig) ->
     let context = (getDataAccess mongoConfig), (getAuth authConfig)
-    (API.registerOrg info) context
+    (registerOrg info) context

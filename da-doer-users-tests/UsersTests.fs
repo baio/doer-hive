@@ -5,12 +5,11 @@ open Xunit
 
 
 open DA.Auth0
-open DA.Doer.Mongo.API
-open DA.Doer.Users.RegisterUser.API
+
 open DA.Doer.Mongo
-open DA.Auth0
 open FSharpx.Task
 open DA.FSX.ReaderTask
+open DA.Doer.Users
 
 let request = DA.FSX.HttpTask.WebClient.webClientRequest
 
@@ -37,7 +36,7 @@ let mongoConfig = {
     dbName = "local"
 }
 
-let andRemove result (mongo: MongoConfig, auth: DA.Auth0.API.APIConfig) = 
+let andRemove result (mongo: MongoConfig, auth: Auth0APIConfig) = 
     [
         Orgs.removeOrg result.orgId mongo
         Users.removeUser result.userId mongo       
@@ -67,4 +66,4 @@ let ``Register org must work`` () =
             Password = "LastPas123"
         }
 
-    (DA.Doer.Users.RegisterOrg.registerOrg user >>= andRemove) (mongoConfig, (request, authConfig))
+    (RegisterOrg.registerOrg user >>= andRemove) (mongoConfig, (request, authConfig))

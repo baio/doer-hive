@@ -4,23 +4,14 @@ open System
 open Xunit
 
 
-open System
-open System.Threading.Tasks
-open Xunit
 open FsUnit.Xunit
-open FSharpx.Task
 
-open System.Net
-
-open DA.FSX
 open DA.FSX.ReaderTask
 open DA.FSX.HttpTask.WebClient
 open DA.Auth0
-open RequestAPI
-open API
 open DA.Auth.Domain
 
-let request = chainWebClient (new WebClient())
+let request = webClientRequest
 let token = managementTokenMem
 
 // config

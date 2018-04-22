@@ -1,11 +1,12 @@
-﻿module DA.Auth0.API
+﻿[<AutoOpen>]
+module DA.Auth0.API
 
+open DA.Auth0
 open DA.FSX
 open System.Threading.Tasks
 
 open DA.FSX.ReaderTask
 open DA.FSX.Reader
-open FSharpx.Task
 open FSharpx.Reader
 open DA.FSX.HttpTask
 open DA.Auth0.RequestAPI
@@ -13,9 +14,9 @@ open DA.Auth.Domain
 
 type HttpRequest = Request -> Task<string>
 
-type APIConfig = HttpRequest * Auth0Config
+type Auth0APIConfig = HttpRequest * Auth0Config
 
-type API<'a> = ReaderTask<APIConfig, 'a>
+type API<'a> = ReaderTask<Auth0APIConfig, 'a>
 
 // Response DTOs
 

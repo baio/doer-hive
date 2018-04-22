@@ -6,10 +6,6 @@ open Xunit
 open FsUnit.Xunit
 open DA.DataAccess.Domain
 open DA.Doer.Mongo
-open API
-open Orgs
-open Users
-open FSharpx.Task
 open DA.FSX.ReaderTask
 
 

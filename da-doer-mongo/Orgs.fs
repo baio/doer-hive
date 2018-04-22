@@ -1,4 +1,5 @@
-﻿module DA.Doer.Mongo.Orgs
+﻿[<AutoOpen>]
+module DA.Doer.Mongo.Orgs
 
 open MongoDB.Bson
 open DA.FSX

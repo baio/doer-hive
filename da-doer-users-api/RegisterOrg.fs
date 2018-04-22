@@ -1,4 +1,5 @@
-﻿module DA.Doer.Users.RegisterUser.API
+﻿[<AutoOpen>]
+module DA.Doer.Users.RegisterOrg
 
 open DA.Auth.Domain
 open DA.Doer.Users
