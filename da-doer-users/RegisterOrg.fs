@@ -20,7 +20,7 @@ let getDataAccess config = {
 }
 
 let getAuth config = {
-    registerUser = fun userInfo -> (managementTokenMem >>= registerUser userInfo) config
+    registerUser = fun userInfo -> registerUser userInfo config
 }
 
 let registerOrg info = fun (mongoConfig, authConfig) ->

@@ -48,27 +48,29 @@ let managementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagem
 
 let managementToken = managementToken' |> flat
 
-// TODO: Use inside
 let managementTokenMem: API<string> = Task.memoize(managementToken)
 
 //
 
 let mapUserIdResponse = mapResponse(fun x -> x.user_id)
 
+let inline withToken f = managementTokenMem |> ReaderTask.bind f
+
 // create user
 
-let createUser' userInfo token (f: HttpRequest) = (f <!> createUser userInfo token) |> mapUserIdResponse
+let createUser'' userInfo token (f: HttpRequest) = (f <!> createUser userInfo token) |> mapUserIdResponse
 
-let createUser userInfo token = createUser' userInfo token |> flat
+let createUser' userInfo token = createUser'' userInfo token |> flat
+
+let createUser = createUser' >> withToken 
 
 // let createUser userInfo = getManagementToken |> ReaderTask.bind (createUserWithToken userInfo)
     
-// get user
+// get user (by user token ?)
 
 let getUser' token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
 
 let getUser = getUser' >> flat
-
 
 // user tokens 
 
@@ -79,22 +81,23 @@ let mapTokensResponse x = x |> mapResponse(fun x ->
         refreshToken = x.refresh_token
     })
 
-let getUserTokens' token (f: HttpRequest) = (f <!> getUserTokens token) |> mapTokensResponse
+let getUserTokens'' userInfo (f: HttpRequest) = (f <!> getUserTokens userInfo) |> mapTokensResponse
 
-let getUserTokens = getUserTokens' >> flat
+let getUserTokens = getUserTokens'' >> flat
 
 // register user
 
-let registerUser userInfo token =    
+let registerUser userInfo =    
     readerTask {
-        let! userId = createUser userInfo token
+        let! userId = createUser userInfo
         let! tokens = getUserTokens userInfo
         return { userId = userId; tokens = tokens }
     }    
 
-
 // remove user
 
-let removeUser' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
+let removeUser'' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
 
-let removeUser userId token = removeUser' userId token |> flat
+let removeUser' userId token = removeUser'' userId token |> flat
+
+let removeUser = removeUser' >> withToken

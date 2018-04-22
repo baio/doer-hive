@@ -40,7 +40,7 @@ let andRemove result (mongo: MongoConfig, auth: Auth0APIConfig) =
     [
         Orgs.removeOrg result.orgId mongo
         Users.removeUser result.userId mongo       
-        ((API.managementTokenMem >>= API.removeUser result.authUserId) *> returnM "ok") auth
+        (API.removeUser result.authUserId *> returnM "ok") auth
     ]
     |> Seq.map(fun x -> (fun () -> x))
     |> Parallel

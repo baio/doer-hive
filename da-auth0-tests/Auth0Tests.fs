@@ -12,7 +12,6 @@ open DA.Auth0
 open DA.Auth.Domain
 
 let request = webClientRequest
-let token = managementTokenMem
 
 // config
 
@@ -38,10 +37,10 @@ let auth0Config = getConfig()
 
 let context = request, auth0Config
 
-let andRemove f = fun token -> readerTask {
-        let! userId = f token
+let andRemove f = readerTask {
+        let! userId = f 
         userId |> should not' Empty 
-        let! removeResult = removeUser userId token
+        let! removeResult = removeUser userId
         removeResult |> should equal true
     }
 
@@ -60,7 +59,7 @@ let ``Create user must work`` () =
 
     let task = createUser userInfo |> andRemove 
 
-    (token >>= task) context
+    task context
 
 [<Fact>]
 let ``Register user must work`` () =
@@ -75,6 +74,6 @@ let ``Register user must work`` () =
         Role = "Owner"
     }
 
-    let task = (registerUser userInfo >> map(fun x -> x.userId)) |> andRemove
+    let task = ((fun x -> x.userId) <!> registerUser userInfo) |> andRemove
 
-    (token >>= task) context
+    task context
