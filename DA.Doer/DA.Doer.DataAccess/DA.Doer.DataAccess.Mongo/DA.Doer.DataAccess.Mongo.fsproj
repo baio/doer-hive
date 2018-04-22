@@ -16,8 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-data-access-domain\DA.Doer.DataAccess.Domain.fsproj" />
-    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
+    <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.Doer.DataAccess.Domain\DA.Doer.DataAccess.Domain.fsproj" />
   </ItemGroup>
 
 </Project>

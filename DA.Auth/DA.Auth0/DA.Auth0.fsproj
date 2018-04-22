@@ -5,8 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Auth0.fs" />
+    <Compile Include="RequestAPI.fs" />
     <Compile Include="API.fs" />
-    <Compile Include="RegisterOrg.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -14,9 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-auth-domain\DA.Auth.Domain.fsproj" />
-    <ProjectReference Include="..\da-data-access-domain\DA.Doer.DataAccess.Domain.fsproj" />
-    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
+    <ProjectReference Include="..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.Auth.Domain\DA.Auth.Domain.fsproj" />
   </ItemGroup>
 
 </Project>

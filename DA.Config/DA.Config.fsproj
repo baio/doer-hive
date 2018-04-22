@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.FSX\DA.FSX.fsproj" />
   </ItemGroup>
 
 </Project>

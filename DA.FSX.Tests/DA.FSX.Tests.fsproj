@@ -7,7 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="DoerMongoTests.fs" />
+    <Compile Include="HttpTaskTests.fs" />
+    <Compile Include="ReaderTaskTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -17,11 +18,12 @@
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-doer-mongo\DA.Doer.DataAccess.Mongo.fsproj" />
-    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.Auth\DA.Auth0\DA.Auth0.fsproj" />
+    <ProjectReference Include="..\DA.FSX\DA.FSX.fsproj" />
   </ItemGroup>
 
 </Project>

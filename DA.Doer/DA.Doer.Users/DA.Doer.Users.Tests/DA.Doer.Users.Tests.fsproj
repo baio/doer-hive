@@ -7,13 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Auth0Tests.fs" />
+    <Compile Include="UsersTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
-    <PackageReference Include="FsUnit.xUnit" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
@@ -21,10 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-auth-domain\DA.Auth.Domain.fsproj" />
-    <ProjectReference Include="..\da-auth0\DA.Auth0.fsproj" />
-    <ProjectReference Include="..\da-config\DA.Config.fsproj" />
-    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
+    <ProjectReference Include="..\..\..\DA.Auth\DA.Auth0\DA.Auth0.fsproj" />
+    <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
+    <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\..\DA.Doer.DataAccess\DA.Doer.DataAccess.Mongo\DA.Doer.DataAccess.Mongo.fsproj" />
+    <ProjectReference Include="..\DA.Doer.Users\DA.Doer.Users.fsproj" />
   </ItemGroup>
 
 </Project>
