@@ -7,23 +7,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="HttpTaskTests.fs" />
-    <Compile Include="ReaderTaskTests.fs" />
+    <Compile Include="Auth0Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
     <PackageReference Include="FsUnit.xUnit" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-auth0\da-auth0.fsproj" />
-    <ProjectReference Include="..\da-fsx\da-fsx.fsproj" />
+    <ProjectReference Include="..\da-auth-domain\DA.Auth.Domain.fsproj" />
+    <ProjectReference Include="..\da-auth0\DA.Auth0.fsproj" />
+    <ProjectReference Include="..\da-config\DA.Config.fsproj" />
+    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
   </ItemGroup>
 
 </Project>

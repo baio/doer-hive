@@ -20,8 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\da-doer-mongo\da-doer-mongo.fsproj" />
-    <ProjectReference Include="..\da-fsx\da-fsx.fsproj" />
+    <ProjectReference Include="..\da-doer-mongo\DA.Doer.DataAccess.Mongo.fsproj" />
+    <ProjectReference Include="..\da-fsx\DA.FSX.fsproj" />
   </ItemGroup>
 
 </Project>
