@@ -12,14 +12,14 @@ open DA.Doer.Domain.Errors
 open FsUnit.Xunit
 
 [<Fact>]
-let ``Register org from dto must work`` () =
-    
-    let payload =  """ 
+let ``Register org with invalid dto must give correct error`` () =
+
+    let payload =  """
         { "firstName" : 1 }
     """
 
-    let assert' actual = 
-        actual 
+    let assert' actual =
+        actual
         |> should equal
             [
                 "firstName", "NOT_STRING_ERROR"
@@ -29,19 +29,37 @@ let ``Register org from dto must work`` () =
                 "email", "NULL_ERROR"
                 "phone", "NULL_ERROR"
                 "password", "NULL_ERROR"
-            ] 
-    
+            ]
+
     let task = (registerOrgDTO payload) context
 
-    task.ContinueWith(fun (t: Task<_>) -> 
+    task.ContinueWith(fun (t: Task<_>) ->
             Assert.IsType<AggregateException>(t.Exception) |> ignore
             Assert.IsType<ValidationException>(t.Exception.InnerException) |> ignore
             assert' (t.Exception.InnerException :?> ValidationException).errors
             0
         )
 
+[<Fact>]
+let ``Register org with correct dto must work`` () =
+
+    let payload =  """
+        {
+            "firstName" : "first",
+            "lastName" : "last",
+            "middleName" : "mid",
+            "orgName" : "first",
+            "email" : "dto_registered@gmail.com",
+            "phone" : "+777777777",
+            "password" : "LastPas123"
+        }
+    """
+
+    (registerOrgDTO payload >>= andRemove) context
 
 
 
 
-    
+
+
+

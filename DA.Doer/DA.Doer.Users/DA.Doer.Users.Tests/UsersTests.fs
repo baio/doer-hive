@@ -11,7 +11,7 @@ open Setup
 
 [<Fact>]
 let ``Register org must work`` () =
-    
+
     let user =  {
             User = {
                 Name = {
@@ -30,4 +30,6 @@ let ``Register org must work`` () =
         }
 
     (RegisterOrg.registerOrg user >>= andRemove) context
+
+
 

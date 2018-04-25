@@ -18,7 +18,7 @@ type RegisterOrgInfoDTO =
         email: obj
         phone: obj
         avatar: obj
-        passord: obj
+        password: obj
     }
 
 let private mapPayload (user: RegisterOrgInfoDTO): RegisterOrgInfo  = 
@@ -36,7 +36,7 @@ let private mapPayload (user: RegisterOrgInfoDTO): RegisterOrgInfo  =
         Org = {
             Name = user.orgName :?> string
         }
-        Password = user.passord :?> string
+        Password = user.password :?> string
     }
 
 let fromPayload = 
@@ -48,7 +48,7 @@ let fromPayload =
         "email", fun x ->  x.email |> isEmail
         "phone", fun x ->  x.phone |> isPhone
         "avatar", fun x ->  (x.avatar |> isNull') <|> (x.avatar |> isUrl)
-        "password", fun x ->  x.passord |> isPassword
+        "password", fun x ->  x.password |> isPassword
     ]
     |> validatePayload mapPayload
 
