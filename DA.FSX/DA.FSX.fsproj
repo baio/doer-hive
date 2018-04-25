@@ -8,6 +8,7 @@
     <Compile Include="ReaderTask.fs" />
     <Compile Include="HttpTask.fs" />
     <Compile Include="Memoize.fs" />
+    <Compile Include="ValidationResult.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.0.0-beta3" />

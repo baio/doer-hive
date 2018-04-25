@@ -26,6 +26,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DA.FSX", "DA.FSX\DA.FSX.fsp
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DA.FSX.Tests", "DA.FSX.Tests\DA.FSX.Tests.fsproj", "{847C96A0-C437-417D-AE55-F56B2892EBC7}"
 EndProject
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DA.Doer.Domain", "DA.Doer\DA.Doer.Domain\DA.Doer.Domain.fsproj", "{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -80,6 +82,10 @@ Global
 		{847C96A0-C437-417D-AE55-F56B2892EBC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{847C96A0-C437-417D-AE55-F56B2892EBC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{847C96A0-C437-417D-AE55-F56B2892EBC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

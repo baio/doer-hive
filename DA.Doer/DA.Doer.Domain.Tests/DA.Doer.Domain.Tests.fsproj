@@ -7,25 +7,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Users.DTO.Tests.fs" />
-    <Compile Include="UsersTests.fs" />
+    <Compile Include="fsharpx.fs" />
+    <Compile Include="Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FSharpx.Collections" Version="1.17.0" />
+    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
+    <PackageReference Include="FsUnit.xUnit" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\DA.Auth\DA.Auth0\DA.Auth0.fsproj" />
-    <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
-    <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
-    <ProjectReference Include="..\..\DA.Doer.DataAccess\DA.Doer.DataAccess.Mongo\DA.Doer.DataAccess.Mongo.fsproj" />
-    <ProjectReference Include="..\DA.Doer.Users.API\DA.Doer.Users.API.fsproj" />
-    <ProjectReference Include="..\DA.Doer.Users\DA.Doer.Users.fsproj" />
+    <ProjectReference Include="..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.Doer.Domain\DA.Doer.Domain.fsproj" />
   </ItemGroup>
 
 </Project>

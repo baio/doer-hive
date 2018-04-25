@@ -67,3 +67,25 @@ let ``Register org must work`` () =
         }
 
     (RegisterOrg.registerOrg user >>= andRemove) (mongoConfig, (request, authConfig))
+
+[<Fact>]
+let ``Register org from dto must work`` () =
+    
+    let user =  {
+            User = {
+                Name = {
+                    FirstName = "first"
+                    LastName = "last"
+                    MiddleName = "middle"
+                }
+                Phone = "+777777777"
+                Email = "registered-org@email.com"
+                Avatar = "http://avatar.com/1"
+            }
+            Org = {
+                Name = "org"
+            }
+            Password = "LastPas123"
+        }
+
+    (RegisterOrg.registerOrg user >>= andRemove) (mongoConfig, (request, authConfig))

@@ -7,16 +7,19 @@
   <ItemGroup>
     <Compile Include="API.fs" />
     <Compile Include="RegisterOrg.fs" />
+    <Compile Include="RegisterOrgDTO.fs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\DA.Auth\DA.Auth.Domain\DA.Auth.Domain.fsproj" />
     <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
     <ProjectReference Include="..\..\DA.Doer.DataAccess\DA.Doer.DataAccess.Domain\DA.Doer.DataAccess.Domain.fsproj" />
+    <ProjectReference Include="..\..\DA.Doer.Domain\DA.Doer.Domain.fsproj" />
   </ItemGroup>
 
 </Project>

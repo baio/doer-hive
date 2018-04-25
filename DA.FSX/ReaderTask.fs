@@ -29,6 +29,8 @@ let inline ofTask t = FSharpx.Reader.returnM t
 
 let inline ofException (ex): ReaderTask<_, _> = ex |> Task.FromException<_> |> ofTask
 
+let ofResult x = x|> Task.ofResult |> ofTask
+
 let inline mapError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     FSharpx.Reader.map (mapError f) m
 

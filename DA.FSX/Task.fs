@@ -1,5 +1,8 @@
 module DA.FSX.Task
 
+let ofResult<'a, 'b when 'b :> System.Exception > (result: Result<'a, 'b>) = 
+    match result with Ok x -> FSharpx.Task.returnM x | Error e -> raise e
+
 open System.Threading.Tasks
 open FSharpx.Task
 open System
