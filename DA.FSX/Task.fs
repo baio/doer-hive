@@ -33,10 +33,9 @@ let mapError f (m: Task<_>) =
 
 // override FSharpx implementation
 let  bind (f: _ -> Task<_>) (x: Task<_>) = 
-    let t = x.ContinueWith(fun (t: Task<_>) -> 
+    x.ContinueWith(fun (t: Task<_>) -> 
         if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else f t.Result 
-    ) 
-    t.Unwrap()
+    ).Unwrap()
 
 let (>>=) x f = bind f x
 

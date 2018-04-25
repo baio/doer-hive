@@ -9,6 +9,7 @@ open Setup
 open System.Threading.Tasks
 open DA.FSX
 open DA.Doer.Domain.Errors
+open FsUnit.Xunit
 
 [<Fact>]
 let ``Register org from dto must work`` () =
@@ -16,16 +17,26 @@ let ``Register org from dto must work`` () =
     let payload =  """ 
         { "firstName" : 1 }
     """
+
+    let assert' actual = 
+        actual 
+        |> should equal
+            [
+                "firstName", "NOT_STRING_ERROR"
+                "lastName", "NULL_ERROR"
+                "middleName", "NULL_ERROR"
+                "orgName", "NULL_ERROR"
+                "email", "NULL_ERROR"
+                "phone", "NULL_ERROR"
+                "password", "NULL_ERROR"
+            ] 
     
     let task = (registerOrgDTO payload) context
 
-    let t = Threading.Tasks.Task.FromException<_> (new Exception "test")
-
-    let task1 = t.ContinueWith(fun (t: Task<_>) -> if t.IsFaulted then raise(t.Exception.InnerException) else t.Result )
-
-    task1.ContinueWith(fun (t: Task<_>) -> 
+    task.ContinueWith(fun (t: Task<_>) -> 
             Assert.IsType<AggregateException>(t.Exception) |> ignore
             Assert.IsType<ValidationException>(t.Exception.InnerException) |> ignore
+            assert' (t.Exception.InnerException :?> ValidationException).errors
             0
         )
 

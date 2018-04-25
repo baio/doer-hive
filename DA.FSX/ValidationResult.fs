@@ -6,6 +6,14 @@ open FSharpx.Functional.Prelude
 // analogoue to  http://fsprojects.github.io/FSharpx.Extras/reference/fsharpx-validation.html
 // but with result and list
 
+let inline alt r = function
+    | Ok x -> Ok x
+    | Error _ -> r
+    
+let inline (<|>) r x = alt r x
+
+let choose x = x |> List.reduce(<|>)
+
 let mapFail x = Result.mapError(fun a -> [a]) x
 
 let mapFailLabeled label x = Result.mapError(fun a -> [label, a]) x

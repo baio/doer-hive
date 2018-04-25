@@ -7,7 +7,6 @@ open DA.Doer.Domain.Validators
 open DA.FSX.ValidationResult
 open DA.FSX
 
-
 let mf = mapFailLabeled
 
 type RegisterOrgInfoDTO =
@@ -48,7 +47,7 @@ let fromPayload =
         "orgName", fun x ->  x.orgName |> isMidStr
         "email", fun x ->  x.email |> isEmail
         "phone", fun x ->  x.phone |> isPhone
-        "avatar", fun x ->  x.avatar |> isUrl
+        "avatar", fun x ->  (x.avatar |> isNull') <|> (x.avatar |> isUrl)
         "password", fun x ->  x.passord |> isPassword
     ]
     |> validatePayload mapPayload
@@ -59,6 +58,6 @@ let registerOrg :(string -> API<_>) =
     fromPayload 
     >> Result.mapError validationException 
     >> ReaderTask.ofResult 
-    // >=> RegisterOrg.registerOrg
+    >=> RegisterOrg.registerOrg
 
 

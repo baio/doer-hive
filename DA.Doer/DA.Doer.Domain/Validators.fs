@@ -14,7 +14,8 @@ let inline (>=>) f1 f2 = fun x -> x |> f1 >>= f2
 //
 let private NULL_ERROR = "NULL_ERROR"
 let notNull (x: obj) = ifElse (isNull >> not) NULL_ERROR x
-    
+let isNull' (x: obj): Result<string, string> = ifElse isNull "NOT_NULL_ERROR" (x :?> string)
+
 let private _isString (x: obj) = match x with | :? String -> true | _ -> false
 let private NOT_STRING_ERROR = "NOT_STRING_ERROR"
 let isString x = ifElse _isString NOT_STRING_ERROR x
@@ -26,6 +27,8 @@ let notNullString: NotNullString = notNull >=> isString >=> (toString >> Ok)
 
 let NOT_EMPTY_ERROR = "NOT_EMPTY_ERROR"
 let notEmpty = ifElse (String.IsNullOrEmpty >> not) NOT_EMPTY_ERROR
+
+
     
 type NotEmptyString<'T> = obj -> Result<'T, string>
 let notEmptyString: NotEmptyString<_> = notNullString >=> notEmpty

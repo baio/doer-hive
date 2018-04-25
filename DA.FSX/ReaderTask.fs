@@ -6,6 +6,7 @@ open Task
 open FSharpx.Reader
 open FSharpx.Task
 open System.Threading.Tasks
+open DA.FSX.Task
 
 type ReaderTask<'e, 'a> = Reader<'e, Task<'a>>
 
@@ -29,7 +30,7 @@ let inline ofTask t = FSharpx.Reader.returnM t
 
 let inline ofException (ex): ReaderTask<_, _> = ex |> Task.FromException<_> |> ofTask
 
-let ofResult x = x|> Task.ofResult |> ofTask
+let ofResult x = x |> ofResult |> ofTask
 
 let inline mapError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     FSharpx.Reader.map (mapError f) m
