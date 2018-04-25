@@ -42,3 +42,12 @@ let traverse f list =
     List.foldBack folder list initState 
 
 let sequence list = traverse id list
+
+type Validator<'a> = string * ('a -> Result<string, string>)
+let validatePayload<'a, 'b> (f: 'a -> 'b) (validators: Validator<'a> list) payload : Result<'b, (string * string) list> = 
+    let x = Newtonsoft.Json.JsonConvert.DeserializeObject<'a>(payload)
+    (fun _ -> f x) <!> 
+        (
+            (validators |> List.map(fun (a, b) -> x |> b  |> mapFailLabeled a))
+            |> sequence
+        )

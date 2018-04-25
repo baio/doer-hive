@@ -40,15 +40,6 @@ let private mapPayload (user: RegisterOrgInfoDTO): RegisterOrgInfo  =
         Password = user.passord :?> string
     }
 
-let mapPayload'<'a, 'b> (f: 'a -> 'b) validators payload = 
-    let x = JsonConvert.DeserializeObject<'a>(payload)
-    (fun _ -> f x) <!> 
-        (
-            (validators |> List.map(fun (a, b) -> x |> b  |> mf a))
-            |> sequence
-        )
-
-
 let fromPayload = 
     [
         "firstName", fun x -> x.firstName |> isMidStr 
@@ -60,32 +51,14 @@ let fromPayload =
         "avatar", fun x ->  x.avatar |> isUrl
         "password", fun x ->  x.passord |> isPassword
     ]
-    |> mapPayload' mapPayload
-
-
-    (*
-    let x = JsonConvert.DeserializeObject<UserOrgDTO>(payload)
-    (fun _ -> mapPayload x) <!> 
-        (
-            [
-                x.firstName |> isMidStr |> mf "firstName"
-                x.lastName |> isMidStr |> mf "lastName"
-                x.middleName |> isMidStr |> mf "middleName"
-                x.orgName |> isMidStr |> mf "orgName"
-                x.email |> isEmail |> mf "email"
-                x.phone |> isPhone |> mf "phone"
-                x.avatar |> isUrl |> mf "avatar"
-                x.passord |> isPassword |> mf "password"
-            ] 
-            |> sequence
-        )
-    *)
+    |> validatePayload mapPayload
 
 open ReaderTask
 
-let registerOrg x = 
-    x 
-    |> fromPayload 
-    |> Result.mapError validationException 
-    |> ReaderTask.ofResult
-    >>= RegisterOrg.registerOrg
+let registerOrg :(string -> API<_>) = 
+    fromPayload 
+    >> Result.mapError validationException 
+    >> ReaderTask.ofResult 
+    // >=> RegisterOrg.registerOrg
+
+

@@ -23,6 +23,9 @@ let getAuth config = {
     registerUser = fun userInfo -> registerUser userInfo config
 }
 
-let registerOrg info = fun (mongoConfig, authConfig) ->
-    let context = (getDataAccess mongoConfig), (getAuth authConfig)
-    (registerOrg info) context
+let mapContext = fun (mongoConfig, authConfig) ->
+    (getDataAccess mongoConfig), (getAuth authConfig)
+
+let registerOrg info = mapContext >> registerOrg info
+
+let registerOrgDTO payload = mapContext >> DA.Doer.Users.RegisterOrgDTO.registerOrg payload

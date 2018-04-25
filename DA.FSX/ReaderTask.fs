@@ -2,10 +2,10 @@ module DA.FSX.ReaderTask
 
 // https://github.com/fsprojects/FSharpx.Extras/blob/master/src/FSharpx.Extras/ComputationExpressions/Monad.fs#L542-542
 
+open Task
 open FSharpx.Reader
 open FSharpx.Task
 open System.Threading.Tasks
-open Task
 
 type ReaderTask<'e, 'a> = Reader<'e, Task<'a>>
 
@@ -55,6 +55,8 @@ let inline ( <*) a b = lift2 (fun z _ -> z) a b
 let inline ( *>) a b = lift2 (fun _ z -> z) a b
 
 let inline (!>) a b = a *> returnM b
+
+let inline (>=>) f g = fun x -> f x >>= g
 
 type ReaderTaskBuilder() =
 

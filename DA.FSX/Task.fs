@@ -1,16 +1,26 @@
 module DA.FSX.Task
 
-let ofResult<'a, 'b when 'b :> System.Exception > (result: Result<'a, 'b>) = 
-    match result with Ok x -> FSharpx.Task.returnM x | Error e -> raise e
-
+open System.Threading
 open System.Threading.Tasks
 open FSharpx.Task
-open System
+
+open FSharp.Core
+open System.Threading.Tasks
+open System.Threading.Tasks
 
 // missed helpers for tasks
 
 // type alias to distinguish between System Rersult and Task Result
-type TaskResult<'a> = Result<'a>
+type TaskResult<'a> = FSharpx.Task.Result<'a>
+
+let inline ofException (ex): Task<_> = ex |> Task.FromException<_>
+
+let ofResult<'a, 'b when 'b :> System.Exception > (result: Result<'a, 'b>) = 
+    match result with 
+    Ok x -> 
+        returnM x 
+    | Error e -> 
+        ofException e
 
 let mapError f (m: Task<_>) =
     m.ContinueWith(
@@ -20,6 +30,29 @@ let mapError f (m: Task<_>) =
          else 
             t.Result
     )
+
+// override FSharpx implementation
+let  bind (f: _ -> Task<_>) (x: Task<_>) = 
+    let t = x.ContinueWith(fun (t: Task<_>) -> 
+        if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else f t.Result 
+    ) 
+    t.Unwrap()
+
+let (>>=) x f = bind f x
+
+let (>=>) f g = fun x -> f x >>= g
+
+(*
+let bindError f (m: Task<_>) =
+    m.ContinueWith(
+      fun (t: Task<_>) -> 
+        if t.IsFaulted then            
+            f t.Exception.InnerException
+         else 
+            t.Result
+    )
+*)
+
 
 let memoize f =
 

@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="HttpTaskTests.fs" />
     <Compile Include="ReaderTaskTests.fs" />
+    <Compile Include="TaskTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
