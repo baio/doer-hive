@@ -30,7 +30,7 @@ let ``Register org with invalid dto must give correct error`` () =
                 "password", "NULL_ERROR"
             ]
 
-    let task = (registerOrgDTO payload) context
+    let task = (registerOrgFromBody payload) context
 
     task.ContinueWith(fun (t: Task<_>) ->
             Assert.IsType<AggregateException>(t.Exception) |> ignore
@@ -54,7 +54,7 @@ let ``Register org with correct dto must work`` () =
         }
     """
 
-    (registerOrgDTO payload >>= andRemove) context
+    (registerOrgFromBody payload >>= andRemove) context
 
 
 

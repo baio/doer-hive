@@ -32,6 +32,9 @@ let inline ofException (ex): ReaderTask<_, _> = ex |> Task.FromException<_> |> o
 
 let ofResult x = x |> ofResult |> ofTask
 
+// utility function mostly to read body from azure functions and create reader task immediately
+let ofStream x = x |> IO.readString |> ofTask 
+
 let inline mapError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     FSharpx.Reader.map (mapError f) m
 

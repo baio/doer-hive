@@ -4,6 +4,7 @@
 open DA.Doer.Users
 open DA.Doer.Mongo
 open DA.Auth0
+open DA.Doer.Users.RegisterOrgDTO
 open DA.FSX.ReaderTask
 
 let request = DA.FSX.HttpTask.WebClient.webClientRequest
@@ -28,4 +29,4 @@ let mapContext = fun (mongoConfig, authConfig) ->
 
 let registerOrg info = mapContext >> registerOrg info
 
-let registerOrgDTO payload = mapContext >> DA.Doer.Users.RegisterOrgDTO.registerOrg payload
+let registerOrgFromBody payload = mapContext >> registerOrgFromBody payload

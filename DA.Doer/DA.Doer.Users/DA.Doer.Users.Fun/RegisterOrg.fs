@@ -18,15 +18,14 @@ module Main =
 
     [<FunctionName("register-org")>]
     let run(
-        [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register-org")>]
-        request: HttpRequest,
-        log: ILogger
+            [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register-org")>]
+            request: HttpRequest,
+            log: ILogger
         ) =
             let task = 
                 request.Body 
-                |> IO.readString 
-                |> ofTask 
-                >>= registerOrgDTO 
+                |> ofStream
+                >>= registerOrgFromBody 
                 |> map (fun x ->
                     ContentResult(Content = x.userId, ContentType = "text/html")
                 )

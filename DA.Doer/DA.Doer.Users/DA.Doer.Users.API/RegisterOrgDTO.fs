@@ -54,7 +54,7 @@ let fromPayload =
 
 open ReaderTask
 
-let registerOrg :(string -> API<_>) = 
+let registerOrgFromBody :(string -> API<_>) = 
     fromPayload 
     >> Result.mapError validationException 
     >> ReaderTask.ofResult 

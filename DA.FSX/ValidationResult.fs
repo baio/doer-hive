@@ -1,7 +1,7 @@
 ﻿module DA.FSX.ValidationResult
 
+open System
 open FSharpx.Functional.Prelude
-
 
 // analogoue to  http://fsprojects.github.io/FSharpx.Extras/reference/fsharpx-validation.html
 // but with result and list
@@ -53,9 +53,12 @@ let sequence list = traverse id list
 
 type Validator<'a> = string * ('a -> Result<string, string>)
 let validatePayload<'a, 'b> (f: 'a -> 'b) (validators: Validator<'a> list) payload : Result<'b, (string * string) list> = 
-    let x = Newtonsoft.Json.JsonConvert.DeserializeObject<'a>(payload)
-    (fun _ -> f x) <!> 
-        (
-            (validators |> List.map(fun (a, b) -> x |> b  |> mapFailLabeled a))
-            |> sequence
-        )
+    if String.IsNullOrEmpty payload then
+        Error [ "Body", "EMPTY_BODY" ]
+    else 
+        let x = Newtonsoft.Json.JsonConvert.DeserializeObject<'a>(payload)
+        (fun _ -> f x) <!> 
+            (
+                (validators |> List.map(fun (a, b) -> x |> b  |> mapFailLabeled a))
+                |> sequence
+            )

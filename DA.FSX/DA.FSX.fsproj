@@ -5,9 +5,9 @@
   <ItemGroup>
     <Compile Include="Reader.fs" />
     <Compile Include="Task.fs" />
+    <Compile Include="IO.fs" />
     <Compile Include="ReaderTask.fs" />
     <Compile Include="HttpTask.fs" />
-    <Compile Include="IO.fs" />
     <Compile Include="Memoize.fs" />
     <Compile Include="ValidationResult.fs" />
   </ItemGroup>
