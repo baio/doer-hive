@@ -23,7 +23,6 @@ let ``Register org with invalid dto must give correct error`` () =
             [
                 "firstName", "NOT_STRING_ERROR"
                 "lastName", "NULL_ERROR"
-                "middleName", "NULL_ERROR"
                 "orgName", "NULL_ERROR"
                 "email", "NULL_ERROR"
                 "phone", "NULL_ERROR"
@@ -35,7 +34,7 @@ let ``Register org with invalid dto must give correct error`` () =
     task.ContinueWith(fun (t: Task<_>) ->
             Assert.IsType<AggregateException>(t.Exception) |> ignore
             Assert.IsType<ValidationException>(t.Exception.InnerException) |> ignore
-            assert' (t.Exception.InnerException :?> ValidationException).errors
+            assert' (t.Exception.InnerException :?> ValidationException).Errors
             0
         )
 

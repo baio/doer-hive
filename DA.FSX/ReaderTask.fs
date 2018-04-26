@@ -38,6 +38,10 @@ let ofStream x = x |> IO.readString |> ofTask
 let inline mapError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     FSharpx.Reader.map (mapError f) m
 
+let inline bindError f (m: ReaderTask<_, _>): ReaderTask<_, _> =
+    fun env ->
+        bindError (fun a -> (f a) env) (m env)
+
 /// Infix map
 let inline (<!>) f x = map f x
 

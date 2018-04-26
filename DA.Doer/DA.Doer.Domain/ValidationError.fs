@@ -5,8 +5,8 @@ open System
 type ValidationException(errors: (string * string) list) = 
     inherit Exception("Validation error")
 
-    member this.errors = errors
-
+    member this.Errors = errors
+        
 
 let validationException x = ValidationException x
 

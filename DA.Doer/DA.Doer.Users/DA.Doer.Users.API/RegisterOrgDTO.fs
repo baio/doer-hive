@@ -1,11 +1,12 @@
 ﻿module DA.Doer.Users.RegisterOrgDTO
 
-open Newtonsoft.Json
+
 
 open DA.Doer.Domain.Errors
 open DA.Doer.Domain.Validators
 open DA.FSX.ValidationResult
 open DA.FSX
+open FSharpx.Reader
 
 let mf = mapFailLabeled
 
@@ -43,11 +44,11 @@ let fromPayload =
     [
         "firstName", fun x -> x.firstName |> isMidStr 
         "lastName", fun x ->  x.lastName |> isMidStr 
-        "middleName", fun x ->  x.middleName |> isMidStr
+        "middleName", fun x -> lift2(<|>) isNull' isMidStr x.middleName
         "orgName", fun x ->  x.orgName |> isMidStr
         "email", fun x ->  x.email |> isEmail
         "phone", fun x ->  x.phone |> isPhone
-        "avatar", fun x ->  (x.avatar |> isNull') <|> (x.avatar |> isUrl)
+        "avatar", fun x ->  lift2(<|>) isNull' isUrl x.avatar
         "password", fun x ->  x.password |> isPassword
     ]
     |> validatePayload mapPayload

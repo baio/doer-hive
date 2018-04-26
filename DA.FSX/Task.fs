@@ -26,10 +26,10 @@ let mapError f (m: Task<_>) =
     m.ContinueWith(
       fun (t: Task<_>) -> 
         if t.IsFaulted then            
-            raise( f t.Exception.InnerException )
+            Task.FromException<_>( f t.Exception.InnerException )
          else 
-            t.Result
-    )
+            t
+    ).Unwrap()
 
 // override FSharpx implementation
 let  bind (f: _ -> Task<_>) (x: Task<_>) = 
@@ -37,7 +37,21 @@ let  bind (f: _ -> Task<_>) (x: Task<_>) =
         if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else f t.Result 
     ).Unwrap()
 
-let inline map f m = map f m
+// override FSharpx implementation
+let  map (f: _ -> _) (x: Task<_>) = 
+    x.ContinueWith(fun (t: Task<_>) -> 
+        if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else (f t.Result) |> returnM
+    ).Unwrap()
+
+let bindError f (m: Task<_>) =
+    m.ContinueWith(
+      fun (t: Task<_>) -> 
+        if t.IsFaulted then            
+            f t.Exception.InnerException 
+         else 
+            t
+    ).Unwrap()
+
 
 let inline (<!>) f m = map f m
 
