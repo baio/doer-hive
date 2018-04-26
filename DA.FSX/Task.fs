@@ -37,9 +37,13 @@ let  bind (f: _ -> Task<_>) (x: Task<_>) =
         if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else f t.Result 
     ).Unwrap()
 
-let (>>=) x f = bind f x
+let inline map f m = map f m
 
-let (>=>) f g = fun x -> f x >>= g
+let inline (<!>) f m = map f m
+
+let inline (>>=) x f = bind f x
+
+let inline (>=>) f g = fun x -> f x >>= g
 
 (*
 let bindError f (m: Task<_>) =

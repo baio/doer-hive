@@ -18,9 +18,8 @@ let ``Register org with invalid dto must give correct error`` () =
         { "firstName" : 1 }
     """
 
-    let assert' actual =
-        actual
-        |> should equal
+    let assert' = 
+        should equal
             [
                 "firstName", "NOT_STRING_ERROR"
                 "lastName", "NULL_ERROR"

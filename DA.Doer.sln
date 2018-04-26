@@ -28,6 +28,8 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DA.FSX.Tests", "DA.FSX.Test
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DA.Doer.Domain", "DA.Doer\DA.Doer.Domain\DA.Doer.Domain.fsproj", "{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DA.Doer.Users.Fun", "DA.Doer\DA.Doer.Users\DA.Doer.Users.Fun\DA.Doer.Users.Fun.fsproj", "{B1CB4F89-A26A-46E4-B77C-8E6A458F8053}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +88,10 @@ Global
 		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4394D1B-A796-4F12-A707-2FBB6C1BE9C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1CB4F89-A26A-46E4-B77C-8E6A458F8053}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1CB4F89-A26A-46E4-B77C-8E6A458F8053}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1CB4F89-A26A-46E4-B77C-8E6A458F8053}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1CB4F89-A26A-46E4-B77C-8E6A458F8053}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <UseNETCoreGenerator>true</UseNETCoreGenerator>
+    <AzureFunctionsVersion>v2</AzureFunctionsVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Config.fs" />
+    <Compile Include="RegisterOrg.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions" Version="3.0.0-beta4" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.8" />
+    <PackageReference Include="System.Configuration" Version="2.0.5" />
+    <PackageReference Include="FSharp.Core" Version="4.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
+    <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.Doer.Users.API\DA.Doer.Users.API.fsproj" />
+    <ProjectReference Include="..\DA.Doer.Users\DA.Doer.Users.fsproj" />
+  </ItemGroup>
+
+</Project>
