@@ -1,6 +1,7 @@
 ﻿module DA.Doer.Users.Errors
 
 open FSharp.Data
+open DA.DataAccess.Domain.Errors
 
 let uniqueKeyUnexpected _ = 
     409, 
@@ -12,12 +13,16 @@ let uniqueKeyUnexpected _ =
         |> JsonValue.Record
     ).ToString()
     
+
             
-let uniqueKey _ = 
+let uniqueKey (err: UniqueKeyError) = 
     409, 
     (
         [|
-            "userAlreadyExists", JsonValue.Boolean(true)
+            (
+                (if err.collection.Contains("OwnerEmail_") then "userAlreadyExists" else "orgAlreadyExists"), 
+                JsonValue.Boolean(true)
+            )
         |]
         |> JsonValue.Record
     ).ToString()
