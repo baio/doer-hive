@@ -1,4 +1,4 @@
-﻿module DA.HTTP.HttpTask.HttpClient
+﻿module DA.Http.HttpTask.HttpClient
 
 open DA.FSX.Task
 open DA.FSX.HttpTask

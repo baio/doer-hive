@@ -8,7 +8,7 @@ open FSharpx.Task
 
 open System.Net
 open DA.FSX.HttpTask
-open DA.HTTP.HttpTask.HttpClient
+open DA.Http.HttpTask.HttpClient
 
 type RequestPayload = {
     lol: Boolean

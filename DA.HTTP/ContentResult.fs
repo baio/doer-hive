@@ -13,8 +13,12 @@ let contentResult (code, content) =
         ContentType = HttpContentTypes.Json
     )
 
-let mapResultJson (code, a) = 
+let mapResultJson code a = 
     a |> JsonConvert.SerializeObject |> fun x -> contentResult (code, x)
+
+let result200 x = mapResultJson 200 x
+
+let result201 x = mapResultJson 201 x
 
 let mapResultStr (code, a) = contentResult (code, a)
 

@@ -12,6 +12,8 @@ let getConfig () =
         "auth0:clientId"
         "auth0:clientSecret"
         "auth0:audience"
+        "mongo:connection"
+        "mongo:dbName"
     ] 
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
@@ -20,14 +22,13 @@ let getConfig () =
             clientId = x.[1]
             clientSecret = x.[2]
             audience = x.[3]
+        },
+        {
+            connection = x.[4]
+            dbName = x.[5]
         }
    
-let authConfig = getConfig()
-
-let mongoConfig = {
-    connection = "mongodb://localhost"
-    dbName = "local"
-}
+let authConfig, mongoConfig = getConfig()
 
 let context = (mongoConfig, (request, authConfig))
 

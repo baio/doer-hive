@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
     <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\..\..\DA.HTTP\DA.HTTP.fsproj" />
     <ProjectReference Include="..\DA.Doer.Users.API\DA.Doer.Users.API.fsproj" />
     <ProjectReference Include="..\DA.Doer.Users\DA.Doer.Users.fsproj" />
   </ItemGroup>

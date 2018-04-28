@@ -16,17 +16,8 @@ module Main =
     open DA.Doer.Users.RegisterOrg.Errors
     open Config
     open Newtonsoft.Json
+    open DA.Http.ContentResult
 
-    let contentResult (code, content) =
-        ContentResult(
-            Content = content,
-            StatusCode = Nullable<int>(code),
-            ContentType = HttpContentTypes.Json
-       )
-
-    let mapSuccess x = x |> JsonConvert.SerializeObject |> fun x -> contentResult (StatusCodes.Status201Created, x)
-
-    let mapError x = x |> getHttpError |> contentResult
 
     [<FunctionName("register-org")>]
     let run(
@@ -38,7 +29,7 @@ module Main =
             request.Body
             |> ofStream
             >>= registerOrgFromBody
-            |> map mapSuccess
-            |> bindError (mapError >> returnM)
+            |> map result201
+            |> bindError (getHttpError >> mapResultStr >> returnM)
             <| context
 

@@ -7,7 +7,7 @@ open FSharpx.Task
 open DA.FSX.ReaderTask
 open DA.Doer.Users
 
-let request = DA.HTTP.HttpTask.HttpClient.httpClientRequest
+let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
 let getConfig () = 
     [

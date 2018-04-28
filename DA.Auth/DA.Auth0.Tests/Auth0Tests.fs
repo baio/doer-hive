@@ -11,7 +11,7 @@ open DA.FSX.HttpTask.WebClient
 open DA.Auth0
 open DA.Auth.Domain
 
-let request = DA.HTTP.HttpTask.HttpClient.httpClientRequest
+let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
 // config
 

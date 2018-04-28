@@ -7,7 +7,7 @@ open DA.Auth0
 open DA.Doer.Users.RegisterOrgDTO
 open DA.FSX.ReaderTask
 
-let request = DA.HTTP.HttpTask.HttpClient.httpClientRequest
+let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
 // collide the worlds!
 
