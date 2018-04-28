@@ -43,6 +43,7 @@ type Request = {
 
 let inline str2json<'a> str = JsonConvert.DeserializeObject<'a> str
 
+
 let inline fromGetLike (r: GetLikeRequest) = {
     url = r.url
     httpMethod = match r.httpMethod with HttpGetLikeMethod.GET -> GET | HttpGetLikeMethod.DELETE -> DELETE

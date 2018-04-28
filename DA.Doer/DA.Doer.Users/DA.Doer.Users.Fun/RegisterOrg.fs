@@ -13,18 +13,9 @@ module Main =
     open DA.Doer.Users
     open DA.FSX.ReaderTask
     open DA.Doer.Users.RegisterOrg
+    open DA.Doer.Users.RegisterOrg.Errors
     open Config
     open Newtonsoft.Json
-    open DA.Doer.Domain.Errors
-
-    let mapValidationErrors errs =
-        errs
-        |> List.map(FSharpx.Reader.lift2(sprintf """ "%s" : "%s" """) fst snd)
-        |> String.concat ","
-        |> sprintf
-                """
-                    { "validationErrors" : { %s } }
-                """
 
     let contentResult (code, content) =
         ContentResult(
@@ -35,16 +26,7 @@ module Main =
 
     let mapSuccess x = x |> JsonConvert.SerializeObject |> fun x -> contentResult (StatusCodes.Status201Created, x)
 
-    let mapError' (x: exn) =
-        match x with
-        | :? ValidationException as ex ->
-            StatusCodes.Status400BadRequest, mapValidationErrors ex.Errors
-        | :? System.Net.WebException as ex when (ex.Response :?> System.Net.HttpWebResponse).StatusCode = Net.HttpStatusCode.Conflict && ex.Response.ResponseUri.Host.IndexOf(".auth0.") <> -1 ->
-            StatusCodes.Status409Conflict, """{ "userAlreadyExists" : true }"""
-        | _ ->
-            StatusCodes.Status500InternalServerError, ""
-
-    let mapError x = x |> mapError' |> contentResult
+    let mapError x = x |> getHttpError |> contentResult
 
     [<FunctionName("register-org")>]
     let run(

@@ -11,5 +11,12 @@ type ValidationException(errors: (string * string) list) =
 let validationException x = ValidationException x
 
 
+type ValidationError = ValidationError of (string * string) list
 
+let matchValidationError (ex: exn) = 
+        match ex with
+        | :? ValidationException as ex ->
+            Some (ex.Errors)
+        | _ ->
+            None
     

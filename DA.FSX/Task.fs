@@ -6,7 +6,7 @@ open FSharpx.Task
 
 open FSharp.Core
 open System.Threading.Tasks
-open System.Threading.Tasks
+
 
 // missed helpers for tasks
 
@@ -43,6 +43,13 @@ let  map (f: _ -> _) (x: Task<_>) =
         if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else (f t.Result) |> returnM
     ).Unwrap()
 
+// of untyped task
+let  ofTaskU (a: _) (x: Task) = 
+    x.ContinueWith(fun (t: Task) -> 
+        if t.IsFaulted then Task.FromException<_>(t.Exception.InnerException) else a |> returnM
+    ).Unwrap()
+
+
 let bindError f (m: Task<_>) =
     m.ContinueWith(
       fun (t: Task<_>) -> 
@@ -59,17 +66,9 @@ let inline (>>=) x f = bind f x
 
 let inline (>=>) f g = fun x -> f x >>= g
 
-(*
-let bindError f (m: Task<_>) =
-    m.ContinueWith(
-      fun (t: Task<_>) -> 
-        if t.IsFaulted then            
-            f t.Exception.InnerException
-         else 
-            t.Result
-    )
-*)
+let inline mapc x = map(fun _ -> x) 
 
+let inline (!>) m x = mapc x m
 
 let memoize f =
 

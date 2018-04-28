@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="HttpTask.WebClinent.Tests.fs" />
-    <Compile Include="ReaderTaskTests.fs" />
-    <Compile Include="TaskTests.fs" />
+    <Compile Include="HttpTask.HttpClient.Tests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
@@ -19,12 +17,11 @@
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
     <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
-    <PackageReference Include="FSharpx.Extras" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DA.Auth\DA.Auth0\DA.Auth0.fsproj" />
     <ProjectReference Include="..\DA.FSX\DA.FSX.fsproj" />
+    <ProjectReference Include="..\DA.HTTP\DA.HTTP.fsproj" />
   </ItemGroup>
 
 </Project>

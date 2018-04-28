@@ -30,3 +30,23 @@ let mapContext = fun (mongoConfig, authConfig) ->
 let registerOrg info = mapContext >> registerOrg info
 
 let registerOrgFromBody payload = mapContext >> registerOrgFromBody payload
+
+module Errors =
+    
+    open DA.Doer.Users.Errors
+    open DA.Doer.Domain.Errors
+    open DA.Doer.Mongo.Errors
+    open DA.Auth0.Errors
+
+    let inline private map f x = Option.map f x
+    
+    let getHttpError (ex: exn) =  
+        [
+            matchValidationError >> (map validation)
+            matchUniqueKeyError >> (map uniqueKey)
+            matchUserAlreadyExistsError >> (map uniqueKeyUnexpected)
+            unexepcted >> Some
+        ] 
+        |> List.choose(fun x -> x ex)
+        |> List.head
+        

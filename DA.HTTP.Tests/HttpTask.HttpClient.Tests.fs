@@ -1,4 +1,4 @@
-﻿module HttpTaskTests
+﻿module HttpTask.HttpClinent.Tests
 
 open System
 open System.Threading.Tasks
@@ -8,6 +8,7 @@ open FSharpx.Task
 
 open System.Net
 open DA.FSX.HttpTask
+open DA.HTTP.HttpTask.HttpClient
 
 type RequestPayload = {
     lol: Boolean
@@ -37,11 +38,10 @@ type Response = {
     json: RequestPayload
 }
 
-let webClient = new WebClient()
-let ofRequest' = WebClient.ofRequest webClient
-let ofRequest r = str2json<Response> <!> ofRequest' r
-let ofGet = fromGetLike >> ofRequest
-let ofPost = fromPostLike >> ofRequest
+let client' = httpClientRequest
+let client r = str2json<Response> <!> client' r
+let ofGet = fromGetLike >> client
+let ofPost = fromPostLike >> client
 
 [<Fact>]
 let ``Get must work`` () =
@@ -54,7 +54,7 @@ let ``Get must work`` () =
         payload = None
     } 
 
-    ofRequest' request
+    client' request
 
 [<Fact>]
 let ``Get with parse response must work`` () =
@@ -67,7 +67,7 @@ let ``Get with parse response must work`` () =
         payload = None
     } 
 
-    (fun resp -> resp.url |> should equal "https://httpbin.org/get") <!> ofRequest request     
+    (fun resp -> resp.url |> should equal "https://httpbin.org/get") <!> (client request)
     
 
 [<Fact>]
@@ -81,7 +81,7 @@ let ``Get with headers must work`` () =
         payload = None
     } 
 
-    (fun resp -> resp.headers.test |> should equal "123") <!> ofRequest request     
+    (fun resp -> resp.headers.test |> should equal "123") <!> (client request)     
     
 [<Fact>]
 let ``Get with query string must work`` () =
@@ -93,7 +93,7 @@ let ``Get with query string must work`` () =
         headers = [ ]
     } 
 
-    (fun resp -> resp.args.q |> should equal "1") <!> ofGet request     
+    (fun resp -> resp.args.q |> should equal "1") <!> (ofGet request)
     
 
     
@@ -107,7 +107,7 @@ let ``Post with form-value payload must work`` () =
         payload = FormPayload [ "x", "100" ] 
     } 
 
-    (fun resp -> resp.form.x |> should equal "100") <!> ofPost request     
+    (fun resp -> resp.form.x |> should equal "100") <!> (ofPost request)
 
 [<Fact>]
 let ``Post with json payload must work`` () =
@@ -119,4 +119,4 @@ let ``Post with json payload must work`` () =
         payload = JsonPayload { lol = true }
     } 
 
-    (fun resp -> resp.json.lol |> should equal true) <!> ofPost request     
+    (fun resp -> resp.json.lol |> should equal true) <!> (ofPost request)     

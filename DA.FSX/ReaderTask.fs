@@ -13,10 +13,11 @@ type ReaderTask<'e, 'a> = Reader<'e, Task<'a>>
 let inline returnM x: ReaderTask<_, _> =
     reader { return returnM x }
 
-let inline map f (m: ReaderTask<_, _>): ReaderTask<_, _> =
-    FSharpx.Reader.map (map f) m
+let inline map f (m: ReaderTask<_, _>): ReaderTask<_, _> = m >> map f 
 
 let inline mapc x = map(fun _ -> x)
+
+let inline (!>) m x = mapc x m
 
 let inline bind f (m: ReaderTask<_, _>): ReaderTask<_, _> =
     fun env ->
@@ -61,8 +62,6 @@ let inline (<*>) f x = ap x f
 let inline ( <*) a b = lift2 (fun z _ -> z) a b
 
 let inline ( *>) a b = lift2 (fun _ z -> z) a b
-
-let inline (!>) a b = a *> returnM b
 
 let inline (>=>) f g = fun x -> f x >>= g
 
