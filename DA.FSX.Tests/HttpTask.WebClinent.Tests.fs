@@ -1,4 +1,4 @@
-﻿module HttpTask.WebClinent.Tests
+﻿module HttpTask.WebClient.Tests
 
 open System
 open System.Threading.Tasks
