@@ -1,7 +1,7 @@
 namespace DA.Doer.Users.Fun
 
 
-module RegitsreOrg =
+module Login =
     open FSharp.Data
     open System
     open Microsoft.AspNetCore.Mvc
@@ -12,24 +12,24 @@ module RegitsreOrg =
     open Microsoft.Extensions.Logging
     open DA.Doer.Users
     open DA.FSX.ReaderTask
-    open DA.Doer.Users.RegisterOrg
-    open DA.Doer.Users.RegisterOrg.Errors
+    open DA.Doer.Users.Login
+    open DA.Doer.Users.Login.Errors
     open Config
     open Newtonsoft.Json
     open DA.Http.ContentResult
 
 
-    [<FunctionName("register-org")>]
+    [<FunctionName("login")>]
     let run(
-            [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register-org")>]
+            [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "login")>]
             request: HttpRequest,
             log: ILogger
         ) =
 
             request.Body
             |> ofStream
-            >>= registerOrgFromBody
-            |> map result201
+            >>= loginFromBody
+            |> map result200
             |> bindError (getHttpError >> mapResultStr >> returnM)
-            <| context
+            <| (context |> snd)
 

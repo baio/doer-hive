@@ -6,7 +6,8 @@
 
   <ItemGroup>
     <Compile Include="Errors.fs" />
-    <Compile Include="API.fs" />
+    <Compile Include="Login.fs" />
+    <Compile Include="LoginDTO.fs" />
     <Compile Include="RegisterOrg.fs" />
     <Compile Include="RegisterOrgDTO.fs" />
   </ItemGroup>

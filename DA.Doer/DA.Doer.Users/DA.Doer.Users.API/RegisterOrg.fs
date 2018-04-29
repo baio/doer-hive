@@ -1,12 +1,33 @@
 ﻿[<AutoOpen>]
 module DA.Doer.Users.RegisterOrg
 
+open System.Threading.Tasks
 open DA.Auth.Domain
-open DA.Doer.Users
 open DA.FSX
 open DA.DataAccess.Domain
 
 open ReaderTask
+
+// API
+
+type DataAccessTable = 
+    | User of UserDoc
+    | Org of OrgDoc
+
+type DataAccess = {
+    insertDoc: DataAccessTable -> Task<string>
+}
+
+//
+
+type Auth = {
+    registerUser: CreateUserInfo -> Task<RegisterUserResult>
+}
+
+
+type API<'a> = ReaderTask<DataAccess * Auth, 'a>
+
+///
 
 type PersonName = {
     FirstName: string
