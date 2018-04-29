@@ -22,9 +22,11 @@ let loginFromBody payload = mapContext >> loginFromBody payload
 module Errors =
     
     open DA.Doer.Users.Errors
+    open DA.Doer.Domain.Errors    
     
     let getHttpError (ex: exn) =  
         [
+            matchValidationError >> (Option.map validation)
             unexepcted >> Some
         ] 
         |> List.choose(fun x -> x ex)
