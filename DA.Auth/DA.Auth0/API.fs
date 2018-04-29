@@ -22,6 +22,12 @@ type API<'a> = ReaderTask<Auth0APIConfig, 'a>
 
 type UserIdResponse = { user_id : string }
 
+type LoginResponse = {
+    id_token: string
+    access_token: string
+    refresh_token: string
+}
+
 type TokensResponse = {
     id_token: string
     access_token: string
@@ -72,25 +78,25 @@ let getUser' token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
 
 let getUser = getUser' >> flat
 
-// user tokens 
+// login
 
-let mapTokensResponse x = x |> mapResponse(fun x -> 
+let mapLoginResponse x = x |> mapResponse(fun x -> 
     {
         idToken = x.id_token
         accessToken = x.access_token
         refreshToken = x.refresh_token
     })
 
-let getUserTokens'' userInfo (f: HttpRequest) = (f <!> getUserTokens userInfo) |> mapTokensResponse
+let login' loginInfo (f: HttpRequest) = (f <!> login loginInfo) |> mapLoginResponse
 
-let getUserTokens = getUserTokens'' >> flat
+let login = login' >> flat
 
 // register user
 
 let registerUser userInfo =    
     readerTask {
         let! userId = createUser userInfo
-        let! tokens = getUserTokens userInfo
+        let! tokens = login { Email = userInfo.Email; Password = userInfo.Password }
         return { userId = userId; tokens = tokens }
     }    
 

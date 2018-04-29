@@ -132,15 +132,15 @@ let removeUser: RemoveUser = fun token userId env ->
     }
 *)
 
-type GetUserTokens = CreateUserInfo -> RequestAPI
-let getUserTokens: GetUserTokens = fun userInfo env -> 
+type Login = LoginInfo -> RequestAPI
+let login: Login = fun loginInfo env -> 
     {
         httpMethod = POST
         url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
         payload = FormPayload 
             [
-                "username", userInfo.Email
-                "password", userInfo.Password
+                "username", loginInfo.Email
+                "password", loginInfo.Password
                 "grant_type", "password"
                 "client_id", env.clientId
                 "client_secret", env.clientSecret

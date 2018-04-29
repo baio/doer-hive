@@ -1,5 +1,9 @@
 ﻿namespace DA.Auth.Domain
 
+type LoginInfo = {
+    Email: string
+    Password: string
+}
 
 type CreateUserInfo = {
     UserId: string
