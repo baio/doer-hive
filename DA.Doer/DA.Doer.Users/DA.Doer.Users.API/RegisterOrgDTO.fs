@@ -22,17 +22,20 @@ type RegisterOrgInfoDTO =
         password: obj
     }
 
+// TODO : Domain object string opts !
+let private norm (x: string) = if isNull x then null else x.ToLower();
+
 let private mapPayload (user: RegisterOrgInfoDTO): RegisterOrgInfo  = 
     {
         User = {
             Name = {
-                FirstName = user.firstName :?> string
-                LastName = user.lastName :?> string
-                MiddleName = user.middleName :?> string       
+                FirstName = user.firstName :?> string |> norm
+                LastName = user.lastName :?> string |> norm
+                MiddleName = user.middleName :?> string |> norm      
             }
-            Phone = user.phone :?> string
-            Email = user.email :?> string
-            Avatar = user.avatar :?> string
+            Phone = user.phone :?> string |> norm
+            Email = user.email :?> string |> norm
+            Avatar = user.avatar :?> string |> norm
         }
         Org = {
             Name = user.orgName :?> string
