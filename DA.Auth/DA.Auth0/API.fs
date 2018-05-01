@@ -81,15 +81,24 @@ let getUser = getUser' >> flat
 // login
 
 let mapLoginResponse x = x |> mapResponse(fun x -> 
-    {
-        idToken = x.id_token
-        accessToken = x.access_token
-        refreshToken = x.refresh_token
-    })
+        {
+            idToken = x.id_token
+            accessToken = x.access_token
+            refreshToken = x.refresh_token
+        }
+        )
 
 let login' loginInfo (f: HttpRequest) = (f <!> login loginInfo) |> mapLoginResponse
 
 let login = login' >> flat
+
+// remove user
+
+let removeUser'' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
+
+let removeUser' userId token = removeUser'' userId token |> flat
+
+let removeUser = removeUser' >> withToken
 
 // register user
 
@@ -100,10 +109,8 @@ let registerUser userInfo =
         return { userId = userId; tokens = tokens }
     }    
 
-// remove user
+// refresh token
 
-let removeUser'' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
+let refreshToken' token (f: HttpRequest) = (f <!> refreshToken token) |> mapLoginResponse
 
-let removeUser' userId token = removeUser'' userId token |> flat
-
-let removeUser = removeUser' >> withToken
+let refreshToken = refreshToken' >> flat

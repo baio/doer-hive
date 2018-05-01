@@ -6,6 +6,8 @@
 
   <ItemGroup>
     <Compile Include="Errors.fs" />
+    <Compile Include="RefreshToken.fs" />
+    <Compile Include="RefreshTokenDTO.fs" />
     <Compile Include="Login.fs" />
     <Compile Include="LoginDTO.fs" />
     <Compile Include="RegisterOrg.fs" />

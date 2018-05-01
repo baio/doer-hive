@@ -145,9 +145,26 @@ let login: Login = fun loginInfo env ->
                 "client_id", env.clientId
                 "client_secret", env.clientSecret
                 "audience", env.audience
-                "scope", "openid profile"
+                "scope", "openid profile offline_access"
             ]
         headers = []
         queryString = []
     }
+
+type RefreshToken = string -> RequestAPI
+let refreshToken: RefreshToken = fun token env -> 
+    {
+        httpMethod = POST
+        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
+        payload = FormPayload 
+            [
+                "grant_type", "refresh_token"
+                "client_id", env.clientId
+                "client_secret", env.clientSecret
+                "refresh_token", token
+            ]
+        headers = []
+        queryString = []
+    }
+
 
