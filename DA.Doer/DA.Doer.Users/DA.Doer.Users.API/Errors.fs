@@ -2,6 +2,7 @@
 
 open FSharp.Data
 open DA.DataAccess.Domain.Errors
+open DA.Auth.Domain.Errors
 
 let uniqueKeyUnexpected _ = 
     409, 
@@ -13,8 +14,7 @@ let uniqueKeyUnexpected _ =
         |> JsonValue.Record
     ).ToString()
     
-
-            
+                
 let uniqueKey (err: UniqueKeyError) = 
     409, 
     (
@@ -22,6 +22,44 @@ let uniqueKey (err: UniqueKeyError) =
             (
                 (if err.collection.Contains("OwnerEmail_") then "userAlreadyExists" else "orgAlreadyExists"), 
                 JsonValue.Boolean(true)
+            )
+        |]
+        |> JsonValue.Record
+    ).ToString()
+
+let connectionFail (err: ConnectionError) = 
+    500, 
+    (
+        [|
+            ("connectionFail", JsonValue.String err.message)
+        |]
+        |> JsonValue.Record
+    ).ToString()
+
+let networkFail (err: NetworkError) = 
+    500, 
+    (
+        [|
+            ("networkFail", JsonValue.String err.message)
+        |]
+        |> JsonValue.Record
+    ).ToString()
+
+
+let requestFail (err: NetworkError) = 
+    500, 
+    (
+        [|
+            ("requestFail", 
+                [| 
+                    ("message", JsonValue.String err.message) 
+                    (
+                        "responseUri", 
+                        match err.response with 
+                            | Some x -> JsonValue.String (x.ResponseUri.ToString()) 
+                            | None _ -> JsonValue.Null
+                    )
+                |] |> JsonValue.Record
             )
         |]
         |> JsonValue.Record

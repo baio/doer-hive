@@ -18,3 +18,18 @@ module Errors =
             Some UserAlreadyExists
         | _ ->
             None
+
+
+    let matchNetworkException (x: exn) =
+        match x with
+        | :? System.Net.Http.HttpRequestException ->
+            Some { message = x.Message; response = None }
+        | _ ->
+            None
+
+    let matchRequestException (x: exn) =
+        match x with
+        | :? System.Net.WebException as ex ->
+            Some { message = ex.Message; response = (Some ex.Response)}
+        | _ ->
+            None

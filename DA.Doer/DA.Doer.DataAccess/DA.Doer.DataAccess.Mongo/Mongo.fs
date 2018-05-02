@@ -33,6 +33,12 @@ module Errors =
     open MongoDB.Driver
     open DA.DataAccess.Domain.Errors
 
+    let matchConnectionError (e: exn) = 
+        match e with
+        | :? System.TimeoutException as ex when ex.Message.Contains("A timeout occured after") ->
+            Some { message = ex.Message }
+        | _ -> None
+
     let matchUniqueKeyError (e: exn) =
         match e with
         | :? MongoWriteException as ex ->

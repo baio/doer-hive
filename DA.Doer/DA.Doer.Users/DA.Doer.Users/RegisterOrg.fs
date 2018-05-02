@@ -43,6 +43,9 @@ module Errors =
     let getHttpError (ex: exn) =  
         [
             matchValidationError >> (map validation)
+            matchNetworkException >> (map networkFail)
+            matchRequestException >> (map requestFail)
+            matchConnectionError >> (map connectionFail)
             matchUniqueKeyError >> (map uniqueKey)
             matchUserAlreadyExistsError >> (map uniqueKeyUnexpected)
             unexepcted >> Some

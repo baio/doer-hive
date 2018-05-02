@@ -37,6 +37,8 @@ let createUser: CreateUser = fun userInfo token env ->
         url = sprintf "https://%s.auth0.com/api/v2/users" (env.clientDomain)
         payload = JsonPayload 
             {
+                // Name and Picture parameters couldn't be set for profile directly
+                // https://auth0.com/docs/user-profile/normalized/auth0 (Fields that are always generated)
                 user_id = sprintf "doer|%s" userInfo.UserId
                 connection = "Username-Password-Authentication"
                 email = userInfo.Email
