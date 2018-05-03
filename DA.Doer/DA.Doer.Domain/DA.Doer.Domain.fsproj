@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Auth.fs" />
     <Compile Include="ValidationError.fs" />
     <Compile Include="Validators.fs" />
   </ItemGroup>

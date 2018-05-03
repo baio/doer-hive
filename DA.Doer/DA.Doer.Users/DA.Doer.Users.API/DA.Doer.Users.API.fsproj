@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <Compile Include="Errors.fs" />
+    <Compile Include="UpdateAvatar.fs" />
     <Compile Include="RefreshToken.fs" />
     <Compile Include="RefreshTokenDTO.fs" />
     <Compile Include="Login.fs" />

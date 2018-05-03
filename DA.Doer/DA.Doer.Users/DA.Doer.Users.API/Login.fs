@@ -8,11 +8,6 @@ open DA.DataAccess.Domain
 
 open ReaderTask
 
-// API
-
-
-//
-
 type Auth = {
     login: LoginInfo -> Task<TokensResult>
 }
