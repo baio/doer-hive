@@ -66,9 +66,9 @@ let inline (>>=) x f = bind f x
 
 let inline (>=>) f g = fun x -> f x >>= g
 
-let inline mapc x = map(fun _ -> x) 
+let inline ``const`` x = map(fun _ -> x) 
 
-let inline (!>) m x = mapc x m
+let inline (!>) m f = ``const`` (f()) m
 
 let memoize f =
 
@@ -83,3 +83,6 @@ let memoize f =
             dict.TryAdd(x, result) |> ignore
             return result
     }
+
+// parallel reserved so sequence the same for tasks
+let sequence x = x |> List.map(fun t -> fun () -> t) |> FSharpx.Task.Parallel

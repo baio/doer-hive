@@ -8,7 +8,7 @@ module Pair =
 
     let bimap f1 f2 (m: Pair<_,_>)  = (f1 (fst m)), (f2 (snd m))
 
-    let crossApply (m: Pair<_,_>)  = (snd m) (fst m)
+    let crossApply ((a, b): Pair<_,_>)  = b a
 
 module ListPair = 
 
@@ -18,6 +18,6 @@ module ListPair =
 
     let bimap f1 f2 = List.map (bimap f1 f2)
 
-    let crossApply m = List.map (crossApply m)
+    let crossApply (m: List<Pair<_, _>>) = m |> List.map crossApply
 
 

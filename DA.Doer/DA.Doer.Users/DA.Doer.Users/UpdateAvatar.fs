@@ -1,9 +1,9 @@
-﻿module DA.Doer.Users.RegisterOrg
+﻿module DA.Doer.Users.UpdateAvatar
 
 open DA.Doer.Users
 open DA.Doer.Mongo
 open DA.Auth0
-open DA.Doer.Users.RegisterOrgDTO
+open DA.Doer.Users.UpdateAvatar
 open DA.FSX.ReaderTask
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
@@ -11,12 +11,17 @@ let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig
+    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig * DA.HTTP.Blob.BlobStorageConfig
 
-let getDataAccess config = {
-    insertDoc = function
-        | User doc -> Users.createUser doc config
-        | Org doc -> Orgs.createOrg doc config            
+(*
+let getDataAccess mongoConfig blobConfig = {
+    UploadAvatar = fun prms -> 
+        DA.HTTP.Blob.uploadStreamToStorage 
+            blobConfig
+            prms.Stream
+            prms.BlobName
+
+    UpdateUserDocAvatar = (string * string) -> Task<bool>
 }
 
 let getAuth config = {
@@ -27,8 +32,6 @@ let mapContext = fun (mongoConfig, authConfig) ->
     (getDataAccess mongoConfig), (getAuth authConfig)
 
 let registerOrg info = mapContext >> registerOrg info
-
-let registerOrgFromBody payload = mapContext >> registerOrgFromBody payload
 
 module Errors =
     
@@ -52,3 +55,4 @@ module Errors =
         |> List.choose(fun x -> x ex)
         |> List.head
         
+*)

@@ -4,14 +4,14 @@ open Microsoft.WindowsAzure.Storage.Auth
 open System
 open Microsoft.WindowsAzure.Storage
 
-type StorageConfig = {
+type BlobStorageConfig = {
     Uri: string
     AccountName: string
     AccountKey: string
     ContainerName: string
 }
 
-let uploadStreamToStorage (config: StorageConfig) stream blobName =
+let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
 
         let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
 
@@ -29,4 +29,4 @@ let uploadStreamToStorage (config: StorageConfig) stream blobName =
         let blockBlob = container.GetBlockBlobReference(blobName)
 
         // Upload the file
-        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> true)
+        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString())

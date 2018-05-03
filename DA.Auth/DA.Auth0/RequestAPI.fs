@@ -30,6 +30,12 @@ type CreateUserPayload = {
     app_metadata: AppMetadata
 }
 
+
+type UpdateUserAvatarMetadata = { avatar: string }
+
+type UpdateUserAvatarPayload = { user_metadata: UpdateUserAvatarMetadata }
+
+
 type CreateUser = CreateUserInfo -> string -> RequestAPI
 let createUser: CreateUser = fun userInfo token env -> 
     {
@@ -52,6 +58,22 @@ let createUser: CreateUser = fun userInfo token env ->
                     {
                         role = sprintf "%O" userInfo.Role
                         orgId = userInfo.OrgId                    
+                    }
+            }
+        headers = ["authorization", token]
+        queryString = []
+    }
+
+type UpdateUserAvatar = (string * string) -> string -> RequestAPI
+let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env -> 
+    {
+        httpMethod = POST
+        url = sprintf "https://%s.auth0.com/api/v2/users/%s" (env.clientDomain) userId
+        payload = JsonPayload 
+            {
+                user_metadata =  
+                    {
+                        avatar = avatarUrl
                     }
             }
         headers = ["authorization", token]

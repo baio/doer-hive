@@ -70,6 +70,14 @@ let createUser' userInfo token = createUser'' userInfo token |> flat
 
 let createUser = createUser' >> withToken 
 
+// update user avatar
+
+let updateUserAvatar'' userInfo token (f: HttpRequest) = (f <!> updateUserAvatar userInfo token) |> mapUserIdResponse
+
+let updateUserAvatar' userInfo token = updateUserAvatar'' userInfo token |> flat
+
+let updateUserAvatar = updateUserAvatar' >> withToken 
+
 // let createUser userInfo = getManagementToken |> ReaderTask.bind (createUserWithToken userInfo)
     
 // get user (by user token ?)
