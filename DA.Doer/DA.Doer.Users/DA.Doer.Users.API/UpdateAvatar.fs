@@ -12,12 +12,12 @@ open DA.Doer.Domain.Auth
 open System.IO
 
 type Auth = {
-    GetPrincipal: string -> Result<Principal, exn>
+    GetPrincipalId: string -> Task<string>
     UpdateAvatar: string -> string -> Task<bool>
 }
 
 type DataAccess = {
-    UploadAvatar: Stream -> string -> Task<string>
+    UploadBlob: Stream -> string -> Task<string>
     UpdateUserDocAvatar: string -> string -> Task<bool>
 }
 
@@ -35,28 +35,27 @@ let resizes = [
 ]
 
 let private updateAvatars userId path  (da, auth, _)= 
-        [ 
-            fun () -> da.UpdateUserDocAvatar userId path
-            fun () -> auth.UpdateAvatar      userId path
-        ]  |> FSharpx.Task.Parallel
+    [ 
+        fun () -> da.UpdateUserDocAvatar userId path
+        fun () -> auth.UpdateAvatar      userId path
+    ]  |> FSharpx.Task.Parallel
 
 let private resizeAndUpload stream userId = fun (da, _, resizer) ->
     let getName = sprintf "%s-%s" userId
     resizes
     |> ListPair.map (resizer.ResizeImage stream)
     |> List.append(["orig", stream])
-    |> ListPair.bimap (getName) (da.UploadAvatar)
+    |> ListPair.bimap (getName) (da.UploadBlob)
     |> ListPair.crossApply
     |> sequence
 
 let private getPrincipal token = fun (_, auth, _) -> 
-    token |> auth.GetPrincipal |> Task.ofResult
+    token |> auth.GetPrincipalId
 
 let updateAvatar (token: string) (stream: Stream): API<string> = 
     readerTask {
         // get principal from access token
-        let! principal = getPrincipal token
-        let principalId = principal.Id
+        let! principalId = getPrincipal token
         // resize original stream and upload them all
         let! uploadResult = resizeAndUpload stream principalId
         // take smallest image and update user profile's avatar with it

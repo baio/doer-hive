@@ -6,6 +6,7 @@ open DA.FSX
 open FSharpx.Reader
 open DA.Doer.Mongo.API
 open DA.DataAccess.Domain
+open MongoDB.Driver
 
 // users
 
@@ -46,3 +47,9 @@ let createUser doc =
 
 let removeUser (id: string) =    
     (remove id <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(id)
+
+let updateUserAvatar id url =  
+    let fr = idFilter id (fun x -> x.Id)
+    let upd = setter url (fun x -> x.Avatar)
+    (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
+    |> ReaderTask.mapc(true)

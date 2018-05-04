@@ -17,6 +17,18 @@ module API =
 
     type MongoReader<'a> = Reader<MongoConfig, 'a>
 
+    let inline bsonId x = x |> ObjectId.Parse |> BsonObjectId
+
+    let inline setter a f = 
+        Builders<_>.Update.Set((fun x -> f x), a)
+
+    let inline filter a f = 
+        Builders<_>.Filter.Eq((fun x -> f x), a)
+
+    let inline idFilter id = filter (bsonId id)
+
+    let inline filterId id x = x._id = bsonId id
+
     let getCollection<'a> name env =
         let client          = MongoClient(env.connection)
         let db              = client.GetDatabase(env.dbName)
@@ -25,8 +37,11 @@ module API =
     let inline insert doc (x: IMongoCollection<'a>) =
         x.InsertOneAsync(doc) |> ofTaskU doc
 
+    let inline update fr upd (x: IMongoCollection<'a>) =
+        x.UpdateOneAsync(fr, upd)
+
     let inline remove id (x: IMongoCollection<'a>) =
-        x.DeleteOneAsync(fun (x: DocWithId) -> x._id = BsonObjectId(ObjectId.Parse(id)))
+        x.DeleteOneAsync(filterId id)
 
 module Errors =
 

@@ -17,8 +17,8 @@ let jsonFromStream<'T> (stream: System.IO.Stream) =
 
 let copyStream f (srcStream: Stream) =
     let distStream = new MemoryStream()
-    f distStream
+    let res = f distStream
     srcStream.Position <- (int64)0
     distStream.Position <- (int64)0
-    distStream
+    res
     
