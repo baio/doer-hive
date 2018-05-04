@@ -29,7 +29,7 @@ type RegisterOrgConfig =
 let getDataAccess mongoConfig blobConfig = {
 
     UploadBlob = fun stream name -> 
-        uploadStreamToStorage blobConfig stream name
+        uploadStreamToStorage blobConfig stream (name + ".jpg")
 
     UpdateUserDocAvatar = fun userId url ->
         Users.updateUserAvatar (userGuid userId) url mongoConfig        
@@ -46,7 +46,7 @@ let getAuth ((http, config): Auth0APIConfig) (jwt: DA.JWT.Config) = {
 }
 
 let imageResizer = {
-    ResizeImage = resizeImage
+    ResizeImage = resizeJpeg
 }
 
 let mapContext = fun (mongoConfig, authConfig, blobStorageConfig, jwtConfig) ->

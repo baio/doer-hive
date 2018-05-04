@@ -40,11 +40,13 @@ let private updateAvatars userId path  (da, auth, _)=
         fun () -> auth.UpdateAvatar      userId path
     ]  |> FSharpx.Task.Parallel
 
+let private normalize (x: string) = x.Replace('|', '_')
+
 let private resizeAndUpload stream userId = fun (da, _, resizer) ->
-    let getName = sprintf "%s-%s" userId
+    let getName = sprintf "%s-%s" userId >> normalize
     resizes
     |> ListPair.map (resizer.ResizeImage stream)
-    |> List.append(["orig", stream])
+    |> fun x -> x@["orig", stream]
     |> ListPair.bimap (getName) (da.UploadBlob)
     |> ListPair.crossApply
     |> sequence

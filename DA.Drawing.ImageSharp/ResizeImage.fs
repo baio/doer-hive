@@ -7,7 +7,7 @@ open SixLabors.ImageSharp.Processing
 open SixLabors.ImageSharp.Processing.Transforms
 open System.IO
 
-let resizeImage srcStream (width, height)  = 
+let resizeJpeg srcStream (width, height)  = 
     let image = Image.Load(stream = srcStream, decoder = SixLabors.ImageSharp.Formats.Jpeg.JpegDecoder())
     image.Mutate(fun x -> x.Resize(width = width, height = height) |> ignore)
     let distStream = new MemoryStream()

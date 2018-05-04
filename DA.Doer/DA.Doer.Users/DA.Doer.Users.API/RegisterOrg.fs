@@ -98,7 +98,7 @@ let insertOrg                : RegOrgApi<string> =             insertOrg' |> Rea
 
 let insertUser   orgId       : RegOrgApi<string> =             insertUser' orgId |> Reader.flat
 
-let registerUser orgId userId: RegOrgApi<RegisterUserResult> = registerUser' userId orgId |> Reader.flat
+let registerUser orgId userId: RegOrgApi<RegisterUserResult> = registerUser' orgId userId |> Reader.flat
 
 type RegisterOrgResult = {
     userId: string
