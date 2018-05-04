@@ -50,6 +50,6 @@ let removeUser (id: string) =
 
 let updateUserAvatar id url =  
     let fr = idFilter id
-    let upd = setter url (fun x -> x.Avatar)
+    let upd = setter url "Avatar"
     (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
     |> ReaderTask.mapc(true)

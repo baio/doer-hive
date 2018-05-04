@@ -19,12 +19,13 @@ module API =
 
     let inline bsonId x = x |> ObjectId.Parse |> BsonObjectId
 
-    let inline setter a f = 
-        Builders<_>.Update.Set((fun x -> f x), a)
+    let inline setter a (x: string) = 
+        let field = FieldDefinition<_, _>.op_Implicit(x)
+        Builders.Update.Set(field, a)
 
-    let inline filterEq<'a, 'b> a (x: string) = 
-        let field = FieldDefinition<'a, 'b>.op_Implicit(x)
-        Builders<'a>.Filter.Eq(field, a)
+    let inline filterEq a (x: string) = 
+        let field = FieldDefinition<_, _>.op_Implicit(x)
+        Builders.Filter.Eq(field, a)
 
     let inline idFilter id = filterEq (bsonId id) "_id"
 

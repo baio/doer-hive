@@ -165,3 +165,30 @@ let ``Create user must work`` () =
     let assert' = should not' Empty
 
     (assert' <!> (createUser user >>= removeUser)) config
+
+[<Fact>]
+let ``Update user avatar must work`` () =
+    
+    let user = 
+        {
+            OrgId = "11"
+            Role = "Owner"
+            FirstName = "first"
+            MidName = "mis"
+            LastName = "last"
+            Email = "first_mid_last_1@gmail.com"
+            Phone = "+79772753595"
+            Ancestors = []
+            Avatar = ""
+        } 
+    
+    let assert' = should not' Empty
+
+    (assert' <!> (
+        readerTask {
+            let! userId  = createUser user 
+            let! _ = updateUserAvatar userId "http://avatar.co/lol.jpg"
+            //return! removeUser userId
+            return userId
+        }
+    )) config
