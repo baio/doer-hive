@@ -6,6 +6,7 @@ open DA.Doer.Mongo
 open FSharpx.Task
 open DA.FSX.ReaderTask
 open DA.Doer.Users
+open DA.HTTP.Blob
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
@@ -29,7 +30,14 @@ let authConfig = getConfig()
 
 let mongoConfig = {
     connection = "mongodb://localhost"
-    dbName = "local"
+    dbName = "doer-local"
+}
+
+let blobStorageConfig: BlobStorageConfig = {
+    Uri = "http://127.0.0.1:10000/devstoreaccount1"
+    AccountName = "devstoreaccount1"
+    AccountKey = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+    ContainerName = "test-images"
 }
 
 let context = (mongoConfig, (request, authConfig))
@@ -40,6 +48,5 @@ let andRemove (result: RegisterOrgResult) (mongo: MongoConfig, auth: Auth0APICon
         Users.removeUser result.userId mongo       
         (API.removeUser result.authUserId *> returnM "ok") auth
     ]
-    |> Seq.map(fun x -> (fun () -> x))
-    |> Parallel
+    |> sequence
 

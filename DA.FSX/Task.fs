@@ -7,7 +7,7 @@ open FSharpx.Task
 open FSharp.Core
 open System.Threading.Tasks
 
-
+let returnM = returnM
 // missed helpers for tasks
 
 // type alias to distinguish between System Rersult and Task Result

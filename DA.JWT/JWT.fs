@@ -14,25 +14,30 @@ open DA.FSX.Task
 open System.Net.Http
 open System
 
-
 type ConfigJwks = 
-    | ConfigJwksConst of string
+    | ConfigJwksConst of (string * string)
     | ConfigJwksWellKnown
 
 type Config = {
     Issuer: string
     Audience: string
-    Jwks: ConfigJwks
+    Jwks: ConfigJwks 
 }
 
-type JwkDocRetriever(jwks) =    
+type JwkDocRetriever(openid, jwks) =    
     interface IDocumentRetriever with
-        member this.GetDocumentAsync (address, cancel) =
-            Tasks.Task.FromResult(jwks)
+        member this.GetDocumentAsync ((address: string), cancel) =
+            if address.Contains(".well-known/openid-configuration") then 
+                returnM openid
+            else 
+                returnM jwks
 
 let getSigningKey (configurationManager: ConfigurationManager<OpenIdConnectConfiguration>) =
     configurationManager.GetConfigurationAsync(CancellationToken.None)     
-    |> map(fun res -> res.SigningKeys |> Seq.cast<SecurityKey>)
+    |> map(fun res -> 
+        let z = res.SigningKeys |> Seq.cast<SecurityKey>
+        z
+    )
     
 let getIssuerSigningKeysWellKnown (issuer: string) = 
 
@@ -40,26 +45,26 @@ let getIssuerSigningKeysWellKnown (issuer: string) =
     let httpClient = new HttpClient()
     let requireHttps = issuer.StartsWith("https://")
     let documentRetriever = HttpDocumentRetriever(httpClient, RequireHttps = requireHttps)
-
+    
     new ConfigurationManager<OpenIdConnectConfiguration>(
         sprintf "%s.well-known/openid-configuration" issuer,
         OpenIdConnectConfigurationRetriever(),
         documentRetriever
     ) |> getSigningKey
 
-let getIssuerSigningKeysConst (jwks: string) = 
+let getIssuerSigningKeysConst x = 
     new ConfigurationManager<OpenIdConnectConfiguration>(
-        "",
+        "https://const/.well-known/openid-configuration",
         OpenIdConnectConfigurationRetriever(),
-        JwkDocRetriever(jwks)
+        JwkDocRetriever(x)
     ) |> getSigningKey
 
 let getIssuerSigningKeys config = 
     match config.Jwks with
     | ConfigJwksWellKnown ->
         getIssuerSigningKeysWellKnown config.Issuer
-    | ConfigJwksConst str ->
-        getIssuerSigningKeysConst str
+    | ConfigJwksConst x ->
+        getIssuerSigningKeysConst x
         
 let getPrincipal' token config (issuerSigningKeys: SecurityKey seq) =
         
