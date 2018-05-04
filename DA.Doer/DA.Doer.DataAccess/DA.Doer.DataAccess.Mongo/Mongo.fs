@@ -22,12 +22,11 @@ module API =
     let inline setter a f = 
         Builders<_>.Update.Set((fun x -> f x), a)
 
-    let inline filter a f = 
-        Builders<_>.Filter.Eq((fun x -> f x), a)
+    let inline filterEq<'a, 'b> a (x: string) = 
+        let field = FieldDefinition<'a, 'b>.op_Implicit(x)
+        Builders<'a>.Filter.Eq(field, a)
 
-    let inline idFilter id = filter (bsonId id)
-
-    let inline filterId id x = x._id = bsonId id
+    let inline idFilter id = filterEq (bsonId id) "_id"
 
     let getCollection<'a> name env =
         let client          = MongoClient(env.connection)
@@ -41,7 +40,8 @@ module API =
         x.UpdateOneAsync(fr, upd)
 
     let inline remove id (x: IMongoCollection<'a>) =
-        x.DeleteOneAsync(filterId id)
+        // let filter = filterEq (bsonId id) "_id"
+        x.DeleteOneAsync(idFilter id)
 
 module Errors =
 
