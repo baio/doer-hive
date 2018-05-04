@@ -78,4 +78,4 @@ let validation e =
     ).ToString()
 
 
-let unexepcted (_: exn) = 500, ""
+let unexepcted (e: exn) = 500, ([| ("message", JsonValue.String(e.Message)) |] |> JsonValue.Record).ToString()

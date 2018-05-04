@@ -10,6 +10,7 @@ open DA.Doer.Users
 open Setup
 open System.Text
 open System.IO
+open DA.FSX
 
 [<Fact>]
 let ``Register org must work`` () =
@@ -35,7 +36,7 @@ let ``Register org must work`` () =
 
 
 let updateAvatar token url (mongo, auth) = 
-    UpdateAvatar.updateAvatar token url (mongo, auth, blobStorageConfig)
+    UpdateAvatar.updateAvatar token url (mongo, auth, blobStorageConfig, jwtConfig)
 
 [<Fact>]
 let ``Update user avatar must work`` () =
@@ -48,20 +49,25 @@ let ``Update user avatar must work`` () =
                     MiddleName = "middle"
                 }
                 Phone = "+777777777"
-                Email = "registered-org@email.com"
+                Email = "update-user-avatar-org@email.com"
                 Avatar = "http://avatar.com/1"
             }
             Org = {
-                Name = "org"
+                Name = "update-user-avatar-org"
             }
             Password = "LastPas123"
         }
     
     let stream = new MemoryStream(buffer = Encoding.UTF8.GetBytes("lol")) :> Stream
     
-    readerTask {
-        let! res = RegisterOrg.registerOrg user
-        let! _ = updateAvatar res.tokens.accessToken stream
-        return! andRemove res
-    } <| context
+    RegisterOrg.registerOrg user
+    >>= (fun res -> 
+        updateAvatar res.tokens.accessToken stream
+        |> bindError(fun ex -> 
+            andRemove res >>= (fun _ -> ofException ex)
+        )
+        |> mapc res
+    )
+    >>= andRemove
+    <| context
 

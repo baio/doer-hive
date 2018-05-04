@@ -13,7 +13,7 @@ let private getHttpMethod (method: DA.FSX.HttpTask.HttpMethod) =
     | POST -> HttpMethod.Post
     | PUT -> HttpMethod.Put    
     | DELETE -> HttpMethod.Delete
-    | PATCH -> failwith "Not implemented"
+    | PATCH -> new HttpMethod("PATCH")
 
 let private  getUrl (request: Request) =
     if (Seq.length request.queryString) = 0 then

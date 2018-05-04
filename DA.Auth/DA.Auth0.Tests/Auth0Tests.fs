@@ -10,6 +10,7 @@ open DA.FSX.ReaderTask
 open DA.FSX.HttpTask.WebClient
 open DA.Auth0
 open DA.Auth.Domain
+open DA.FSX
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
@@ -75,5 +76,29 @@ let ``Register user must work`` () =
     }
 
     let task = ((fun x -> x.userId) <!> registerUser userInfo) |> andRemove
+
+    task context
+
+[<Fact>]
+let ``Update user avatar work`` () =
+    
+    let userInfo = {
+        UserId = "bd296071-f13f-4023-bf91-885ee0729135"
+        OrgId = "5538ee3c-d332-44a5-ae3b-610e8b015325"
+        Name = "uspdate user avatar"
+        Email = "uspdate_user_avatar@gmail.com"
+        Password = "PasLslol123"
+        Avatar = null
+        Role = "Owner"
+    }
+
+    let task = 
+        readerTask {
+            let! res = registerUser userInfo
+            return! updateUserAvatar (res.userId, "http://avatar.co/7") 
+                |> bindError(fun ex -> 
+                    ((returnM res.userId) |> andRemove) >>= (fun _ -> ofException ex)                    
+                )           
+        } |> andRemove
 
     task context

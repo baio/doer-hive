@@ -14,7 +14,11 @@ open DA.Drawing.IamgeSharp
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
-let getUserProfile = getClaims >> map(profileFromClaims)
+let trimBearer (x: string) = x.Split([|' '|]).[1]
+
+let userGuid (x: string) = x.Split([|'|'|]).[2]
+
+let getUserProfile = trimBearer >> getClaims >> map(profileFromClaims)
 
 // collide the worlds!
 
@@ -28,20 +32,15 @@ let getDataAccess mongoConfig blobConfig = {
         uploadStreamToStorage blobConfig stream name
 
     UpdateUserDocAvatar = fun userId url ->
-        Users.updateUserAvatar userId url mongoConfig        
+        Users.updateUserAvatar (userGuid userId) url mongoConfig        
 }
 
 
-let getAuth ((http, config): Auth0APIConfig) = {
-    GetPrincipalId = fun token ->
-        {
-            Issuer = config.clientDomain
-            Audience = config.audience
-            Jwks = ConfigJwksWellKnown
+let getAuth ((http, config): Auth0APIConfig) (jwt: DA.JWT.Config) = {
 
-        } 
-        |> getUserProfile token 
-        |> Task.map(fun x -> x.Id)
+    GetPrincipalId = fun token ->
+        jwt |> getUserProfile token |> Task.map(fun x -> x.Id)
+
     UpdateAvatar = fun userId url -> 
         updateUserAvatar (userId, url) (http, config) |> Task.``const`` true
 }
@@ -50,9 +49,8 @@ let imageResizer = {
     ResizeImage = resizeImage
 }
 
-
-let mapContext = fun (mongoConfig, authConfig, blobStorageConfig) ->
-    (getDataAccess mongoConfig blobStorageConfig), (getAuth authConfig), imageResizer
+let mapContext = fun (mongoConfig, authConfig, blobStorageConfig, jwtConfig) ->
+    (getDataAccess mongoConfig blobStorageConfig), (getAuth authConfig jwtConfig), imageResizer
 
 let updateAvatar token stream = mapContext >> updateAvatar token stream
 

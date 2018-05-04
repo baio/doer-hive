@@ -7,6 +7,7 @@ open FSharpx.Task
 open DA.FSX.ReaderTask
 open DA.Doer.Users
 open DA.HTTP.Blob
+open DA.JWT
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
@@ -16,6 +17,10 @@ let getConfig () =
         "auth0:clientId"
         "auth0:clientSecret"
         "auth0:audience"
+        "auth0:issuer"
+        "jwks:configuration"
+        "jwks:keys"
+
     ] 
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
@@ -24,9 +29,14 @@ let getConfig () =
             clientId = x.[1]
             clientSecret = x.[2]
             audience = x.[3]
+        },
+        {   
+            Audience = x.[3]
+            Issuer = x.[4]
+            Jwks = ConfigJwksConst (x.[5], x.[6])
         }
    
-let authConfig = getConfig()
+let authConfig, jwtConfig = getConfig()
 
 let mongoConfig = {
     connection = "mongodb://localhost"

@@ -67,7 +67,7 @@ let createUser: CreateUser = fun userInfo token env ->
 type UpdateUserAvatar = (string * string) -> string -> RequestAPI
 let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env -> 
     {
-        httpMethod = POST
+        httpMethod = PATCH
         url = sprintf "https://%s.auth0.com/api/v2/users/%s" (env.clientDomain) userId
         payload = JsonPayload 
             {
