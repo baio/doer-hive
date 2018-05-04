@@ -45,11 +45,31 @@ let private getRequestMessage (request: Request): HttpRequestMessage =
         | None -> ()
     | _ -> ()
     m
-        
+
+let private convertToHttpException (x: HttpResponseMessage) =
+    x.Content.ReadAsStringAsync()
+    |> map (fun content ->
+        {
+            StatusCode =    x.StatusCode
+            Reason     =    x.ReasonPhrase
+            Content    =    content
+            Uri        =    x.RequestMessage.RequestUri
+            Method     =    x.RequestMessage.Method
+        }
+    )
+    |> map HttpException
+
+                
 let chainHttpRequest (httpClient: HttpClient) (request: Request) : Task<string> =         
     request 
     |> getRequestMessage 
     |> fun x -> httpClient.SendAsync(x) 
-    >>= (fun x -> x.Content.ReadAsStringAsync())
+    >>= (fun x -> 
+        match x.IsSuccessStatusCode with
+        | true  ->
+            x.Content.ReadAsStringAsync()
+        | false ->
+            x |> convertToHttpException >>= ofException
+    )
 
 let httpClientRequest = chainHttpRequest (new HttpClient())

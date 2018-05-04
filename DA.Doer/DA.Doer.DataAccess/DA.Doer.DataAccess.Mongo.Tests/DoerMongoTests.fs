@@ -188,7 +188,7 @@ let ``Update user avatar must work`` () =
         readerTask {
             let! userId  = createUser user 
             let! _ = updateUserAvatar userId "http://avatar.co/lol.jpg"
-            //return! removeUser userId
+            let! _ = removeUser userId
             return userId
         }
     )) config

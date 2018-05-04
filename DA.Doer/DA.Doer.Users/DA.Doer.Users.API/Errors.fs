@@ -40,7 +40,7 @@ let networkFail (err: NetworkError) =
     500, 
     (
         [|
-            ("networkFail", JsonValue.String err.message)
+            ("networkFail", JsonValue.String err.Message)
         |]
         |> JsonValue.Record
     ).ToString()
@@ -52,11 +52,11 @@ let requestFail (err: NetworkError) =
         [|
             ("requestFail", 
                 [| 
-                    ("message", JsonValue.String err.message) 
+                    ("message", JsonValue.String err.Message) 
                     (
                         "responseUri", 
-                        match err.response with 
-                            | Some x -> JsonValue.String (x.ResponseUri.ToString()) 
+                        match err.Response with 
+                            | Some x -> JsonValue.String (x.Uri.ToString()) 
                             | None _ -> JsonValue.Null
                     )
                 |] |> JsonValue.Record

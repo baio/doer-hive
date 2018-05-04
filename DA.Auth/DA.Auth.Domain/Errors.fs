@@ -1,10 +1,12 @@
 ﻿namespace DA.Auth.Domain.Errors
 
-open System.Net
+type NetworkErrorResponse = {
+    Uri : System.Uri
+}
 
 type NetworkError = {
-    message: string
-    response: WebResponse option
+    Message    : string
+    Response  : NetworkErrorResponse option
 }
 
 type UserAlreadyExists = UserAlreadyExists

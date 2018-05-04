@@ -1,4 +1,4 @@
-﻿module DA.FSX.HttpTask
+﻿namespace DA.FSX.HttpTask
 
 open System.Threading.Tasks
 open FSharpx.Task
@@ -41,29 +41,68 @@ type Request = {
     queryString: QueryString
 }
 
-let inline str2json<'a> str = JsonConvert.DeserializeObject<'a> str
-
-
-let inline fromGetLike (r: GetLikeRequest) = {
-    url = r.url
-    httpMethod = match r.httpMethod with HttpGetLikeMethod.GET -> GET | HttpGetLikeMethod.DELETE -> DELETE
-    payload = None
-    headers = r.headers
-    queryString = r.queryString
+type HttpExceptionData = {
+    StatusCode :    System.Net.HttpStatusCode
+    Reason     :    string
+    Content    :    string    
+    Uri        :    System.Uri
+    Method     :    System.Net.Http.HttpMethod
 }
 
-let inline fromPostLike (r: PostLikeRequest) = {
-    url = r.url
-    httpMethod = match r.httpMethod with HttpPostLikeMethod.POST -> POST | HttpPostLikeMethod.PUT -> PUT | HttpPostLikeMethod.PATCH -> PATCH
-    payload = r.payload
-    headers = r.headers
-    queryString = []
-}
+type HttpException(ExceptionData: HttpExceptionData) = 
+    
+    inherit System.Net.WebException(ExceptionData.Content)
+    
+    member this.ExceptionData = ExceptionData
+
+
+
+[<AutoOpen>]
+module Utils = 
+
+    let inline str2json<'a> str = 
+        JsonConvert.DeserializeObject<'a> str
+
+
+    let inline fromGetLike (r: GetLikeRequest) = {
+        url = r.url
+        httpMethod = match r.httpMethod with HttpGetLikeMethod.GET -> GET | HttpGetLikeMethod.DELETE -> DELETE
+        payload = None
+        headers = r.headers
+        queryString = r.queryString
+    }
+
+    let inline fromPostLike (r: PostLikeRequest) = {
+        url = r.url
+        httpMethod = match r.httpMethod with HttpPostLikeMethod.POST -> POST | HttpPostLikeMethod.PUT -> PUT | HttpPostLikeMethod.PATCH -> PATCH
+        payload = r.payload
+        headers = r.headers
+        queryString = []
+    }
 
 module WebClient = 
 
     open System.Net
     open System.Collections.Specialized
+    open DA.FSX
+    open DA.FSX
+
+    let private convertToHttpException (x: WebException) =
+        x.Response.GetResponseStream()
+        |> DA.FSX.IO.readString
+        |> map (fun content ->
+            {   
+                // TODO !
+                StatusCode =    System.Net.HttpStatusCode.InternalServerError
+                Reason     =    x.Message
+                Content    =    content
+                Uri        =    x.Response.ResponseUri
+                // TODO !
+                Method     =    System.Net.Http.HttpMethod.Get
+            }
+        )
+        |> map HttpException
+
     
     let private bytes2str (xs: byte[]) = System.Text.Encoding.UTF8.GetString(xs)
 
@@ -106,6 +145,11 @@ module WebClient =
             uploadValues webClient request (NameValueCollection())
         | PUT | POST | PATCH ->
             upload webClient request
+        |> Task.bindError(
+            function 
+            :? WebException as ex -> ex |> convertToHttpException >>= Task.ofException
+            | _ as ex -> ex |> Task.ofException
+         )
                 
     let inline ofRequest (webClient: WebClient) = returnM >=> chainWebClient webClient       
 
