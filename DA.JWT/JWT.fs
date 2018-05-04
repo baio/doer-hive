@@ -24,7 +24,7 @@ type Config = {
     Jwks: ConfigJwks 
 }
 
-type JwkDocRetriever(openid, jwks) =    
+type JwksDocRetriever(openid, jwks) =    
     interface IDocumentRetriever with
         member this.GetDocumentAsync ((address: string), cancel) =
             if address.Contains(".well-known/openid-configuration") then 
@@ -35,8 +35,7 @@ type JwkDocRetriever(openid, jwks) =
 let getSigningKey (configurationManager: ConfigurationManager<OpenIdConnectConfiguration>) =
     configurationManager.GetConfigurationAsync(CancellationToken.None)     
     |> map(fun res -> 
-        let z = res.SigningKeys |> Seq.cast<SecurityKey>
-        z
+        res.SigningKeys |> Seq.cast<SecurityKey>
     )
     
 let getIssuerSigningKeysWellKnown (issuer: string) = 
@@ -56,7 +55,7 @@ let getIssuerSigningKeysConst x =
     new ConfigurationManager<OpenIdConnectConfiguration>(
         "https://const/.well-known/openid-configuration",
         OpenIdConnectConfigurationRetriever(),
-        JwkDocRetriever(x)
+        JwksDocRetriever(x)
     ) |> getSigningKey
 
 let getIssuerSigningKeys config = 

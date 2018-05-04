@@ -19,6 +19,8 @@ let getConfig () =
         "auth0:clientSecret"
         "auth0:audience"
         "auth0:issuer"
+        "jwks:configuration"
+        "jwks:keys"
     ] 
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
@@ -29,9 +31,9 @@ let getConfig () =
             audience = x.[3]
         }),
         {
-            Issuer = x.[4]
             Audience = x.[3]
-            Jwks = ConfigJwksConst (openid, jwks) // ConfigJwks.ConfigJwksWellKnown // ConfigJwksConst jwks
+            Issuer = x.[4]            
+            Jwks = ConfigJwksConst (x.[5], x.[6]) // ConfigJwks.ConfigJwksWellKnown // ConfigJwksConst jwks
         }
 
    
