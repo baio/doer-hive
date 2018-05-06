@@ -11,6 +11,24 @@ type BlobStorageConfig = {
     ContainerName: string
 }
 
+let private normalizeUri (uri:string) =
+    (*
+        Remote devices can't access localhost, so we need special local address to where such devices
+        could do requests.
+        When image url returned, for such devices, it must have correct local address.
+        Also proxy for this local address must be set 192.168.0.100:778 -> localhost:10000.
+        Now device could access images by 192.168.0.100:778...
+        All these addressess must be well known and correct.
+        + localhost:10000 - address of local storage emulator
+        + 192.168.0.100:778 - proxy to local storage emulator (must be set by nginx for example)
+    *)
+
+    #if DEBUG
+        uri.Replace("localhost:10000", "192.168.0.100:778")
+    #else 
+        uri
+    #endif
+
 let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
 
         let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
@@ -29,4 +47,4 @@ let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
         let blockBlob = container.GetBlockBlobReference(blobName)
 
         // Upload the file
-        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString())
+        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString() |> normalizeUri)

@@ -8,6 +8,7 @@ let uniqueKeyUnexpected _ =
     409, 
     (
         [|
+            "message", JsonValue.String "Unique key contsraint violation"
             "userAlreadyExists", JsonValue.Boolean(true)
             "unexpected", JsonValue.Boolean(true)
         |]
@@ -19,6 +20,7 @@ let uniqueKey (err: UniqueKeyError) =
     409, 
     (
         [|
+            ("message", JsonValue.String "Unique key contsraint violation") 
             (
                 (if err.collection.Contains("OwnerEmail_") then "userAlreadyExists" else "orgAlreadyExists"), 
                 JsonValue.Boolean(true)
@@ -31,6 +33,7 @@ let connectionFail (err: ConnectionError) =
     500, 
     (
         [|
+            ("message", JsonValue.String err.message) 
             ("connectionFail", JsonValue.String err.message)
         |]
         |> JsonValue.Record
@@ -40,6 +43,7 @@ let networkFail (err: NetworkError) =
     500, 
     (
         [|
+            ("message", JsonValue.String err.Message) 
             ("networkFail", JsonValue.String err.Message)
         |]
         |> JsonValue.Record
@@ -47,12 +51,12 @@ let networkFail (err: NetworkError) =
 
 
 let requestFail (err: NetworkError) = 
-    500, 
+    ((int)err.Code) , 
     (
         [|
+            ("message", JsonValue.String err.Message) 
             ("requestFail", 
                 [| 
-                    ("message", JsonValue.String err.Message) 
                     (
                         "responseUri", 
                         match err.Response with 
@@ -69,6 +73,7 @@ let validation e =
     400, 
     (
         [|
+            ("message", JsonValue.String "Validation failed") 
             (
                 "validationErrors", 
                 e |> List.map(fun (f, s) -> f, JsonValue.String(s)) |> List.toArray |> JsonValue.Record

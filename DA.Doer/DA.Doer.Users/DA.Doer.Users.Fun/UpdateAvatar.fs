@@ -25,10 +25,12 @@ module UpdateAvatar =
             request: HttpRequest,
             log: ILogger
         ) =            
-            let x = readAuthHeader' request
-            let y = readFirstFileContent' request
-            (updateAvatar <!> x <*> y) |> bind(fun x -> x)
-            |> map result200
+            readerTask {
+                let! authToken  = readAuthHeader'        request
+                let! fileStream = readFirstFileContent' request
+                let! result     = updateAvatar authToken fileStream
+                return result200 result
+            }
             |> bindError (getHttpError >> mapResultStr >> returnM)
             <| context2
 

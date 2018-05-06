@@ -25,13 +25,13 @@ module Errors =
     let matchNetworkException (x: exn) =
         match x with
         | :? System.Net.Http.HttpRequestException ->
-            Some { Message = x.Message; Response = None }
+            Some { Message = x.Message; Response = None; Code = System.Net.HttpStatusCode.InternalServerError }
         | _ ->
             None
 
     let matchRequestException (x: exn) =
         match x with
         | :? DA.FSX.HttpTask.HttpException as ex ->
-            Some { Message = ex.Message; Response = Some { Uri = ex.ExceptionData.Uri } }
+            Some { Message = ex.Message; Code = ex.ExceptionData.StatusCode; Response = Some { Uri = ex.ExceptionData.Uri } }
         | _ ->
             None
