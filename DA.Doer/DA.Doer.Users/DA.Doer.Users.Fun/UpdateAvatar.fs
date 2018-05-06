@@ -16,16 +16,21 @@ module UpdateAvatar =
     open Config
     open Newtonsoft.Json
     open DA.Http.ContentResult
+    open DA.HTTP.Request
 
 
-    [<FunctionName("updateAvatar")>]
+    [<FunctionName("update-avatar")>]
     let run(
             [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-avatar")>]
             request: HttpRequest,
             log: ILogger
         ) =            
-            updateAvatar (request.Headers.Item("Authorization").[0]) request.Body
+            let x = readAuthHeader' request
+            let y = readFirstFileContent' request
+            (updateAvatar <!> x <*> y) |> bind(fun x -> x)
             |> map result200
             |> bindError (getHttpError >> mapResultStr >> returnM)
             <| context2
+
+            
 

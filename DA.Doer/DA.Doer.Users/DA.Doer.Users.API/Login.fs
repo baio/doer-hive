@@ -17,6 +17,4 @@ type API<'a> = ReaderTask<Auth, 'a>
 
 ///
 
-let login (info: LoginInfo): API<TokensResult> = fun x -> x.login info
-    
-    
+let login (info: LoginInfo): API<TokensResult> = fun x -> x.login info   

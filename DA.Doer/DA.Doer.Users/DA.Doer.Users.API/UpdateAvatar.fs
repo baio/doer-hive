@@ -65,4 +65,5 @@ let updateAvatar (token: string) (stream: Stream): API<string> =
         let! _ = updateAvatars principalId avatarUrl
         return avatarUrl
     }
-           
+          
+    

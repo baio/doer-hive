@@ -8,6 +8,7 @@
     <Compile Include="Blob.fs" />
     <Compile Include="HttpTask.HttpClient.fs" />
     <Compile Include="ContentResult.fs" />
+    <Compile Include="Request.fs" />
   </ItemGroup>
 
   <ItemGroup>

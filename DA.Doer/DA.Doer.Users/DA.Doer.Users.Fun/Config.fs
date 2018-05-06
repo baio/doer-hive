@@ -8,7 +8,7 @@ open DA.JWT
 
 open DA.HTTP.Blob
 
-let request = DA.FSX.HttpTask.WebClient.webClientRequest
+let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
 let getConfig () = 
     [
