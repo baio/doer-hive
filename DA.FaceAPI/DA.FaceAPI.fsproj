@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="FaceAPI.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Torutek.Microsoft.ProjectOxford.Face" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DA.FSX\DA.FSX.fsproj" />
+  </ItemGroup>
+
+</Project>

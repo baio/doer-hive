@@ -8,6 +8,7 @@
     <Compile Include="Mongo.fs" />
     <Compile Include="Orgs.fs" />
     <Compile Include="Users.fs" />
+    <Compile Include="UserPhotoLinks.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -7,11 +7,11 @@ open FSharpx.Reader
 open DA.Doer.Mongo.API
 open DA.DataAccess.Domain
 open MongoDB.Driver
+open System
 
 // users
 
 let USERS_COLLECTION_NAME = "users"
-
 
 type UserDocIns = {
     Id: BsonObjectId
@@ -51,5 +51,11 @@ let removeUser (id: string) =
 let updateUserAvatar id url =  
     let fr = idFilter id
     let upd = setter "Avatar" url
+    (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
+    |> ReaderTask.mapc(true)
+
+let markAsReadyForTraining id =  
+    let fr = idFilter id
+    let upd = setter "Meta.PhotoValidator.LatestUploadTime" (DateTime.UtcNow)
     (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
     |> ReaderTask.mapc(true)

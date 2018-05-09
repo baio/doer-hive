@@ -65,6 +65,9 @@ let inline ( *>) a b = lift2 (fun _ z -> z) a b
 
 let inline (>=>) f g = fun x -> f x >>= g
 
+let sequence (x: ReaderTask<_,_> list) = fun env -> 
+    x |> List.map(fun f -> f env) |> Task.sequence
+
 type ReaderTaskBuilder() =
 
     member this.Return x = returnM x

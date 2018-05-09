@@ -3,6 +3,10 @@
 open Microsoft.WindowsAzure.Storage.Auth
 open System
 open Microsoft.WindowsAzure.Storage
+open Microsoft.WindowsAzure.Storage.Blob
+open System.IO
+
+open DA.FSX.ReaderTask
 
 type BlobStorageConfig = {
     Uri: string
@@ -10,6 +14,22 @@ type BlobStorageConfig = {
     AccountKey: string
     ContainerName: string
 }
+
+
+let getBlobContainer config = 
+
+    let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
+
+    let uri = new Uri(config.Uri)
+    // Create cloudstorage account by passing the storagecredentials
+    let storageAccount = new CloudStorageAccount(storageCredentials, uri, uri, uri, uri)
+
+    // Create the blob client.
+    let blobClient = storageAccount.CreateCloudBlobClient()
+
+    // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
+    blobClient.GetContainerReference(config.ContainerName)
+
 
 let private normalizeUri (uri:string) =
     (*
@@ -48,3 +68,18 @@ let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
 
         // Upload the file
         blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString() |> normalizeUri)
+
+let getBlob blobName (container: CloudBlobContainer) =
+    
+    // Get the reference to the block blob from the container
+    let blockBlob = container.GetBlockBlobReference(blobName)
+
+    let stream = new MemoryStream()
+
+    blockBlob.DownloadToStreamAsync(stream).ContinueWith(fun _ -> stream :> Stream)
+
+
+let getBlobs x = x |> List.map getBlob |> sequence
+
+
+    

@@ -58,5 +58,5 @@ let andRemove (result: RegisterOrgResult) (mongo: MongoConfig, auth: Auth0APICon
         Users.removeUser result.userId mongo       
         (API.removeUser result.authUserId *> returnM "ok") auth
     ]
-    |> sequence
+    |> FSharpx.Task.sequence
 

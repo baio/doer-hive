@@ -17,6 +17,8 @@ module API =
 
     type MongoReader<'a> = Reader<MongoConfig, 'a>
 
+    let inline bsoinId2String (id:  BsonObjectId) = id.AsObjectId.ToString()
+
     let inline bsonId x = x |> ObjectId.Parse |> BsonObjectId
 
     let inline setter (x: string) a = 
@@ -42,6 +44,7 @@ module API =
 
     let inline remove id (x: IMongoCollection<'a>) =
         x.DeleteOneAsync(idFilter id)
+
 
 module Errors =
 

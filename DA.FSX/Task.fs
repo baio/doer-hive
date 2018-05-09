@@ -85,4 +85,4 @@ let memoize f =
     }
 
 // parallel reserved so sequence the same for tasks
-let sequence x = x |> List.map(fun t -> fun () -> t) |> FSharpx.Task.Parallel
+let sequence x = x |> List.map(fun t -> fun () -> t) |> FSharpx.Task.Parallel |> map Array.toList
