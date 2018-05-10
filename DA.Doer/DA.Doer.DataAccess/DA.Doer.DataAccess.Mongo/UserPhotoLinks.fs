@@ -26,8 +26,12 @@ let addUserPhotoLink userId photoId =
         PhotoId = photoId
         Created = System.DateTime.UtcNow
     }
-    (insert doc <!> getCollection USER_PHOTO_LINKS_COLLECTION_NAME) |> ReaderTask.mapc(bsoinId2String id)
+    (insert doc <!> getCollection USER_PHOTO_LINKS_COLLECTION_NAME) |> ReaderTask.mapc(bsonId2String id)
 
+let removeUserPhotoLinks userId config =
+    let coll = getCollection USER_PHOTO_LINKS_COLLECTION_NAME config
+    coll.DeleteManyAsync(fun x -> x.UserId = userId)
+    
 let getTopUserPhotoLinks (limit: int) userId config =
     let coll = getCollection USER_PHOTO_LINKS_COLLECTION_NAME config
     coll.Find(fun x -> x.UserId = userId)

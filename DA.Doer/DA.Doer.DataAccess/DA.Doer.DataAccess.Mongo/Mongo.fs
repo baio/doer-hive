@@ -17,7 +17,7 @@ module API =
 
     type MongoReader<'a> = Reader<MongoConfig, 'a>
 
-    let inline bsoinId2String (id:  BsonObjectId) = id.AsObjectId.ToString()
+    let inline bsonId2String (id:  BsonObjectId) = id.AsObjectId.ToString()
 
     let inline bsonId x = x |> ObjectId.Parse |> BsonObjectId
 

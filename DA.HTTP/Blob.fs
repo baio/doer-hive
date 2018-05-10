@@ -69,6 +69,9 @@ let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
         // Upload the file
         blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString() |> normalizeUri)
 
+let removeBlobFromStorage blobName (container: CloudBlobContainer) =
+    container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
+
 let getBlob blobName (container: CloudBlobContainer) =
     
     // Get the reference to the block blob from the container
