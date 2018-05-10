@@ -42,55 +42,52 @@ let mockApi  =
 let ``Enlist to verify with mock api must work`` () =
     enlistToVerify "test-user" mockApi
 
-let setupForEnlistTest () =
+let semiMockApi = 
+    {
+        getLatestUserPhotos = fun userId -> 
+           getDirectoryBlobNames (Some 5) userId blobContainer
+
+        getBlob = fun photoId ->
+            getBlob photoId blobContainer
+                
+        uploadToTraining = fun userId streams ->
+            FSharpx.Task.returnM true
+        
+        markAsReadyForTraining = fun userId ->
+            markAsReadyForTraining userId mongoConfig
+    }
+
+
+let setupForEnlistTest userId =    
 
     task {
-        (*
-        // create mongo records
-        let! l1 = addUserPhotoLink "test-user" "1" mongoConfig
-        let! l2 = addUserPhotoLink "test-user" "2" mongoConfig
-        let! l3 = addUserPhotoLink "test-user" "5" mongoConfig
-        let! l4 = addUserPhotoLink "test-user" "7" mongoConfig
-        let! l5 = addUserPhotoLink "test-user" "9" mongoConfig
-        *)
 
         //upload blobs
         let stream = new MemoryStream(buffer = Encoding.UTF8.GetBytes("xxx")) :> Stream
-        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/1")
-        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/2")
-        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/3")
-        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/4")
-        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/5")       
+        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/1")
+        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/2")
+        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/3")
+        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/4")
+        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/5")       
 
         return true
     }
 
-let cleanForEnlistTest () =
-
-    task {
-        
-        (*
-        let! docs = getTopUserPhotoLinks 5  "test-user" mongoConfig
-
-        let ids = docs |> List.map(fun x -> x.Id |> bsonId2String)
-
-        let! _ = ids |> List.map(fun x -> removeBlobFromStorage x blobContainer) |> sequence
-
-        let! _ = removeUserPhotoLinks "test-user" mongoConfig
-        *)
-        let! _ = removeBlobDirectory "max" blobContainer
-
-        return true
-    }
+let cleanForEnlistTest userId =
+    removeBlobDirectory userId blobContainer
 
 [<Fact>]
 let ``Enlist to verify with mongo and blob api must work`` () =
+
+    let userId = "5aecbeab15db5a2a4c145e70"
     
     task {
 
-        let! _ = setupForEnlistTest()
+        let! _ = setupForEnlistTest userId
 
-        let! _ = cleanForEnlistTest()
+        let! _ = enlistToVerify userId semiMockApi
+
+        let! _ = cleanForEnlistTest userId
 
         return true
     }

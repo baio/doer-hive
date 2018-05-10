@@ -4,6 +4,7 @@ open System.IO
 open System.Threading.Tasks
 open DA.FSX.Task
 open System
+open DA.Doer.Domain.Auth
 
 type UserMustHaveAtLeast5PhotosException (currentLength) =
     inherit Exception()
