@@ -67,9 +67,15 @@ let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
         let blockBlob = container.GetBlockBlobReference(blobName)
 
         // Upload the file
-        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> blockBlob.Uri.ToString() |> normalizeUri)
+        blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> 
+            stream.Position <- (int64)0
+            blockBlob.Uri.ToString() |> normalizeUri
+        )
 
 let removeBlobFromStorage blobName (container: CloudBlobContainer) =
+    container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
+
+let removeBlobFromDirectory blobName (container: CloudBlobContainer) =
     container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
 let getBlob blobName (container: CloudBlobContainer) =
@@ -84,5 +90,43 @@ let getBlob blobName (container: CloudBlobContainer) =
 
 let getBlobs x = x |> List.map getBlob |> sequence
 
+open DA.FSX.Task
+
+let private getBlobNameFromUri (uri: Uri) = 
+    uri.Segments |> Array.skip 3 |> String.concat ""
+
+let private listBlobSegments limit dirName (container: CloudBlobContainer) =
+    container
+        .GetDirectoryReference(dirName)
+        .ListBlobsSegmentedAsync(
+            true, 
+            BlobListingDetails.None, 
+            (match limit with | Some x -> Nullable.op_Implicit(x) | None -> System.Nullable()), 
+            null, 
+            null, 
+            null
+        )
+
+let getDirectoryBlobNames limit dirName (container: CloudBlobContainer) =
+    listBlobSegments limit dirName container
+    |> map (fun x -> 
+        x.Results 
+        |> Seq.map(fun x -> x.Uri |> getBlobNameFromUri) 
+        |> Seq.toList
+    )
+
+let removeBlobDirectory dirName =
+    readerTask {
+        let! names = getDirectoryBlobNames None dirName
+        return! names |> List.map(removeBlobFromStorage) |> DA.FSX.ReaderTask.sequence
+    }
+
+let getDirectoryBlobs limit dirName =
+    readerTask {
+        let! names = getDirectoryBlobNames limit dirName
+        return! names |> List.map(getBlob) |> DA.FSX.ReaderTask.sequence
+    }
+
+    
 
     

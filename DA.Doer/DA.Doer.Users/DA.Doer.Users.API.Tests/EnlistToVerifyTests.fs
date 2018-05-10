@@ -45,21 +45,22 @@ let ``Enlist to verify with mock api must work`` () =
 let setupForEnlistTest () =
 
     task {
-        
+        (*
         // create mongo records
         let! l1 = addUserPhotoLink "test-user" "1" mongoConfig
         let! l2 = addUserPhotoLink "test-user" "2" mongoConfig
         let! l3 = addUserPhotoLink "test-user" "5" mongoConfig
         let! l4 = addUserPhotoLink "test-user" "7" mongoConfig
         let! l5 = addUserPhotoLink "test-user" "9" mongoConfig
+        *)
 
         //upload blobs
         let stream = new MemoryStream(buffer = Encoding.UTF8.GetBytes("xxx")) :> Stream
-        let! _ = uploadStreamToStorage blobStorageConfig stream l1
-        let! _ = uploadStreamToStorage blobStorageConfig stream l2
-        let! _ = uploadStreamToStorage blobStorageConfig stream l3
-        let! _ = uploadStreamToStorage blobStorageConfig stream l4
-        let! _ = uploadStreamToStorage blobStorageConfig stream l5       
+        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/1")
+        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/2")
+        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/3")
+        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/4")
+        let! _ = uploadStreamToStorage blobStorageConfig stream ("max/5")       
 
         return true
     }
@@ -68,6 +69,7 @@ let cleanForEnlistTest () =
 
     task {
         
+        (*
         let! docs = getTopUserPhotoLinks 5  "test-user" mongoConfig
 
         let ids = docs |> List.map(fun x -> x.Id |> bsonId2String)
@@ -75,6 +77,8 @@ let cleanForEnlistTest () =
         let! _ = ids |> List.map(fun x -> removeBlobFromStorage x blobContainer) |> sequence
 
         let! _ = removeUserPhotoLinks "test-user" mongoConfig
+        *)
+        let! _ = removeBlobDirectory "max" blobContainer
 
         return true
     }
