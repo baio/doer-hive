@@ -70,12 +70,15 @@ let semiMockApi =
             getBlob photoId blobContainer
                 
         uploadToTraining = fun userId tagId streams ->
+            returnM { TagId = Guid.NewGuid().ToString(); Results =  List.replicate 5 UploadStatusOk ; TotalPhotosCount = 5 }
+            (*
             let tag = 
                 match tagId with 
                 | Some x -> x |> Guid.Parse |> CreateImageExistentTag 
                 | None -> CreateImageNewTag userId
             createImages tag streams VISION_API_PROJECT_ID trainingApi
             |> map mapUploadToTrainingResult
+            *)
         
         markAsReadyForTraining = fun x ->
             markAsReadyForTraining x.UserId x.TagId x.Count mongoConfig
@@ -103,15 +106,15 @@ let cleanForEnlistTest userId =
 [<Fact>]
 let ``Enlist to verify with mongo and blob api must work`` () =
 
-    let userId = "5aecbeab15db5a2a4c145e70"
+    let userId = "22ecbeab15db5a2a4c145e70"
     
     task {
 
-        //let! _ = setupForEnlistTest userId
+        let! _ = setupForEnlistTest userId
 
         let! _ = enlistToVerify userId semiMockApi
 
-        //let! _ = cleanForEnlistTest userId
+        let! _ = cleanForEnlistTest userId
 
         return true
     }
