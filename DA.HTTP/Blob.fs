@@ -85,7 +85,10 @@ let getBlob blobName (container: CloudBlobContainer) =
 
     let stream = new MemoryStream()
 
-    blockBlob.DownloadToStreamAsync(stream).ContinueWith(fun _ -> stream :> Stream)
+    blockBlob.DownloadToStreamAsync(stream).ContinueWith(fun _ -> 
+        stream.Position <- (int64)0
+        stream :> Stream
+    )
 
 
 let getBlobs x = x |> List.map getBlob |> sequence
@@ -108,6 +111,8 @@ let private listBlobSegments limit dirName (container: CloudBlobContainer) =
         )
 
 let getDirectoryBlobNames limit dirName (container: CloudBlobContainer) =
+    // blobs must be stored with names formatted as create date time 
+    // https://stackoverflow.com/questions/5876519/azure-sort-order-of-list-operation-on-blob-container?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     listBlobSegments limit dirName container
     |> map (fun x -> 
         x.Results 

@@ -13,4 +13,8 @@
     <PackageReference Include="Microsoft.Cognitive.CustomVision.Training" Version="1.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DA.FSX\DA.FSX.fsproj" />
+  </ItemGroup>
+
 </Project>

@@ -54,8 +54,31 @@ let updateUserAvatar id url =
     (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
     |> ReaderTask.mapc(true)
 
-let markAsReadyForTraining id =  
+type MetaPhotoValidator = {
+    LatestUploadTime: DateTime
+    PhotosCount: int
+    TagId: string
+}
+
+let markAsReadyForTraining id tagId count =  
     let fr = idFilter id
-    let upd = setter "Meta.PhotoValidator.LatestUploadTime" (DateTime.UtcNow)
+    let upd = setter "Meta.PhotoValidator" { LatestUploadTime = DateTime.UtcNow; PhotosCount = count; TagId = tagId }
     (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
     |> ReaderTask.mapc(true)
+
+type UserMeta = {
+    PhotoValidator: MetaPhotoValidator
+}
+
+type UserWithMeta = {
+    Id: BsonObjectId
+    Meta: UserMeta
+}
+
+let getTrainingPhotoTag id config =  
+    let coll = getCollection USERS_COLLECTION_NAME config
+    coll.Find<UserWithMeta>(idFilter id)
+        .Project(fun x -> x.Meta.PhotoValidator.TagId)
+        .SingleOrDefaultAsync()
+        |> DA.FSX.Task.map(fun x -> if isNull x then None else Some x)
+

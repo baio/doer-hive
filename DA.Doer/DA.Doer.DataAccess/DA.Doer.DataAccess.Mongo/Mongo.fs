@@ -25,6 +25,10 @@ module API =
         let field = FieldDefinition<_, _>.op_Implicit(x)
         Builders.Update.Set(field, a)
 
+    let inline getter (x: string) a = 
+        let field = FieldDefinition<_>.op_Implicit(x)
+        Builders.Projection.Include(field)
+
     let inline filterEq (x: string) a  = 
         let field = FieldDefinition<_, _>.op_Implicit(x)
         Builders.Filter.Eq(field, a)

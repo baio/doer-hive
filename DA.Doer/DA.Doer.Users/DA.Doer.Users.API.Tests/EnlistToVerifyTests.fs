@@ -2,7 +2,7 @@
 
 open System
 open Xunit
-open FSharpx.Task
+//open FSharpx.Task
 open DA.FSX.Task
 open DA.Doer.Users.API.EnlistToVerify
 open System.IO
@@ -11,6 +11,21 @@ open DA.Doer.Mongo
 open Setup
 open DA.HTTP.Blob
 open DA.Doer.Mongo.API
+open Microsoft.Cognitive.CustomVision
+open DA.VisionAPI
+open FSharpx.Task
+
+let VISION_API_PROJECT_ID = Guid.Parse "7e6f1b23-befc-4fa2-a1aa-b2cf497a3073"
+
+let mapUploadToTrainingResult (tagId: Guid, summary: Models.CreateImageSummaryModel, photosCount: int) = 
+    {
+        TagId            = tagId.ToString()
+        TotalPhotosCount = photosCount
+        Results          =     summary.Images 
+            |> Seq.map(fun x -> 
+                if x.Status = "OK" then UploadStatusOk else UploadStatusFail
+            ) |> List.ofSeq
+    }    
 
 let mockApi  =
     {
@@ -20,18 +35,19 @@ let mockApi  =
            else
                 failwith "user not found"
 
-
+        getUserPhotoTrainingTag = fun userId -> returnM None
+            
         getBlob = fun photoId ->
             (new MemoryStream(buffer = Encoding.UTF8.GetBytes(photoId)) :> Stream) |> returnM
 
-        uploadToTraining = fun userId streams ->
+        uploadToTraining = fun userId tagId streams ->
            if userId = "test-user" then
-                returnM true
+                returnM { TagId = Guid.NewGuid().ToString(); Results = [ UploadStatusOk ]; TotalPhotosCount = 1 }
            else
                 failwith "user not found"
 
-        markAsReadyForTraining = fun userId ->
-           if userId = "test-user" then
+        markAsReadyForTraining = fun x ->
+           if x.UserId = "test-user" then
                 returnM true
            else
                 failwith "user not found"
@@ -45,16 +61,24 @@ let ``Enlist to verify with mock api must work`` () =
 let semiMockApi = 
     {
         getLatestUserPhotos = fun userId -> 
-           getDirectoryBlobNames (Some 5) userId blobContainer
+           getDirectoryBlobNames (Some 10) userId blobContainer
+
+        getUserPhotoTrainingTag = fun userId -> 
+            getTrainingPhotoTag userId mongoConfig
 
         getBlob = fun photoId ->
             getBlob photoId blobContainer
                 
-        uploadToTraining = fun userId streams ->
-            FSharpx.Task.returnM true
+        uploadToTraining = fun userId tagId streams ->
+            let tag = 
+                match tagId with 
+                | Some x -> x |> Guid.Parse |> CreateImageExistentTag 
+                | None -> CreateImageNewTag userId
+            createImages tag streams VISION_API_PROJECT_ID trainingApi
+            |> map mapUploadToTrainingResult
         
-        markAsReadyForTraining = fun userId ->
-            markAsReadyForTraining userId mongoConfig
+        markAsReadyForTraining = fun x ->
+            markAsReadyForTraining x.UserId x.TagId x.Count mongoConfig
     }
 
 
@@ -83,11 +107,11 @@ let ``Enlist to verify with mongo and blob api must work`` () =
     
     task {
 
-        let! _ = setupForEnlistTest userId
+        //let! _ = setupForEnlistTest userId
 
         let! _ = enlistToVerify userId semiMockApi
 
-        let! _ = cleanForEnlistTest userId
+        //let! _ = cleanForEnlistTest userId
 
         return true
     }

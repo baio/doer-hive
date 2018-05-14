@@ -6,6 +6,8 @@ open DA.FSX.Task
 open Microsoft.WindowsAzure.Storage.Blob
 open DA.HTTP
 open Microsoft.Cognitive.CustomVision
+open System
+open DA.VisionAPI
 
 type Config = {
     mongo        : MongoConfig
@@ -13,22 +15,40 @@ type Config = {
     trainingApi  : TrainingApi
 }
 
-let VISION_API_PROJECT_ID = "test"
+let VISION_API_PROJECT_ID = Guid.Parse("test")
+
+let mapUploadToTrainingResult (tagId: Guid, summary: Models.CreateImageSummaryModel, photosCount: int) = 
+    {
+        TagId            = tagId.ToString()
+        TotalPhotosCount = photosCount
+        Results          =     summary.Images 
+            |> Seq.map(fun x -> 
+                if x.Status = "OK" then UploadStatusOk else UploadStatusFail
+            ) |> List.ofSeq
+    }
+    
 
 let getApi config = 
     {
         getLatestUserPhotos = fun userId -> 
            (List.map(fun x -> x.PhotoId)) <!> (getTopUserPhotoLinks 5 userId config.mongo)           
 
+        getUserPhotoTrainingTag = fun userId -> 
+            getTrainingPhotoTag userId config.mongo
+
         getBlob = fun photoId ->
             Blob.getBlob photoId config.blobContainer
-                
-        uploadToTraining = fun userId streams ->
-            DA.VisionAPI.uploadStreams userId streams VISION_API_PROJECT_ID config.trainingApi
-            |> ``const`` true            
-        
-        markAsReadyForTraining = fun userId ->
-            markAsReadyForTraining userId config.mongo            
+
+        uploadToTraining = fun userId tagId streams ->
+            let tag = 
+                match tagId with 
+                | Some x -> x |> CreateImageNewTag 
+                | None -> CreateImageNewTag userId
+            createImages tag streams VISION_API_PROJECT_ID config.trainingApi
+            |> map mapUploadToTrainingResult
+                                
+        markAsReadyForTraining = fun x ->
+            markAsReadyForTraining x.UserId x.TagId x.Count config.mongo            
     }
 
 
