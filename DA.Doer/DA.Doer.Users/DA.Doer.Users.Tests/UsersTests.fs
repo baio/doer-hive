@@ -23,11 +23,11 @@ let ``Register org must work`` () =
                     MiddleName = "middle"
                 }
                 Phone = "+777777777"
-                Email = "registered-org@email.com"
+                Email = "registered-org-1@email.com"
                 Avatar = "http://avatar.com/1"
             }
             Org = {
-                Name = "org"
+                Name = "org-1"
             }
             Password = "LastPas123"
         }
