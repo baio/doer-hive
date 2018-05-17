@@ -29,7 +29,7 @@ type RegisterOrgConfig =
 let getDataAccess mongoConfig blobConfig = {
 
     UploadBlob = fun stream name -> 
-        uploadStreamToStorage blobConfig stream (name + ".jpg")
+        uploadStreamToStorage (name + ".jpg") stream blobConfig 
 
     UpdateUserDocAvatar = fun userId url ->
         Users.updateUserAvatar (userGuid userId) url mongoConfig        

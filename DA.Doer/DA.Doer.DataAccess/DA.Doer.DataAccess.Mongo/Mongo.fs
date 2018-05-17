@@ -5,6 +5,39 @@ type MongoConfig = {
     dbName: string
 }
 
+module Errors =
+
+    open MongoDB.Driver
+    open DA.DataAccess.Domain.Errors
+    open System
+
+    let matchConnectionError (e: exn) = 
+        match e with
+        | :? System.TimeoutException as ex when ex.Message.Contains("A timeout occured after") ->
+            Some { message = ex.Message }
+        | _ -> None
+
+    let matchUniqueKeyError (e: exn) =
+        match e with
+        | :? MongoWriteException as ex ->
+            match ex.InnerException with
+            | :? MongoBulkWriteException as ex1 when ex1.WriteErrors.Item(0).Code = 11000 ->
+                let err = ex1.WriteErrors.Item(0)
+                // TODO: extract collection and key
+                {
+                    collection = err.Message
+                    keys = [err.Message]
+                } |> Some
+            | _ -> None
+        | _ -> None
+
+    // TODO: field option 
+    type NotFoundException (name, id) =
+        inherit Exception(sprintf "Object %s with id %s not found" name id)
+
+open Errors
+
+
 module API =
 
     open System.Threading.Tasks
@@ -49,28 +82,19 @@ module API =
     let inline remove id (x: IMongoCollection<'a>) =
         x.DeleteOneAsync(idFilter id)
 
+    let firstOrNone (find: IFindFluent<_, _>) = 
+        find.FirstOrDefaultAsync() |> map(fun x -> 
+            if isNull (x :> obj) then
+                Some x
+            else 
+                None
+        )
 
-module Errors =
+    let firstOrException a (find: IFindFluent<_, _>) = 
+        find.FirstOrDefaultAsync() |> map(fun x -> 
+            if isNull (x :> obj) then
+                raise (new NotFoundException(a))
+            x
+        )
 
-    open MongoDB.Driver
-    open DA.DataAccess.Domain.Errors
 
-    let matchConnectionError (e: exn) = 
-        match e with
-        | :? System.TimeoutException as ex when ex.Message.Contains("A timeout occured after") ->
-            Some { message = ex.Message }
-        | _ -> None
-
-    let matchUniqueKeyError (e: exn) =
-        match e with
-        | :? MongoWriteException as ex ->
-            match ex.InnerException with
-            | :? MongoBulkWriteException as ex1 when ex1.WriteErrors.Item(0).Code = 11000 ->
-                let err = ex1.WriteErrors.Item(0)
-                // TODO: extract collection and key
-                {
-                    collection = err.Message
-                    keys = [err.Message]
-                } |> Some
-            | _ -> None
-        | _ -> None

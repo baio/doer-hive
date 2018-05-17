@@ -29,6 +29,20 @@ let private getFormBody (x: (string * string) list) =
     
 let private getJsonBody x =  
     new StringContent(JsonConvert.SerializeObject(x), Encoding.UTF8, "application/json")
+
+let private getFormMultipartBody (streams, data) =  
+    let requestContent = new MultipartFormDataContent() 
+    streams |> List.iter(fun (name, stream) ->
+        let imageContent = new StreamContent(stream)
+        requestContent.Add(imageContent, name, name) 
+    )
+    data |> List.iter(fun (name, x) ->
+        let strContent = new StringContent(x)
+        requestContent.Add(strContent, name) 
+    )
+    //let formData = getFormBody data
+    //requestContent.Add(formData)
+    requestContent
             
 let private getRequestMessage (request: Request): HttpRequestMessage = 
     let url = getUrl request
@@ -42,7 +56,10 @@ let private getRequestMessage (request: Request): HttpRequestMessage =
             m.Content <- getFormBody(x)
         | JsonPayload x -> 
             m.Content <- getJsonBody(x)
-        | None -> ()
+        | FormMultipartPayload (x, y) -> 
+            m.Content <- getFormMultipartBody(x, y)
+        | None ->             
+            ()
     | _ -> ()
     m
 

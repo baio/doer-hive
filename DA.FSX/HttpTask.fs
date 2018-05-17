@@ -3,6 +3,7 @@
 open System.Threading.Tasks
 open FSharpx.Task
 open Newtonsoft.Json
+open System.IO
 
 type Url = string
 type Headers = seq<string * string>
@@ -10,6 +11,7 @@ type QueryString = seq<string * string>
 
 type Payload = 
     FormPayload of list<string * string> 
+    | FormMultipartPayload of (list<string * Stream>) * (list<string * string>)
     | JsonPayload of obj
     | None
 
@@ -130,6 +132,8 @@ module WebClient =
             x |> JsonConvert.SerializeObject |> uploadString
         | FormPayload x ->
             x |> seq2coll |> uploadValues
+        | FormMultipartPayload _ ->
+            failwith "Not implemented"                
         | None ->
             uploadValues (NameValueCollection())
     

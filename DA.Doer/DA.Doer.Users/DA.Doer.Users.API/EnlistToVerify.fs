@@ -8,98 +8,74 @@ open System
 open DA.Doer.Domain.Auth
 
 ///
+type OrgId            = string
 type UserId            = string
-type PhotoPath         = string
+type PrincipalId       = string
 type TagId             = string
-type UploadStatus      = UploadStatusOk | UploadStatusFail
-
-type TrainingResultError = {
-    PhotoPath: PhotoPath
-    Status   : string
-}
-
-type TrainingBatchUploadResult = UploadStatus list
-
-type TrainingUploadResult = {
-    TagId           : TagId 
-    TotalPhotosCount: int
-    Results         : UploadStatus list
-}
+type SetId             = string
+type FaceTokenId       = string
 
 type UploadedPhotoParams = {
-    UserId: UserId
-    TagId : TagId
-    Count : int
+    OrgId            : OrgId
+    UserId           : UserId
+    FaceTokenIds     : FaceTokenId list
 }
 
 ///
 
-type UserMustHaveAtLeast5PhotosException (currentLength) =
+type UserPhotosMinimalLimitException (requiredLength, currentLength) =
     inherit Exception()
+    member this.requiredLength = requiredLength
     member this.currentLength = currentLength
 
-type TrainingUploadFailedException (trainingTotalPhotosCount: int, trainingUploadErrorsCount: int) =
-    inherit Exception()
-    member this.trainingTotalPhotosCount  = trainingTotalPhotosCount
-    member this.trainingUploadErrorsCount = trainingUploadErrorsCount
-       
-///
 
-type Api = {    
-    getLatestUserPhotos     : UserId -> Task<PhotoPath list>
-    getBlob                 : PhotoPath -> Task<Stream>
-    getUserPhotoTrainingTag : UserId -> Task<TagId option>
-    uploadToTraining        : UserId -> TagId option -> Stream list -> Task<TrainingUploadResult>
-    markAsReadyForTraining  : UploadedPhotoParams -> Task<bool>
+type AccessDeniedException () =
+    inherit Exception()
+       
+type API = {    
+    isPrincipalAncestor     : PrincipalId -> UserId -> Task<bool>
+    getUserPhotos           : UserId -> Task<Stream list>
+    isPhotoSetExists        : OrgId -> Task<bool>
+    createPhotoSet          : SetId -> Task<bool>
+    addPhotosToSet          : SetId -> Stream list -> Task<FaceTokenId list>
+    // must return total user number of user faces
+    markAsUploaded          : UploadedPhotoParams -> Task<int>
 }
 
-let validateUserHasAtLeast5Photos photosList = 
-    if (photosList |> List.length) < 5 then 
-        photosList.Length |> UserMustHaveAtLeast5PhotosException |> ofException
-    else 
-        photosList |> returnM
-
-(*
-Hadle result of upload to training
-If not all items were uploaded with success, function will remove failed uploads from images
-and then return error
-*)
-let handleUploadResult api userId (uploadResult: TrainingUploadResult) = 
-
-    let successResultsLength = 
-        uploadResult.Results
-        |> List.choose (function | UploadStatusOk -> Some true | _ -> None)
-        |> List.length
-
-    let uploadResultsLength = uploadResult.Results.Length
-
-    {
-        UserId = userId
-        TagId = uploadResult.TagId
-        Count = uploadResult.TotalPhotosCount
-    } 
-    |> api.markAsReadyForTraining
-    >>= (fun x -> 
-        if successResultsLength <> uploadResultsLength then
-            TrainingUploadFailedException(uploadResultsLength - successResultsLength, uploadResult.TotalPhotosCount) |> ofException
-        else 
-            returnM x
-    )
-
-let uploadToTraining api userId streams tagId =
-    api.uploadToTraining userId tagId streams
-    >>= handleUploadResult api userId
-
-let enlistToVerify userId api = 
-    api.getLatestUserPhotos userId
-    >>= fun photoNames ->
-        photoNames 
-        |> validateUserHasAtLeast5Photos
-        >>= (fun paths ->
-            let streams = paths |> List.map api.getBlob |> sequence
-            let tag = api.getUserPhotoTrainingTag userId
-            FSharpx.Task.lift2(uploadToTraining api userId) streams tag
-                >>= (fun x -> x)
-        )
+let enlistToVerify (principal: Principal) userId api = 
     
+    let principalId = principal.Id
+
+    let orgId = principal.OrgId
     
+    task {
+
+        // validate principal is ancestor of user
+        let! isPrincipalAncestor = api.isPrincipalAncestor principalId userId
+
+        if not isPrincipalAncestor then
+            raise (new AccessDeniedException())
+                    
+        // read user photos
+        let! userPhotos = api.getUserPhotos userId
+
+        // validate minimal required user photos quantity
+        if userPhotos.Length < 1 then
+            raise (new UserPhotosMinimalLimitException(1, userPhotos.Length))
+
+        // get photo set (by principalId) and if it is already exists
+        let! photoSetExists = api.isPhotoSetExists principal.OrgId
+
+        // create photo set if not exists, assign orgId as setId        
+        let! _ = if not photoSetExists then api.createPhotoSet orgId else returnM true       
+
+        // add photos to set
+        let! faceTokenIds = api.addPhotosToSet orgId userPhotos
+
+        // mark user - photos added to set
+        let! totalUserFacesCount = api.markAsUploaded({ OrgId = orgId; UserId = userId; FaceTokenIds = faceTokenIds })
+
+        // return total number of photos for user
+        return totalUserFacesCount
+    }
+        

@@ -5,21 +5,41 @@ open FSharpx.Task
 open DA.FSX.ReaderTask
 open DA.Doer.Users
 open DA.HTTP.Blob
+open DA.FacePlusPlus
 
+let getConfig () = 
+    [
+        "mongo:connection"
+        "mongo:dbName"
+        "blob:uri"
+        "blob:accountName"
+        "blob:accountKey"
+        "facepp:apiKey"
+        "facepp:apiSecret"
 
+    ] 
+    |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
+    |> fun x -> 
+        {
+            connection = x.[0]
+            dbName = x.[1]
+        },
+        {   
+            Uri = x.[2]
+            AccountName = x.[3]
+            AccountKey = x.[4]
+            ContainerName = "user-photos"
+        },
+        {
+            apiKey =    x.[5]
+            apiSecret = x.[6]
+        }
 
-let mongoConfig = {
-    connection = "mongodb://localhost"
-    dbName = "doer-local"
-}
-
-let blobStorageConfig: BlobStorageConfig = {
-    Uri = "http://127.0.0.1:10000/devstoreaccount1"
-    AccountName = "devstoreaccount1"
-    AccountKey = "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
-    ContainerName = "user-photos"
-}
+let mongoConfig, blobStorageConfig, faceppConfig = getConfig()
 
 let blobContainer = getBlobContainer blobStorageConfig
 
-let trainingApi = DA.VisionAPI.createTrainingApi "40bcb5a3da7a454eadb24f8008697f71"
+let faceppApi = {
+    config = faceppConfig
+    http = DA.Http.HttpTask.HttpClient.httpClientRequest
+}

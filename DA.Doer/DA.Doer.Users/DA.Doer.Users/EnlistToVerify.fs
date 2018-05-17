@@ -1,5 +1,6 @@
 ﻿module DA.Doer.Users.EnlistToVerify
 
+(*
 open DA.Doer.Users.API.EnlistToVerify
 open DA.Doer.Mongo
 open DA.FSX.Task
@@ -81,3 +82,4 @@ module Errors =
         ] 
         |> List.choose(fun x -> x ex)
         |> List.head
+*)

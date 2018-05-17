@@ -49,7 +49,7 @@ let private normalizeUri (uri:string) =
         uri
     #endif
 
-let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
+let uploadStreamToStorage blobName stream (config: BlobStorageConfig) =
 
         let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
 
@@ -72,6 +72,10 @@ let uploadStreamToStorage (config: BlobStorageConfig) stream blobName =
             blockBlob.Uri.ToString() |> normalizeUri
         )
 
+let getDateTimeFileName dir = sprintf "%s/%s" dir (DateTime.UtcNow.ToString("yyyyMMddHmmssfffff"))
+
+let uploadStreamToStorageDirectoty dir = dir |> getDateTimeFileName |> uploadStreamToStorage
+    
 let removeBlobFromStorage blobName (container: CloudBlobContainer) =
     container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
@@ -120,16 +124,17 @@ let getDirectoryBlobNames limit dirName (container: CloudBlobContainer) =
         |> Seq.toList
     )
 
+let getDirectoryBlobs limit dirName  = 
+    readerTask {
+        let! names = getDirectoryBlobNames limit dirName
+        return! getBlobs names
+    }
+
+
 let removeBlobDirectory dirName =
     readerTask {
         let! names = getDirectoryBlobNames None dirName
         return! names |> List.map(removeBlobFromStorage) |> DA.FSX.ReaderTask.sequence
-    }
-
-let getDirectoryBlobs limit dirName =
-    readerTask {
-        let! names = getDirectoryBlobNames limit dirName
-        return! names |> List.map(getBlob) |> DA.FSX.ReaderTask.sequence
     }
 
     

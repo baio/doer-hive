@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
@@ -13,6 +13,25 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="assets\max-1.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\max-2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\lev-1.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\lev-2.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="assets\lev-3.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FsUnit.xUnit" Version="3.1.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
@@ -21,9 +40,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
+    <ProjectReference Include="..\..\..\DA.FacePlusPlus\DA.FacePlusPlus.fsproj" />
     <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
     <ProjectReference Include="..\..\..\DA.HTTP\DA.HTTP.fsproj" />
-    <ProjectReference Include="..\..\..\DA.VisionAPI\DA.VisionAPI.fsproj" />
     <ProjectReference Include="..\..\DA.Doer.DataAccess\DA.Doer.DataAccess.Domain\DA.Doer.DataAccess.Domain.fsproj" />
     <ProjectReference Include="..\..\DA.Doer.DataAccess\DA.Doer.DataAccess.Mongo\DA.Doer.DataAccess.Mongo.fsproj" />
     <ProjectReference Include="..\DA.Doer.Users.API\DA.Doer.Users.API.fsproj" />

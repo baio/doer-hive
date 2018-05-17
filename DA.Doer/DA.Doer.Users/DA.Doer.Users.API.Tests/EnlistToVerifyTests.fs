@@ -3,7 +3,6 @@
 open System
 open Xunit
 //open FSharpx.Task
-open DA.FSX.Task
 open DA.Doer.Users.API.EnlistToVerify
 open System.IO
 open System.Text
@@ -11,110 +10,177 @@ open DA.Doer.Mongo
 open Setup
 open DA.HTTP.Blob
 open DA.Doer.Mongo.API
-open Microsoft.Cognitive.CustomVision
-open DA.VisionAPI
-open FSharpx.Task
-
-let VISION_API_PROJECT_ID = Guid.Parse "7e6f1b23-befc-4fa2-a1aa-b2cf497a3073"
-
-let mapUploadToTrainingResult (tagId: Guid, summary: Models.CreateImageSummaryModel, photosCount: int) = 
-    {
-        TagId            = tagId.ToString()
-        TotalPhotosCount = photosCount
-        Results          =     summary.Images 
-            |> Seq.map(fun x -> 
-                if x.Status = "OK" then UploadStatusOk else UploadStatusFail
-            ) |> List.ofSeq
-    }    
+open DA.FSX.Task
+open DA.Doer.Domain.Auth
+open DA.Doer.Users.API.IdentifyPhoto
+open DA.FacePlusPlus
+open DA.DataAccess.Domain
+open FsUnit.Xunit
 
 let mockApi  =
     {
-        getLatestUserPhotos = fun userId ->
-           if userId = "test-user" then
-                returnM ["1"; "2"; "7"; "8"; "9" ]
-           else
-                failwith "user not found"
+        isPrincipalAncestor = fun principalId userId -> returnM true
 
-        getUserPhotoTrainingTag = fun userId -> returnM None
-            
-        getBlob = fun photoId ->
-            (new MemoryStream(buffer = Encoding.UTF8.GetBytes(photoId)) :> Stream) |> returnM
+        getUserPhotos = fun userId -> 
+            (new MemoryStream(buffer = Encoding.UTF8.GetBytes("123")) :> Stream) |> List.replicate 5 |> returnM
 
-        uploadToTraining = fun userId tagId streams ->
-           if userId = "test-user" then
-                returnM { TagId = Guid.NewGuid().ToString(); Results = [ UploadStatusOk ]; TotalPhotosCount = 1 }
-           else
-                failwith "user not found"
+        isPhotoSetExists = fun principalId -> returnM true
+        
+        createPhotoSet = fun setId -> returnM true
 
-        markAsReadyForTraining = fun x ->
-           if x.UserId = "test-user" then
-                returnM true
-           else
-                failwith "user not found"
+        addPhotosToSet = fun setId treams -> returnM ["777"]
+
+        markAsUploaded = fun x -> returnM 1
     }
 
 
 [<Fact>]
 let ``Enlist to verify with mock api must work`` () =
-    enlistToVerify "test-user" mockApi
+    let principal: Principal = {
+        Id = "test-principal"
+        OrgId = "test-org"
+    }
+    enlistToVerify principal "test-user" mockApi
+
 
 let semiMockApi = 
     {
-        getLatestUserPhotos = fun userId -> 
-           getDirectoryBlobNames (Some 10) userId blobContainer
+        isPrincipalAncestor = fun principalId userId -> returnM true
 
-        getUserPhotoTrainingTag = fun userId -> 
-            getTrainingPhotoTag userId mongoConfig
+        getUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobContainer
 
-        getBlob = fun photoId ->
-            getBlob photoId blobContainer
-                
-        uploadToTraining = fun userId tagId streams ->
-            returnM { TagId = Guid.NewGuid().ToString(); Results =  List.replicate 5 UploadStatusOk ; TotalPhotosCount = 5 }
-            (*
-            let tag = 
-                match tagId with 
-                | Some x -> x |> Guid.Parse |> CreateImageExistentTag 
-                | None -> CreateImageNewTag userId
-            createImages tag streams VISION_API_PROJECT_ID trainingApi
-            |> map mapUploadToTrainingResult
-            *)
+        isPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoConfig
         
-        markAsReadyForTraining = fun x ->
-            markAsReadyForTraining x.UserId x.TagId x.Count mongoConfig
+        createPhotoSet = fun setId -> 
+            createFaceSet setId faceppApi |> ``const`` true
+            //returnM true
+
+        addPhotosToSet = fun setId streams -> 
+            detectAndAddSinglePersonFaces setId streams faceppApi |> map( fun (x, _, _) -> x )
+            //returnM ["100"]
+
+        markAsUploaded = fun x -> 
+            addUserPhotoLinks' x.OrgId x.UserId x.FaceTokenIds mongoConfig
+
     }
 
+let identPhotoApi  = 
+    {
+        identifyPhoto = fun orgId stream -> 
+            searchFace orgId stream faceppApi 
+                |> map(fun x -> 
+                    // TODO : throw exception if nothing found ?
+                    (x.results.[0].confidence, x.results.[0].face_token)
+                 )
+        findUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoConfig
+    }
 
-let setupForEnlistTest userId =    
+let setupForEnlistTest () =    
 
     task {
 
-        //upload blobs
-        let stream = new MemoryStream(buffer = Encoding.UTF8.GetBytes("xxx")) :> Stream
-        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/1")
-        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/2")
-        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/3")
-        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/4")
-        let! _ = uploadStreamToStorage blobStorageConfig stream (userId + "/5")       
+        let! orgId = createOrg { Name = "test-org-enlist"; OwnerEmail = "test-org-enlist@mail.ru" } mongoConfig
 
-        return true
+        let userDoc1: UserDoc =  {
+            OrgId = orgId
+            Role = "Owner"
+            FirstName = "first"
+            MidName = "user"
+            LastName = "name"
+            Email = "first_user_name@gmail.com"
+            Phone = "+79772753595"
+            Ancestors = []
+            Avatar = ""
+        } 
+
+        let userDoc2: UserDoc =  {
+            OrgId = orgId
+            Role = "Master"
+            FirstName = "second"
+            MidName = "user"
+            LastName = "name"
+            Email = "second_user_name@gmail.com"
+            Phone = "+79772753595"
+            Ancestors = []
+            Avatar = ""
+        } 
+       
+        // create user 1
+        let! user1Id = createUser userDoc1 mongoConfig
+        
+        // create user 2
+        let! user2Id = createUser userDoc2 mongoConfig
+
+        // upload user 1 blobs
+        let img1 = new FileStream("./assets/lev-1.jpg", FileMode.Open);    
+        let img2 = new FileStream("./assets/lev-2.jpg", FileMode.Open);    
+        let! _ = 
+            [
+                uploadStreamToStorageDirectoty user1Id img1 blobStorageConfig 
+                uploadStreamToStorageDirectoty user1Id img2 blobStorageConfig  
+            ] |> DA.FSX.Task.sequence
+
+        // upload user 2 blobs
+        let img3 = new FileStream("./assets/max-1.jpg", FileMode.Open);    
+        let! _ = uploadStreamToStorageDirectoty user2Id img3 blobStorageConfig 
+
+        return (orgId, user1Id, user2Id)
     }
 
-let cleanForEnlistTest userId =
-    removeBlobDirectory userId blobContainer
-
-[<Fact>]
-let ``Enlist to verify with mongo and blob api must work`` () =
-
-    let userId = "22ecbeab15db5a2a4c145e70"
+let cleanForEnlistTest (orgId, user1Id, user2Id) =
     
     task {
 
-        let! _ = setupForEnlistTest userId
+        let! _ = removeOrg orgId mongoConfig 
+        
+        let! _ = removeUserData user1Id mongoConfig 
 
-        let! _ = enlistToVerify userId semiMockApi
+        let! _ = removeUserData user2Id mongoConfig 
+        
+        let! _ = removeBlobDirectory user1Id blobContainer
 
-        let! _ = cleanForEnlistTest userId
+        let! _ = removeBlobDirectory user2Id blobContainer
+
+        let! _ = deleteFaceset orgId faceppApi
 
         return true
+    }
+
+// Paid or Limited !
+[<Fact>]
+let ``Enlist to verify with mongo and blob api must work`` () =
+           
+    task {
+
+        let! orgId, user1Id, user2Id = setupForEnlistTest()
+
+        let principal = {
+                Id    = user1Id
+                OrgId = orgId
+            }
+
+        return! task {                
+
+            let! _ = enlistToVerify principal user1Id semiMockApi
+            
+            let! _ = enlistToVerify principal user2Id semiMockApi
+       
+            let imgUser1 = new FileStream("./assets/lev-3.jpg", FileMode.Open);    
+
+            let! (conf1, user1) = identifyPhoto principal imgUser1 identPhotoApi
+
+            let imgUser2 = new FileStream("./assets/max-2.png", FileMode.Open);    
+
+            let! (conf2, user2) = identifyPhoto principal imgUser2 identPhotoApi
+
+            // image for user must be correctly identified as image for user with high confidency
+            user1.Id |> should equal user1Id
+            conf1 |> should equal High
+
+            user2.Id |> should equal user2Id
+            conf2 |> should equal Medium
+
+        } 
+        |> tryFinally (fun () -> cleanForEnlistTest (orgId, user1Id, user2Id))
+               
     }
