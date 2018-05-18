@@ -19,18 +19,18 @@ open FsUnit.Xunit
 
 let mockApi  =
     {
-        isPrincipalAncestor = fun principalId userId -> returnM true
+        IsPrincipalAncestor = fun principalId userId -> returnM true
 
-        getUserPhotos = fun userId -> 
+        GetUserPhotos = fun userId -> 
             (new MemoryStream(buffer = Encoding.UTF8.GetBytes("123")) :> Stream) |> List.replicate 5 |> returnM
 
-        isPhotoSetExists = fun principalId -> returnM true
+        IsPhotoSetExists = fun principalId -> returnM true
         
-        createPhotoSet = fun setId -> returnM true
+        CreatePhotoSet = fun setId -> returnM true
 
-        addPhotosToSet = fun setId treams -> returnM ["777"]
+        AddPhotosToSet = fun setId treams -> returnM ["777"]
 
-        markAsUploaded = fun x -> returnM 1
+        MarkAsUploaded = fun x -> returnM 1
     }
 
 
@@ -45,34 +45,34 @@ let ``Enlist to verify with mock api must work`` () =
 
 let semiMockApi = 
     {
-        isPrincipalAncestor = fun principalId userId -> returnM true
+        IsPrincipalAncestor = fun principalId userId -> returnM true
 
-        getUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobApi
+        GetUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobApi
 
-        isPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoApi
+        IsPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoApi
         
-        createPhotoSet = fun setId -> 
+        CreatePhotoSet = fun setId -> 
             createFaceSet setId faceppApi |> ``const`` true
             //returnM true
 
-        addPhotosToSet = fun setId streams -> 
+        AddPhotosToSet = fun setId streams -> 
             detectAndAddSinglePersonFaces setId streams faceppApi |> map( fun (x, _, _) -> x )
             //returnM ["100"]
 
-        markAsUploaded = fun x -> 
+        MarkAsUploaded = fun x -> 
             addUserPhotoLinks' x.OrgId x.UserId x.FaceTokenIds mongoApi
 
     }
 
 let identPhotoApi  = 
     {
-        identifyPhoto = fun orgId stream -> 
+        IdentifyPhoto = fun orgId stream -> 
             searchFace orgId stream faceppApi 
                 |> map(fun x -> 
                     // TODO : throw exception if nothing found ?
                     (x.results.[0].confidence, x.results.[0].face_token)
                  )
-        findUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
+        FindUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
     }
 
 let setupForEnlistTest () =    

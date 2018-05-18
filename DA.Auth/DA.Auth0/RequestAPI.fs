@@ -12,9 +12,9 @@ type RequestAPI = Auth0Reader<Request>
 // create user
 
 type UserMetadata = {
-        name: string
-        avatar: string
-    }
+    name: string
+    avatar: string
+}
 
 type AppMetadata = {
     role: string
@@ -39,9 +39,9 @@ type UpdateUserAvatarPayload = { user_metadata: UpdateUserAvatarMetadata }
 type CreateUser = CreateUserInfo -> string -> RequestAPI
 let createUser: CreateUser = fun userInfo token env -> 
     {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/api/v2/users" (env.clientDomain)
-        payload = JsonPayload 
+        HttpMethod = POST
+        Url = sprintf "https://%s.auth0.com/api/v2/users" (env.ClientDomain)
+        Payload = JsonPayload 
             {
                 // Name and Picture parameters couldn't be set for profile directly
                 // https://auth0.com/docs/user-profile/normalized/auth0 (Fields that are always generated)
@@ -60,24 +60,24 @@ let createUser: CreateUser = fun userInfo token env ->
                         orgId = userInfo.OrgId                    
                     }
             }
-        headers = ["authorization", token]
-        queryString = []
+        Headers = ["authorization", token]
+        QueryString = []
     }
 
 type UpdateUserAvatar = (string * string) -> string -> RequestAPI
 let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env -> 
     {
-        httpMethod = PATCH
-        url = sprintf "https://%s.auth0.com/api/v2/users/%s" (env.clientDomain) userId
-        payload = JsonPayload 
+        HttpMethod = PATCH
+        Url = sprintf "https://%s.auth0.com/api/v2/users/%s" (env.ClientDomain) userId
+        Payload = JsonPayload 
             {
                 user_metadata =  
                     {
                         avatar = avatarUrl
                     }
             }
-        headers = ["authorization", token]
-        queryString = []
+        Headers = ["authorization", token]
+        QueryString = []
     }
 
 // get user
@@ -85,27 +85,27 @@ let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env ->
 type GetUser = string -> RequestAPI
 let getUser: GetUser = fun token env -> 
     {
-        httpMethod = GET
-        url = sprintf "https://%s.auth0.com/api/v2/users?fields=user_id" (env.clientDomain)
-        payload = None
-        headers = ["authorization", token]
-        queryString = []
+        HttpMethod = GET
+        Url = sprintf "https://%s.auth0.com/api/v2/users?fields=user_id" (env.ClientDomain)
+        Payload = None
+        Headers = ["authorization", token]
+        QueryString = []
     }
 
 // get management token
 
 let getManagementToken: RequestAPI = fun env -> 
     {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
-        payload = FormPayload  [
-                    "audience", sprintf "https://%s.auth0.com/api/v2/" env.clientDomain
+        HttpMethod = POST
+        Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain
+        Payload = FormPayload  [
+                    "audience", sprintf "https://%s.auth0.com/api/v2/" env.ClientDomain
                     "grant_type", "client_credentials"
-                    "client_id", env.clientId
-                    "client_secret", env.clientSecret
+                    "client_id", env.ClientId
+                    "client_secret", env.ClientSecret
                 ]
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
 
 // remove user
@@ -113,11 +113,11 @@ let getManagementToken: RequestAPI = fun env ->
 type RemoveUser = string -> string -> RequestAPI
 let removeUser: RemoveUser = fun token userId env -> 
     {
-        httpMethod = DELETE
-        url = sprintf "https://%s.auth0.com/api/v2/users/%s" env.clientDomain userId
-        payload = None
-        headers = ["authorization", token]
-        queryString = []
+        HttpMethod = DELETE
+        Url = sprintf "https://%s.auth0.com/api/v2/users/%s" env.ClientDomain userId
+        Payload = None
+        Headers = ["authorization", token]
+        QueryString = []
     }
 
 // user token
@@ -159,36 +159,36 @@ let removeUser: RemoveUser = fun token userId env ->
 type Login = LoginInfo -> RequestAPI
 let login: Login = fun loginInfo env -> 
     {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
-        payload = FormPayload 
+        HttpMethod = POST
+        Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain
+        Payload = FormPayload 
             [
                 "username", loginInfo.Email
                 "password", loginInfo.Password
                 "grant_type", "password"
-                "client_id", env.clientId
-                "client_secret", env.clientSecret
-                "audience", env.audience
+                "client_id", env.ClientId
+                "client_secret", env.ClientSecret
+                "audience", env.Audience
                 "scope", "openid profile offline_access"
             ]
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
 
 type RefreshToken = string -> RequestAPI
 let refreshToken: RefreshToken = fun token env -> 
     {
-        httpMethod = POST
-        url = sprintf "https://%s.auth0.com/oauth/token" env.clientDomain
-        payload = FormPayload 
+        HttpMethod = POST
+        Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain
+        Payload = FormPayload 
             [
                 "grant_type", "refresh_token"
-                "client_id", env.clientId
-                "client_secret", env.clientSecret
+                "client_id", env.ClientId
+                "client_secret", env.ClientSecret
                 "refresh_token", token
             ]
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
 
 

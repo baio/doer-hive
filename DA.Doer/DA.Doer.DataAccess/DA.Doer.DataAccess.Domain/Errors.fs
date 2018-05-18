@@ -1,11 +1,11 @@
 ﻿namespace DA.DataAccess.Domain.Errors
 
 type ConnectionError = {
-    message: string
+    Message: string
 }
 
 type UniqueKeyError = {
-    collection: string
-    keys: string list
+    Collection: string
+    Keys: string list
 }
 

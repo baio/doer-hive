@@ -29,10 +29,10 @@ let getConfig () =
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
         {
-            clientDomain = x.[0]
-            clientId = x.[1]
-            clientSecret = x.[2]
-            audience = x.[3]
+            ClientDomain = x.[0]
+            ClientId = x.[1]
+            ClientSecret = x.[2]
+            Audience = x.[3]
         },
         {   
             Audience = x.[3]
@@ -40,8 +40,8 @@ let getConfig () =
             Jwks = ConfigJwksConst(x.[5], x.[6])                
         },
         {
-            connection = x.[7]
-            dbName = x.[8]
+            Connection = x.[7]
+            DbName = x.[8]
         },
         {
             Uri = x.[9]
@@ -53,7 +53,7 @@ let getConfig () =
 let authConfig, jwtConfig, mongoConfig, blobConfig = getConfig()
 
 let mongoApi = {
-    db = getDb mongoConfig
+    Db = getDb mongoConfig
 }
 
 let blobApi = {

@@ -33,13 +33,13 @@ type AccessDeniedException () =
     inherit Exception()
        
 type API = {    
-    isPrincipalAncestor     : PrincipalId -> UserId -> Task<bool>
-    getUserPhotos           : UserId -> Task<Stream list>
-    isPhotoSetExists        : OrgId -> Task<bool>
-    createPhotoSet          : SetId -> Task<bool>
-    addPhotosToSet          : SetId -> Stream list -> Task<FaceTokenId list>
+    IsPrincipalAncestor     : PrincipalId -> UserId -> Task<bool>
+    GetUserPhotos           : UserId -> Task<Stream list>
+    IsPhotoSetExists        : OrgId -> Task<bool>
+    CreatePhotoSet          : SetId -> Task<bool>
+    AddPhotosToSet          : SetId -> Stream list -> Task<FaceTokenId list>
     // must return total user number of user faces
-    markAsUploaded          : UploadedPhotoParams -> Task<int>
+    MarkAsUploaded          : UploadedPhotoParams -> Task<int>
 }
 
 let enlistToVerify (principal: Principal) userId api = 
@@ -51,29 +51,29 @@ let enlistToVerify (principal: Principal) userId api =
     task {
 
         // validate principal is ancestor of user
-        let! isPrincipalAncestor = api.isPrincipalAncestor principalId userId
+        let! isPrincipalAncestor = api.IsPrincipalAncestor principalId userId
 
         if not isPrincipalAncestor then
             raise (new AccessDeniedException())
                     
         // read user photos
-        let! userPhotos = api.getUserPhotos userId
+        let! userPhotos = api.GetUserPhotos userId
 
         // validate minimal required user photos quantity
         if userPhotos.Length < 1 then
             raise (new UserPhotosMinimalLimitException(1, userPhotos.Length))
 
         // get photo set (by principalId) and if it is already exists
-        let! photoSetExists = api.isPhotoSetExists principal.OrgId
+        let! photoSetExists = api.IsPhotoSetExists principal.OrgId
 
         // create photo set if not exists, assign orgId as setId        
-        let! _ = if not photoSetExists then api.createPhotoSet orgId else returnM true       
+        let! _ = if not photoSetExists then api.CreatePhotoSet orgId else returnM true       
 
         // add photos to set
-        let! faceTokenIds = api.addPhotosToSet orgId userPhotos
+        let! faceTokenIds = api.AddPhotosToSet orgId userPhotos
 
         // mark user - photos added to set
-        let! totalUserFacesCount = api.markAsUploaded({ OrgId = orgId; UserId = userId; FaceTokenIds = faceTokenIds })
+        let! totalUserFacesCount = api.MarkAsUploaded({ OrgId = orgId; UserId = userId; FaceTokenIds = faceTokenIds })
 
         // return total number of photos for user
         return totalUserFacesCount

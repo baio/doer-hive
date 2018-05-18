@@ -9,7 +9,7 @@ open DA.DataAccess.Domain
 open ReaderTask
 
 type Auth = {
-    login: LoginInfo -> Task<TokensResult>
+    Login: LoginInfo -> Task<TokensResult>
 }
 
 
@@ -17,4 +17,4 @@ type API<'a> = ReaderTask<Auth, 'a>
 
 ///
 
-let login (info: LoginInfo): API<TokensResult> = fun x -> x.login info   
+let login (info: LoginInfo): API<TokensResult> = fun x -> x.Login info   

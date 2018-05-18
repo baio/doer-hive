@@ -22,25 +22,25 @@ type HttpPostLikeMethod = POST | PUT | PATCH
 type HttpMethod = POST | PUT | PATCH | DELETE | GET 
 
 type GetLikeRequest = {
-    url: Url
-    httpMethod: HttpGetLikeMethod 
-    headers: Headers
-    queryString: QueryString
+    Url: Url
+    HttpMethod: HttpGetLikeMethod 
+    Headers: Headers
+    QueryString: QueryString
 }
 
 type PostLikeRequest = {
-    url: Url
-    httpMethod: HttpPostLikeMethod 
-    headers: Headers
-    payload: Payload 
+    Url: Url
+    HttpMethod: HttpPostLikeMethod 
+    Headers: Headers
+    Payload: Payload 
 }
 
 type Request = {
-    url: Url
-    httpMethod: HttpMethod
-    payload: Payload 
-    headers: Headers
-    queryString: QueryString
+    Url: Url
+    HttpMethod: HttpMethod
+    Payload: Payload 
+    Headers: Headers
+    QueryString: QueryString
 }
 
 type HttpExceptionData = {
@@ -67,19 +67,19 @@ module Utils =
 
 
     let inline fromGetLike (r: GetLikeRequest) = {
-        url = r.url
-        httpMethod = match r.httpMethod with HttpGetLikeMethod.GET -> GET | HttpGetLikeMethod.DELETE -> DELETE
-        payload = None
-        headers = r.headers
-        queryString = r.queryString
+        Url = r.Url
+        HttpMethod = match r.HttpMethod with HttpGetLikeMethod.GET -> GET | HttpGetLikeMethod.DELETE -> DELETE
+        Payload = None
+        Headers = r.Headers
+        QueryString = r.QueryString
     }
 
     let inline fromPostLike (r: PostLikeRequest) = {
-        url = r.url
-        httpMethod = match r.httpMethod with HttpPostLikeMethod.POST -> POST | HttpPostLikeMethod.PUT -> PUT | HttpPostLikeMethod.PATCH -> PATCH
-        payload = r.payload
-        headers = r.headers
-        queryString = []
+        Url = r.Url
+        HttpMethod = match r.HttpMethod with HttpPostLikeMethod.POST -> POST | HttpPostLikeMethod.PUT -> PUT | HttpPostLikeMethod.PATCH -> PATCH
+        Payload = r.Payload
+        Headers = r.Headers
+        QueryString = []
     }
 
 module WebClient = 
@@ -118,15 +118,15 @@ module WebClient =
     let private getMethod = function GET -> "GET" | POST -> "POST" | PUT -> "PUT" | PATCH -> "PATCH" | DELETE -> "DELETE"
 
     let private uploadValues (webClient: WebClient) request body =
-        bytes2str <!> webClient.UploadValuesTaskAsync(request.url, getMethod(request.httpMethod), body) 
+        bytes2str <!> webClient.UploadValuesTaskAsync(request.Url, getMethod(request.HttpMethod), body) 
 
     let private uploadString (webClient: WebClient) request body =
-        webClient.UploadStringTaskAsync(request.url, getMethod(request.httpMethod), body)
+        webClient.UploadStringTaskAsync(request.Url, getMethod(request.HttpMethod), body)
 
     let private upload (webClient: WebClient) request =
         let uploadValues = uploadValues webClient request
         let uploadString = uploadString webClient request
-        match request.payload with
+        match request.Payload with
         | JsonPayload x -> 
             webClient.Headers.Add("content-type", "application/json")
             x |> JsonConvert.SerializeObject |> uploadString
@@ -139,12 +139,12 @@ module WebClient =
     
     let chainWebClient (webClient: WebClient) (request: Request) : Task<string> =         
                 
-        webClient.Headers <- seq2coll' (WebHeaderCollection()) request.headers
-        webClient.QueryString <- seq2coll request.queryString
+        webClient.Headers <- seq2coll' (WebHeaderCollection()) request.Headers
+        webClient.QueryString <- seq2coll request.QueryString
         
-        match request.httpMethod with
+        match request.HttpMethod with
         | GET ->
-            webClient.DownloadStringTaskAsync request.url
+            webClient.DownloadStringTaskAsync request.Url
         | DELETE ->
             uploadValues webClient request (NameValueCollection())
         | PUT | POST | PATCH ->

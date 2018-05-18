@@ -16,12 +16,12 @@ type CreateUserInfo = {
 }
 
 type TokensResult = {
-    idToken: string
-    accessToken: string
-    refreshToken: string
+    IdToken: string
+    AccessToken: string
+    RefreshToken: string
 }
 
 type RegisterUserResult = {
-    userId: string
-    tokens: TokensResult
+    UserId: string
+    Tokens: TokensResult
 }

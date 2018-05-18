@@ -12,7 +12,7 @@ let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 // collide the worlds!
 
 let getAuth config = {
-    refreshToken = fun token -> refreshToken token config
+    RefreshToken = fun token -> refreshToken token config
 }
 
 let mapContext = fun authConfig -> getAuth authConfig

@@ -14,13 +14,13 @@ type RegisterOrgConfig =
     DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig
 
 let getDataAccess config = {
-    insertDoc = function
+    InsertDoc = function
         | User doc -> Users.createUser doc config
         | Org doc -> Orgs.createOrg doc config            
 }
 
 let getAuth config = {
-    registerUser = fun userInfo -> registerUser userInfo config
+    RegisterUser = fun userInfo -> registerUser userInfo config
 }
 
 let mapContext = fun (mongoConfig, authConfig) ->

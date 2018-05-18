@@ -22,7 +22,7 @@ let uniqueKey (err: UniqueKeyError) =
         [|
             ("message", JsonValue.String "Unique key contsraint violation") 
             (
-                (if err.collection.Contains("OwnerEmail_") then "userAlreadyExists" else "orgAlreadyExists"), 
+                (if err.Collection.Contains("OwnerEmail_") then "userAlreadyExists" else "orgAlreadyExists"), 
                 JsonValue.Boolean(true)
             )
         |]
@@ -33,8 +33,8 @@ let connectionFail (err: ConnectionError) =
     500, 
     (
         [|
-            ("message", JsonValue.String err.message) 
-            ("connectionFail", JsonValue.String err.message)
+            ("message", JsonValue.String err.Message) 
+            ("connectionFail", JsonValue.String err.Message)
         |]
         |> JsonValue.Record
     ).ToString()

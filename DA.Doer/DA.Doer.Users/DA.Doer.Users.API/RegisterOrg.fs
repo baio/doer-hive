@@ -15,13 +15,13 @@ type DataAccessTable =
     | Org of OrgDoc
 
 type DataAccess = {
-    insertDoc: DataAccessTable -> Task<string>
+    InsertDoc: DataAccessTable -> Task<string>
 }
 
 //
 
 type Auth = {
-    registerUser: CreateUserInfo -> Task<RegisterUserResult>
+    RegisterUser: CreateUserInfo -> Task<RegisterUserResult>
 }
 
 
@@ -86,11 +86,11 @@ let info2register orgId userId (info: RegisterOrgInfo) =
 
 type RegOrgApi<'a> = ReaderTask<RegisterOrgInfo * (DataAccess * Auth), 'a>
 
-let insertOrg'                 info = fun (dataAccess, _) -> info |> info2org |> Org |> dataAccess.insertDoc
+let insertOrg'                 info = fun (dataAccess, _) -> info |> info2org |> Org |> dataAccess.InsertDoc
 
-let insertUser'   orgId        info = fun (dataAccess, _) -> info |> info2user orgId |> User |> dataAccess.insertDoc
+let insertUser'   orgId        info = fun (dataAccess, _) -> info |> info2user orgId |> User |> dataAccess.InsertDoc
 
-let registerUser' orgId userId info = fun (_,       auth) -> info |> info2register orgId userId |> auth.registerUser
+let registerUser' orgId userId info = fun (_,       auth) -> info |> info2register orgId userId |> auth.RegisterUser
 
 //
 
@@ -112,6 +112,6 @@ let registerOrg (info: RegisterOrgInfo): API<RegisterOrgResult> = fun x ->
         let! orgId  = insertOrg
         let! userId = insertUser   orgId
         let! result = registerUser orgId userId
-        return { orgId = orgId; userId = userId; authUserId = result.userId; tokens = result.tokens }
+        return { orgId = orgId; userId = userId; authUserId = result.UserId; tokens = result.Tokens }
     }) (info, x)
     

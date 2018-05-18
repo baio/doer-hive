@@ -21,8 +21,8 @@ let getConfig () =
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
         {
-            connection = x.[0]
-            dbName = x.[1]
+            Connection = x.[0]
+            DbName = x.[1]
         },
         {   
             Uri = x.[2]
@@ -31,19 +31,19 @@ let getConfig () =
             ContainerName = "user-photos"
         },
         {
-            apiKey =    x.[5]
-            apiSecret = x.[6]
+            ApiKey =    x.[5]
+            ApiSecret = x.[6]
         }
 
 let mongoConfig, blobStorageConfig, faceppConfig = getConfig()
 
 let faceppApi = {
-    config = faceppConfig
-    http = DA.Http.HttpTask.HttpClient.httpClientRequest
+    Config = faceppConfig
+    Http = DA.Http.HttpTask.HttpClient.httpClientRequest
 }
 
 let mongoApi = {
-    db = getDb mongoConfig
+    Db = getDb mongoConfig
 }
 
 let blobApi = {

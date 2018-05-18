@@ -14,7 +14,7 @@ open ReaderTask
 //
 
 type Auth = {
-    refreshToken: string -> Task<TokensResult>
+    RefreshToken: string -> Task<TokensResult>
 }
 
 
@@ -22,6 +22,6 @@ type API<'a> = ReaderTask<Auth, 'a>
 
 ///
 
-let refreshToken (token: string): API<TokensResult> = fun x -> x.refreshToken token
+let refreshToken (token: string): API<TokensResult> = fun x -> x.RefreshToken token
     
     

@@ -14,8 +14,8 @@ type FaceTokenId    = string
 type Confidence = High | Medium | Low | Uncertain
        
 type API = {    
-    identifyPhoto : OrgId -> Stream -> Task<float * FaceTokenId>
-    findUser      : FaceTokenId -> Task<User>
+    IdentifyPhoto : OrgId -> Stream -> Task<float * FaceTokenId>
+    FindUser      : FaceTokenId -> Task<User>
 }
 
 let private pointsToConfidence (points: float) = 
@@ -33,9 +33,9 @@ let identifyPhoto (principal: Principal) stream (api: API) =
     let orgId = principal.OrgId
 
     task {
-        let! (points, faceTokenId) = api.identifyPhoto orgId stream
+        let! (points, faceTokenId) = api.IdentifyPhoto orgId stream
         let confidence = pointsToConfidence points
-        let! user = api.findUser faceTokenId
+        let! user = api.FindUser faceTokenId
         return (confidence, user)
     }
     

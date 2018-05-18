@@ -3,12 +3,12 @@
 open MongoDB.Driver
 
 type MongoConfig = {
-    connection: string
-    dbName: string
+    Connection: string
+    DbName: string
 }
 
 type MongoAPI = {
-    db: IMongoDatabase
+    Db: IMongoDatabase
 }
 
 module Errors =
@@ -20,7 +20,7 @@ module Errors =
     let matchConnectionError (e: exn) = 
         match e with
         | :? System.TimeoutException as ex when ex.Message.Contains("A timeout occured after") ->
-            Some { message = ex.Message }
+            Some { Message = ex.Message }
         | _ -> None
 
     let matchUniqueKeyError (e: exn) =
@@ -31,8 +31,8 @@ module Errors =
                 let err = ex1.WriteErrors.Item(0)
                 // TODO: extract collection and key
                 {
-                    collection = err.Message
-                    keys = [err.Message]
+                    Collection = err.Message
+                    Keys = [err.Message]
                 } |> Some
             | _ -> None
         | _ -> None
@@ -47,8 +47,8 @@ open Errors
 module Utils = 
 
     let getDb (config: MongoConfig) =
-        let client = MongoClient(config.connection)
-        client.GetDatabase(config.dbName)
+        let client = MongoClient(config.Connection)
+        client.GetDatabase(config.DbName)
 
 module API =
 
@@ -82,7 +82,7 @@ module API =
     let inline idFilter id = filterEq "_id" (bsonId id) 
 
     let getCollection<'a> name env =
-        env.db.GetCollection<'a>(name)
+        env.Db.GetCollection<'a>(name)
 
     let inline insert doc (x: IMongoCollection<'a>) =
         x.InsertOneAsync(doc) |> ofTaskU doc

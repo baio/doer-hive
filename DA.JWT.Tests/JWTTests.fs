@@ -29,8 +29,8 @@ let ``Validate token by well known jwks`` () =
     assert' <!> 
         task {
             let! regUserRes = registerUser userInfo authConfig
-            let! principalRes = getPrincipal regUserRes.tokens.accessToken jwtConfig
-            let! _ = removeUser regUserRes.userId authConfig
+            let! principalRes = getPrincipal regUserRes.Tokens.AccessToken jwtConfig
+            let! _ = removeUser regUserRes.UserId authConfig
             return principalRes
         }
     

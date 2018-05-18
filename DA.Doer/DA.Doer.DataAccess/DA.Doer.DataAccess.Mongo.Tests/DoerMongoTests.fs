@@ -10,12 +10,12 @@ open DA.FSX.ReaderTask
 
 // tests for local
 let config = {
-    connection = "mongodb://localhost"
-    dbName = "doer-local"
+    Connection = "mongodb://localhost"
+    DbName = "doer-local"
 }    
 
 let api = {
-    db = getDb config
+    Db = getDb config
 }
 
 [<Fact>]

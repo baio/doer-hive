@@ -90,9 +90,9 @@ let getUser = getUser' >> flat
 
 let mapLoginResponse x = x |> mapResponse(fun x -> 
         {
-            idToken = x.id_token
-            accessToken = x.access_token
-            refreshToken = x.refresh_token
+            IdToken = x.id_token
+            AccessToken = x.access_token
+            RefreshToken = x.refresh_token
         }
         )
 
@@ -114,7 +114,7 @@ let registerUser userInfo =
     readerTask {
         let! userId = createUser userInfo
         let! tokens = login { Email = userInfo.Email; Password = userInfo.Password }
-        return { userId = userId; tokens = tokens }
+        return { UserId = userId; Tokens = tokens }
     }    
 
 // refresh token

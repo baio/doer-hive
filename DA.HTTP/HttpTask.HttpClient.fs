@@ -16,11 +16,11 @@ let private getHttpMethod (method: DA.FSX.HttpTask.HttpMethod) =
     | PATCH -> new HttpMethod("PATCH")
 
 let private  getUrl (request: Request) =
-    if (Seq.length request.queryString) = 0 then
-        request.url
+    if (Seq.length request.QueryString) = 0 then
+        request.Url
     else 
-        request.url + "?" + 
-            (request.queryString |> Seq.map(fun (k, v) -> k + "=" + v) |> String.concat "&")
+        request.Url + "?" + 
+            (request.QueryString |> Seq.map(fun (k, v) -> k + "=" + v) |> String.concat "&")
 
 let private getFormBody (x: (string * string) list) =  
     new FormUrlEncodedContent(x 
@@ -46,12 +46,12 @@ let private getFormMultipartBody (streams, data) =
             
 let private getRequestMessage (request: Request): HttpRequestMessage = 
     let url = getUrl request
-    let method = getHttpMethod request.httpMethod
+    let method = getHttpMethod request.HttpMethod
     let m = new HttpRequestMessage(method, url)
-    request.headers |> Seq.iter(fun (k, v) -> m.Headers.Add(k, v))
-    match request.httpMethod with
+    request.Headers |> Seq.iter(fun (k, v) -> m.Headers.Add(k, v))
+    match request.HttpMethod with
     | PUT | POST | PATCH -> 
-        match request.payload with
+        match request.Payload with
         | FormPayload x -> 
             m.Content <- getFormBody(x)
         | JsonPayload x -> 

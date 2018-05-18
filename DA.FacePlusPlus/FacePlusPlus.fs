@@ -10,21 +10,21 @@ let private FACEPP_BASE_URL = "https://api-us.faceplusplus.com/facepp/v3/"
 let private getUrl = sprintf "%s%s" FACEPP_BASE_URL
 
 type FacePlusPlusConfig = {
-    apiKey: string
-    apiSecret: string
+    ApiKey: string
+    ApiSecret: string
 }
 
 type FacePlusPlusApi = {
-    config: FacePlusPlusConfig
-    http: Request -> Task<string>
+    Config: FacePlusPlusConfig
+    Http: Request -> Task<string>
 }
 
 type API<'a> = ReaderTask<FacePlusPlusApi, 'a>
 
 let private apiKeysPayload api = 
-    [ ("api_key", api.config.apiKey); ("api_secret", api.config.apiSecret) ]
+    [ ("api_key", api.Config.ApiKey); ("api_secret", api.Config.ApiSecret) ]
 
-let private http<'a> api = api.http >> Task.map str2json<'a>
+let private http<'a> api = api.Http >> Task.map str2json<'a>
 
 type DetectFaceRectangle = {
     width: int
@@ -49,11 +49,11 @@ type DetectFaceResponse = {
 // Returns face id
 let detectFace stream: API<DetectFaceResponse> = fun api ->
     {
-        url = getUrl "detect"
-        httpMethod = HttpMethod.POST
-        payload = ([("image_file", stream)], (apiKeysPayload api)) |> FormMultipartPayload 
-        headers = []
-        queryString = []
+        Url = getUrl "detect"
+        HttpMethod = HttpMethod.POST
+        Payload = ([("image_file", stream)], (apiKeysPayload api)) |> FormMultipartPayload 
+        Headers = []
+        QueryString = []
     }
     |> http api
 
@@ -64,11 +64,11 @@ type CreateFaceSetResponse = {
 // https://console.faceplusplus.com/documents/6329329
 let createFaceSet faceSetId: API<CreateFaceSetResponse> = fun api ->
     {
-        url = getUrl "faceset/create"
-        httpMethod = HttpMethod.POST
-        payload = (apiKeysPayload api)@[("outer_id", faceSetId)] |> FormPayload 
-        headers = []
-        queryString = []
+        Url = getUrl "faceset/create"
+        HttpMethod = HttpMethod.POST
+        Payload = (apiKeysPayload api)@[("outer_id", faceSetId)] |> FormPayload 
+        Headers = []
+        QueryString = []
     }
     |> http api
 
@@ -82,15 +82,15 @@ type AddFaceResponse = {
 // https://console.faceplusplus.com/documents/6329371
 let addFaces faceSetId faceTokens: API<AddFaceResponse> = fun api ->
     {
-        url = getUrl "faceset/addface"
-        httpMethod = HttpMethod.POST
-        payload = 
+        Url = getUrl "faceset/addface"
+        HttpMethod = HttpMethod.POST
+        Payload = 
             (apiKeysPayload api)@[
                 ("outer_id", faceSetId)
                 ("face_tokens", faceTokens |> String.concat ",")
             ] |> FormPayload 
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
     |> http api
 
@@ -140,15 +140,15 @@ type SearchFaceResponse = {
 // https://console.faceplusplus.com/documents/5681455
 let searchFace faceSetId stream: API<SearchFaceResponse> = fun api ->
     {
-        url = getUrl "search"
-        httpMethod = HttpMethod.POST
-        payload = 
+        Url = getUrl "search"
+        HttpMethod = HttpMethod.POST
+        Payload = 
             (
                 [("image_file", stream)],
                 (apiKeysPayload api)@[("outer_id", faceSetId)]
             ) |> FormMultipartPayload 
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
     |> http api
 
@@ -164,16 +164,16 @@ type RemoveFacesResponse = {
 // https://console.faceplusplus.com/documents/6329376
 let removeFaces' faceSetId faceTokens: API<RemoveFacesResponse> = fun api ->
     {
-        url = getUrl "removeface"
-        httpMethod = HttpMethod.POST
-        payload = 
+        Url = getUrl "removeface"
+        HttpMethod = HttpMethod.POST
+        Payload = 
             (apiKeysPayload api)@[
                 ("outer_id", faceSetId)
                 ("face_tokens", faceTokens)
             ]
             |> FormPayload 
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
     |> http api
 
@@ -193,17 +193,17 @@ type DeleteFacesetResponse = {
 // https://console.faceplusplus.com/documents/6329394
 let deleteFaceset faceSetId: API<DeleteFacesetResponse> = fun api ->
     {
-        url = getUrl "faceset/delete"
-        httpMethod = HttpMethod.POST
-        payload = 
+        Url = getUrl "faceset/delete"
+        HttpMethod = HttpMethod.POST
+        Payload = 
             (apiKeysPayload api)@[
                 ("outer_id", faceSetId)
                 // 1 - error if set is not empty
                 ("check_empty", "0")
             ]
             |> FormPayload 
-        headers = []
-        queryString = []
+        Headers = []
+        QueryString = []
     }
     |> http api
 

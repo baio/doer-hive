@@ -12,7 +12,7 @@ let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 // collide the worlds!
 
 let getAuth config = {
-    login = fun loginInfo -> login loginInfo config
+    Login = fun loginInfo -> login loginInfo config
 }
 
 let mapContext = fun authConfig -> getAuth authConfig

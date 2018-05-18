@@ -26,10 +26,10 @@ let getConfig () =
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
         {
-            clientDomain = x.[0]
-            clientId = x.[1]
-            clientSecret = x.[2]
-            audience = x.[3]
+            ClientDomain = x.[0]
+            ClientId = x.[1]
+            ClientSecret = x.[2]
+            Audience = x.[3]
         }
    
 let auth0Config = getConfig()
@@ -75,7 +75,7 @@ let ``Register user must work`` () =
         Role = "Owner"
     }
 
-    let task = ((fun x -> x.userId) <!> registerUser userInfo) |> andRemove
+    let task = ((fun x -> x.UserId) <!> registerUser userInfo) |> andRemove
 
     task context
 
@@ -95,9 +95,9 @@ let ``Update user avatar work`` () =
     let task = 
         readerTask {
             let! res = registerUser userInfo
-            return! updateUserAvatar (res.userId, "http://avatar.co/7") 
+            return! updateUserAvatar (res.UserId, "http://avatar.co/7") 
                 |> bindError(fun ex -> 
-                    ((returnM res.userId) |> andRemove) >>= (fun _ -> ofException ex)                    
+                    ((returnM res.UserId) |> andRemove) >>= (fun _ -> ofException ex)                    
                 )           
         } |> andRemove
 

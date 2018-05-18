@@ -21,10 +21,10 @@ let getConfig () =
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
         (request, {
-            clientDomain = x.[0]
-            clientId = x.[1]
-            clientSecret = x.[2]
-            audience = x.[3]
+            ClientDomain = x.[0]
+            ClientId = x.[1]
+            ClientSecret = x.[2]
+            Audience = x.[3]
         }),
         {
             Audience = x.[3]

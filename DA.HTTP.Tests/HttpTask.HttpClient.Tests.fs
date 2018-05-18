@@ -47,11 +47,11 @@ let ofPost = fromPostLike >> client
 let ``Get must work`` () =
     
     let request = {
-        url = "https://httpbin.org/get"
-        httpMethod = GET
-        headers = []
-        queryString = []
-        payload = None
+        Url = "https://httpbin.org/get"
+        HttpMethod = GET
+        Headers = []
+        QueryString = []
+        Payload = None
     } 
 
     client' request
@@ -60,11 +60,11 @@ let ``Get must work`` () =
 let ``Get with parse response must work`` () =
     
     let request = {
-        url = "https://httpbin.org/get"
-        httpMethod = GET
-        headers = []
-        queryString = []
-        payload = None
+        Url = "https://httpbin.org/get"
+        HttpMethod = GET
+        Headers = []
+        QueryString = []
+        Payload = None
     } 
 
     (fun resp -> resp.url |> should equal "https://httpbin.org/get") <!> (client request)
@@ -74,11 +74,11 @@ let ``Get with parse response must work`` () =
 let ``Get with headers must work`` () =
     
     let request = {
-        url = "https://httpbin.org/get"
-        httpMethod = GET
-        queryString = []
-        headers = [ "test", "123" ]
-        payload = None
+        Url = "https://httpbin.org/get"
+        HttpMethod = GET
+        QueryString = []
+        Headers = [ "test", "123" ]
+        Payload = None
     } 
 
     (fun resp -> resp.headers.test |> should equal "123") <!> (client request)     
@@ -87,10 +87,10 @@ let ``Get with headers must work`` () =
 let ``Get with query string must work`` () =
     
     let request = {
-        url = "https://httpbin.org/get"
-        httpMethod = HttpGetLikeMethod.GET
-        queryString = [ "q", "1" ]
-        headers = [ ]
+        Url = "https://httpbin.org/get"
+        HttpMethod = HttpGetLikeMethod.GET
+        QueryString = [ "q", "1" ]
+        Headers = [ ]
     } 
 
     (fun resp -> resp.args.q |> should equal "1") <!> (ofGet request)
@@ -101,10 +101,10 @@ let ``Get with query string must work`` () =
 let ``Post with form-value payload must work`` () =
     
     let request = {
-        url = "https://httpbin.org/post"
-        httpMethod = HttpPostLikeMethod.POST
-        headers = []
-        payload = FormPayload [ "x", "100" ] 
+        Url = "https://httpbin.org/post"
+        HttpMethod = HttpPostLikeMethod.POST
+        Headers = []
+        Payload = FormPayload [ "x", "100" ] 
     } 
 
     (fun resp -> resp.form.x |> should equal "100") <!> (ofPost request)
@@ -113,10 +113,10 @@ let ``Post with form-value payload must work`` () =
 let ``Post with json payload must work`` () =
     
     let request = {
-        url = "https://httpbin.org/post"
-        httpMethod = HttpPostLikeMethod.POST
-        headers = []
-        payload = JsonPayload { lol = true }
+        Url = "https://httpbin.org/post"
+        HttpMethod = HttpPostLikeMethod.POST
+        Headers = []
+        Payload = JsonPayload { lol = true }
     } 
 
     (fun resp -> resp.json.lol |> should equal true) <!> (ofPost request)     
