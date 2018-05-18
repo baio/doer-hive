@@ -47,7 +47,7 @@ let semiMockApi =
     {
         isPrincipalAncestor = fun principalId userId -> returnM true
 
-        getUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobContainer
+        getUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobApi
 
         isPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoApi
         
@@ -116,13 +116,13 @@ let setupForEnlistTest () =
         let img2 = new FileStream("./assets/lev-2.jpg", FileMode.Open);    
         let! _ = 
             [
-                uploadStreamToStorageDirectoty user1Id img1 blobStorageConfig 
-                uploadStreamToStorageDirectoty user1Id img2 blobStorageConfig  
+                uploadStreamToStorageDirectoty user1Id img1 blobApi
+                uploadStreamToStorageDirectoty user1Id img2 blobApi
             ] |> DA.FSX.Task.sequence
 
         // upload user 2 blobs
         let img3 = new FileStream("./assets/max-1.jpg", FileMode.Open);    
-        let! _ = uploadStreamToStorageDirectoty user2Id img3 blobStorageConfig 
+        let! _ = uploadStreamToStorageDirectoty user2Id img3 blobApi
 
         return (orgId, user1Id, user2Id)
     }
@@ -137,9 +137,9 @@ let cleanForEnlistTest (orgId, user1Id, user2Id) =
 
         let! _ = removeUserData user2Id mongoApi 
         
-        let! _ = removeBlobDirectory user1Id blobContainer
+        let! _ = removeBlobDirectory user1Id blobApi
 
-        let! _ = removeBlobDirectory user2Id blobContainer
+        let! _ = removeBlobDirectory user2Id blobApi
 
         let! _ = deleteFaceset orgId faceppApi
 

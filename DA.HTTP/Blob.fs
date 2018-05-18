@@ -15,7 +15,27 @@ type BlobStorageConfig = {
     ContainerName: string
 }
 
+type BlobAPI = {
+    Container: CloudBlobContainer
+}
 
+let getBlobClient config = 
+
+    let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
+
+    let uri = new Uri(config.Uri)
+    // Create cloudstorage account by passing the storagecredentials
+    let storageAccount = new CloudStorageAccount(storageCredentials, uri, uri, uri, uri)
+
+    // Create the blob client.
+    storageAccount.CreateCloudBlobClient()
+
+let getBlobContainer name (client: CloudBlobClient) =
+    
+    // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
+    client.GetContainerReference(name)
+
+(*
 let getBlobContainer config = 
 
     let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
@@ -29,7 +49,7 @@ let getBlobContainer config =
 
     // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
     blobClient.GetContainerReference(config.ContainerName)
-
+*)
 
 let private normalizeUri (uri:string) =
     (*
@@ -49,22 +69,10 @@ let private normalizeUri (uri:string) =
         uri
     #endif
 
-let uploadStreamToStorage blobName stream (config: BlobStorageConfig) =
-
-        let storageCredentials = new StorageCredentials(config.AccountName, config.AccountKey)
-
-        let uri = new Uri(config.Uri)
-        // Create cloudstorage account by passing the storagecredentials
-        let storageAccount = new CloudStorageAccount(storageCredentials, uri, uri, uri, uri)
-
-        // Create the blob client.
-        let blobClient = storageAccount.CreateCloudBlobClient()
-
-        // Get reference to the blob container by passing the name by reading the value from the configuration (appsettings.json)
-        let container = blobClient.GetContainerReference(config.ContainerName)
+let uploadStreamToStorage blobName stream (api: BlobAPI) =
 
         // Get the reference to the block blob from the container
-        let blockBlob = container.GetBlockBlobReference(blobName)
+        let blockBlob = api.Container.GetBlockBlobReference(blobName)
 
         // Upload the file
         blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> 
@@ -76,16 +84,16 @@ let getDateTimeFileName dir = sprintf "%s/%s" dir (DateTime.UtcNow.ToString("yyy
 
 let uploadStreamToStorageDirectoty dir = dir |> getDateTimeFileName |> uploadStreamToStorage
     
-let removeBlobFromStorage blobName (container: CloudBlobContainer) =
-    container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
+let removeBlobFromStorage blobName (api: BlobAPI) =
+    api.Container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
-let removeBlobFromDirectory blobName (container: CloudBlobContainer) =
-    container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
+let removeBlobFromDirectory blobName (api: BlobAPI) =
+    api.Container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
-let getBlob blobName (container: CloudBlobContainer) =
+let getBlob blobName (api: BlobAPI) =
     
     // Get the reference to the block blob from the container
-    let blockBlob = container.GetBlockBlobReference(blobName)
+    let blockBlob = api.Container.GetBlockBlobReference(blobName)
 
     let stream = new MemoryStream()
 
@@ -102,8 +110,8 @@ open DA.FSX.Task
 let private getBlobNameFromUri (uri: Uri) = 
     uri.Segments |> Array.skip 3 |> String.concat ""
 
-let private listBlobSegments limit dirName (container: CloudBlobContainer) =
-    container
+let private listBlobSegments limit dirName (api: BlobAPI) =
+    api.Container
         .GetDirectoryReference(dirName)
         .ListBlobsSegmentedAsync(
             true, 
@@ -114,10 +122,10 @@ let private listBlobSegments limit dirName (container: CloudBlobContainer) =
             null
         )
 
-let getDirectoryBlobNames limit dirName (container: CloudBlobContainer) =
+let getDirectoryBlobNames limit dirName (api: BlobAPI) =
     // blobs must be stored with names formatted as create date time 
     // https://stackoverflow.com/questions/5876519/azure-sort-order-of-list-operation-on-blob-container?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
-    listBlobSegments limit dirName container
+    listBlobSegments limit dirName api
     |> map (fun x -> 
         x.Results 
         |> Seq.map(fun x -> x.Uri |> getBlobNameFromUri) 

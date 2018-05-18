@@ -37,12 +37,15 @@ let getConfig () =
 
 let mongoConfig, blobStorageConfig, faceppConfig = getConfig()
 
-let blobContainer = getBlobContainer blobStorageConfig
-
 let faceppApi = {
     config = faceppConfig
     http = DA.Http.HttpTask.HttpClient.httpClientRequest
 }
+
 let mongoApi = {
     db = getDb mongoConfig
+}
+
+let blobApi = {
+    Container = blobStorageConfig |> getBlobClient |> getBlobContainer "user-photos"
 }
