@@ -49,7 +49,7 @@ let semiMockApi =
 
         getUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId blobContainer
 
-        isPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoConfig
+        isPhotoSetExists = fun orgId -> orgHasPhotoLink orgId mongoApi
         
         createPhotoSet = fun setId -> 
             createFaceSet setId faceppApi |> ``const`` true
@@ -60,7 +60,7 @@ let semiMockApi =
             //returnM ["100"]
 
         markAsUploaded = fun x -> 
-            addUserPhotoLinks' x.OrgId x.UserId x.FaceTokenIds mongoConfig
+            addUserPhotoLinks' x.OrgId x.UserId x.FaceTokenIds mongoApi
 
     }
 
@@ -72,14 +72,14 @@ let identPhotoApi  =
                     // TODO : throw exception if nothing found ?
                     (x.results.[0].confidence, x.results.[0].face_token)
                  )
-        findUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoConfig
+        findUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
     }
 
 let setupForEnlistTest () =    
 
     task {
 
-        let! orgId = createOrg { Name = "test-org-enlist"; OwnerEmail = "test-org-enlist@mail.ru" } mongoConfig
+        let! orgId = createOrg { Name = "test-org-enlist"; OwnerEmail = "test-org-enlist@mail.ru" } mongoApi
 
         let userDoc1: UserDoc =  {
             OrgId = orgId
@@ -106,10 +106,10 @@ let setupForEnlistTest () =
         } 
        
         // create user 1
-        let! user1Id = createUser userDoc1 mongoConfig
+        let! user1Id = createUser userDoc1 mongoApi
         
         // create user 2
-        let! user2Id = createUser userDoc2 mongoConfig
+        let! user2Id = createUser userDoc2 mongoApi
 
         // upload user 1 blobs
         let img1 = new FileStream("./assets/lev-1.jpg", FileMode.Open);    
@@ -131,11 +131,11 @@ let cleanForEnlistTest (orgId, user1Id, user2Id) =
     
     task {
 
-        let! _ = removeOrg orgId mongoConfig 
+        let! _ = removeOrg orgId mongoApi 
         
-        let! _ = removeUserData user1Id mongoConfig 
+        let! _ = removeUserData user1Id mongoApi 
 
-        let! _ = removeUserData user2Id mongoConfig 
+        let! _ = removeUserData user2Id mongoApi 
         
         let! _ = removeBlobDirectory user1Id blobContainer
 

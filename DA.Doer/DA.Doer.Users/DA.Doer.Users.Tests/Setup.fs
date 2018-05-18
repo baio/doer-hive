@@ -50,9 +50,13 @@ let blobStorageConfig: BlobStorageConfig = {
     ContainerName = "test-images"
 }
 
-let context = (mongoConfig, (request, authConfig))
+let mongoApi = {
+    db = getDb mongoConfig
+}
 
-let andRemove (result: RegisterOrgResult) (mongo: MongoConfig, auth: Auth0APIConfig) = 
+let context = (mongoApi, (request, authConfig))
+
+let andRemove (result: RegisterOrgResult) (mongo: MongoAPI, auth: Auth0APIConfig) = 
     [
         Orgs.removeOrg result.orgId mongo
         Users.removeUser result.userId mongo       

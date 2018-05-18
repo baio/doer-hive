@@ -52,7 +52,11 @@ let getConfig () =
    
 let authConfig, jwtConfig, mongoConfig, blobConfig = getConfig()
 
-let context  = (mongoConfig, (request, authConfig))
-let context2 = (mongoConfig, (request, authConfig), blobConfig, jwtConfig)
+let mongoApi = {
+    db = getDb mongoConfig
+}
+
+let context  = (mongoApi, (request, authConfig))
+let context2 = (mongoApi, (request, authConfig), blobConfig, jwtConfig)
 
 

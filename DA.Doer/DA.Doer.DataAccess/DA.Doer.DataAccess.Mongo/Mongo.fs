@@ -1,8 +1,14 @@
 ﻿namespace DA.Doer.Mongo
 
+open MongoDB.Driver
+
 type MongoConfig = {
     connection: string
     dbName: string
+}
+
+type MongoAPI = {
+    db: IMongoDatabase
 }
 
 module Errors =
@@ -37,6 +43,12 @@ module Errors =
 
 open Errors
 
+[<AutoOpen>]
+module Utils = 
+
+    let getDb (config: MongoConfig) =
+        let client = MongoClient(config.connection)
+        client.GetDatabase(config.dbName)
 
 module API =
 
@@ -48,7 +60,8 @@ module API =
 
     type DocWithId = { _id: BsonObjectId }
 
-    type MongoReader<'a> = Reader<MongoConfig, 'a>
+    // TODO: rename MongoApi
+    type MongoReader<'a> = Reader<MongoAPI, 'a>
 
     let inline bsonId2String (id:  BsonObjectId) = id.AsObjectId.ToString()
 
@@ -69,9 +82,7 @@ module API =
     let inline idFilter id = filterEq "_id" (bsonId id) 
 
     let getCollection<'a> name env =
-        let client          = MongoClient(env.connection)
-        let db              = client.GetDatabase(env.dbName)
-        db.GetCollection<'a>(name)
+        env.db.GetCollection<'a>(name)
 
     let inline insert doc (x: IMongoCollection<'a>) =
         x.InsertOneAsync(doc) |> ofTaskU doc

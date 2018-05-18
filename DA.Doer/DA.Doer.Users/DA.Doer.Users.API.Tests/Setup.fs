@@ -43,3 +43,6 @@ let faceppApi = {
     config = faceppConfig
     http = DA.Http.HttpTask.HttpClient.httpClientRequest
 }
+let mongoApi = {
+    db = getDb mongoConfig
+}

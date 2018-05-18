@@ -8,12 +8,15 @@ open DA.DataAccess.Domain
 open DA.Doer.Mongo
 open DA.FSX.ReaderTask
 
-
 // tests for local
 let config = {
     connection = "mongodb://localhost"
     dbName = "doer-local"
 }    
+
+let api = {
+    db = getDb config
+}
 
 [<Fact>]
 let ``Create org must work`` () =
@@ -26,7 +29,7 @@ let ``Create org must work`` () =
     
     let assert' = should not' Empty
 
-    (assert' <!> (createOrg org >>= removeOrg)) config
+    (assert' <!> (createOrg org >>= removeOrg)) api
 
 [<Fact>]
 let ``ownerEmail restriction must work on orgs`` () =
@@ -60,7 +63,7 @@ let ``ownerEmail restriction must work on orgs`` () =
         // unexpected success on createOrg org1
         | Error x -> x |> should be Empty        
     )    
-    <| config
+    <| api
     
 [<Fact>]
 let ``name restriction must work on orgs`` () =
@@ -94,7 +97,7 @@ let ``name restriction must work on orgs`` () =
         // unexpected success on createOrg org1
         | Error x -> x |> should be Empty        
     )    
-    <| config
+    <| api
     
 
 [<Fact>]
@@ -143,7 +146,7 @@ let ``email restriction must work on users`` () =
         // unexpected success on createUser user1
         | Error x -> x |> should be Empty        
     )    
-    <| config
+    <| api
 
 
 [<Fact>]
@@ -164,7 +167,7 @@ let ``Create user must work`` () =
     
     let assert' = should not' Empty
 
-    (assert' <!> (createUser user >>= removeUser)) config
+    (assert' <!> (createUser user >>= removeUser)) api
 
 [<Fact>]
 let ``Update user avatar must work`` () =
@@ -191,4 +194,4 @@ let ``Update user avatar must work`` () =
             let! _ = removeUser userId
             return userId
         }
-    )) config
+    )) api
