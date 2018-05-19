@@ -24,7 +24,10 @@ let getAuth config = {
 }
 
 let mapContext = fun (mongoConfig, authConfig) ->
-    (getDataAccess mongoConfig), (getAuth authConfig)
+    {
+        DataAccess = getDataAccess mongoConfig
+        Auth = getAuth authConfig
+    }
 
 let registerOrg info = mapContext >> registerOrg info
 

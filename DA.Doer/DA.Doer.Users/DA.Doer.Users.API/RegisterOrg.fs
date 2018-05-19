@@ -14,18 +14,20 @@ type DataAccessTable =
     | User of UserDoc
     | Org of OrgDoc
 
-type DataAccess = {
+type DataAccessApi = {
     InsertDoc: DataAccessTable -> Task<string>
 }
 
-//
-
-type Auth = {
+type AuthApi = {
     RegisterUser: CreateUserInfo -> Task<RegisterUserResult>
 }
 
+type Api = {
+    DataAccess: DataAccessApi
+    Auth      : AuthApi
+}
 
-type API<'a> = ReaderTask<DataAccess * Auth, 'a>
+type API<'a> = ReaderTask<Api, 'a>
 
 ///
 
@@ -84,13 +86,13 @@ let info2register orgId userId (info: RegisterOrgInfo) =
         Role = OWNER_ROLE
     }
 
-type RegOrgApi<'a> = ReaderTask<RegisterOrgInfo * (DataAccess * Auth), 'a>
+type RegOrgApi<'a> = ReaderTask<RegisterOrgInfo * Api, 'a>
 
-let insertOrg'                 info = fun (dataAccess, _) -> info |> info2org |> Org |> dataAccess.InsertDoc
+let insertOrg'                 info = fun api -> info |> info2org |> Org |> api.DataAccess.InsertDoc
 
-let insertUser'   orgId        info = fun (dataAccess, _) -> info |> info2user orgId |> User |> dataAccess.InsertDoc
+let insertUser'   orgId        info = fun api -> info |> info2user orgId |> User |> api.DataAccess.InsertDoc
 
-let registerUser' orgId userId info = fun (_,       auth) -> info |> info2register orgId userId |> auth.RegisterUser
+let registerUser' orgId userId info = fun api -> info |> info2register orgId userId |> api.Auth.RegisterUser
 
 //
 

@@ -11,21 +11,27 @@ open DA.DataAccess.Domain
 open DA.Doer.Domain.Auth
 open System.IO
 
-type Auth = {
+type AuthApi = {
     GetPrincipalId: string -> Task<string>
     UpdateAvatar: string -> string -> Task<bool>
 }
 
-type DataAccess = {
+type DataAccessApi = {
     UploadBlob: Stream -> string -> Task<string>
     UpdateUserDocAvatar: string -> string -> Task<bool>
 }
 
-type ImageResizer = {
+type ImageResizerApi = {
     ResizeImage: Stream -> int * int -> Stream
 }
 
-type API<'a> = ReaderTask.ReaderTask<DataAccess * Auth * ImageResizer, 'a>
+type Api = {
+    Auth        : AuthApi
+    DataAccess  : DataAccessApi
+    ImageResizer: ImageResizerApi
+}
+
+type API<'a> = ReaderTask.ReaderTask<Api, 'a>
 
 ///
 
@@ -34,25 +40,25 @@ let resizes = [
     ("md", (250, 250))
 ]
 
-let private updateAvatars userId path  (da, auth, _)= 
+let private updateAvatars userId path api = 
     [ 
-        fun () -> da.UpdateUserDocAvatar userId path
-        fun () -> auth.UpdateAvatar      userId path
+        fun () -> api.DataAccess.UpdateUserDocAvatar userId path
+        fun () -> api.Auth.UpdateAvatar      userId path
     ]  |> FSharpx.Task.Parallel
 
 let private normalize (x: string) = x.Replace('|', '_')
 
-let private resizeAndUpload stream userId = fun (da, _, resizer) ->
+let private resizeAndUpload stream userId = fun api ->
     let getName = sprintf "%s-%s" userId >> normalize
     resizes
-    |> ListPair.map (resizer.ResizeImage stream)
+    |> ListPair.map (api.ImageResizer.ResizeImage stream)
     |> fun x -> x@["orig", stream]
-    |> ListPair.bimap (getName) (da.UploadBlob)
+    |> ListPair.bimap (getName) (api.DataAccess.UploadBlob)
     |> ListPair.crossApply
     |> sequence
 
-let private getPrincipal token = fun (_, auth, _) -> 
-    token |> auth.GetPrincipalId
+let private getPrincipal token = fun api -> 
+    token |> api.Auth.GetPrincipalId
 
 let updateAvatar (token: string) (stream: Stream): API<string> = 
     readerTask {

@@ -32,13 +32,13 @@ type UserPhotosMinimalLimitException (requiredLength, currentLength) =
 type AccessDeniedException () =
     inherit Exception()
        
-type API = {    
+type Api = {    
     IsPrincipalAncestor     : PrincipalId -> UserId -> Task<bool>
     GetUserPhotos           : UserId -> Task<Stream list>
     IsPhotoSetExists        : OrgId -> Task<bool>
     CreatePhotoSet          : SetId -> Task<bool>
     AddPhotosToSet          : SetId -> Stream list -> Task<FaceTokenId list>
-    // must return total user number of user faces
+    // must return total number of user faces in system
     MarkAsUploaded          : UploadedPhotoParams -> Task<int>
 }
 

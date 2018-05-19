@@ -50,7 +50,11 @@ let imageResizer = {
 }
 
 let mapContext = fun (mongoConfig, authConfig, blobStorageConfig, jwtConfig) ->
-    (getDataAccess mongoConfig blobStorageConfig), (getAuth authConfig jwtConfig), imageResizer
+    {
+        DataAccess = getDataAccess mongoConfig blobStorageConfig
+        Auth = getAuth authConfig jwtConfig
+        ImageResizer = imageResizer
+    }
 
 let updateAvatar token stream = mapContext >> updateAvatar token stream
 

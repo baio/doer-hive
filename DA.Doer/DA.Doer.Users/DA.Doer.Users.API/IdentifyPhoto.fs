@@ -13,7 +13,7 @@ type FaceTokenId    = string
 
 type Confidence = High | Medium | Low | Uncertain
        
-type API = {    
+type Api = {    
     IdentifyPhoto : OrgId -> Stream -> Task<float * FaceTokenId>
     FindUser      : FaceTokenId -> Task<User>
 }
@@ -28,7 +28,7 @@ let private pointsToConfidence (points: float) =
     else
         Uncertain
 
-let identifyPhoto (principal: Principal) stream (api: API) = 
+let identifyPhoto (principal: Principal) stream (api: Api) = 
 
     let orgId = principal.OrgId
 
