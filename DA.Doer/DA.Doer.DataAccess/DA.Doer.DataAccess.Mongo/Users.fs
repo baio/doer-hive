@@ -14,37 +14,37 @@ open DA.Doer.Domain.Users
 
 let USERS_COLLECTION_NAME = "users"
 
-type UserDocWithId = {
-    Id: BsonObjectId
-    OrgId: string
-    Role: string
-    FirstName: string
-    MidName: string 
-    LastName: string
-    Email: string
-    Phone: string
-    Ancestors: string seq
-    Avatar: string
+type UserDocDTO = {
+    id: BsonObjectId
+    orgId: string
+    role: string
+    firstName: string
+    midName: string 
+    lastName: string
+    email: string
+    phone: string
+    ancestors: string seq
+    avatar: string
 }
 
 let createInsDoc (doc: UserDoc) =    
     let id = BsonObjectId(ObjectId.GenerateNewId())
     { 
-        Id = id
-        OrgId = doc.OrgId
-        Role = doc.Role
-        FirstName = doc.FirstName
-        MidName = doc.MidName
-        LastName = doc.LastName
-        Email = doc.Email
-        Phone = doc.Phone
-        Ancestors = doc.Ancestors
-        Avatar = doc.Avatar
+        id = id
+        orgId = doc.OrgId
+        role = doc.Role
+        firstName = doc.FirstName
+        midName = doc.MidName
+        lastName = doc.LastName
+        email = doc.Email
+        phone = doc.Phone
+        ancestors = doc.Ancestors
+        avatar = doc.Avatar
     }
 
 let createUser doc =    
     let insDoc = createInsDoc doc
-    (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.Id.AsObjectId.ToString())
+    (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.id.AsObjectId.ToString())
 
 let removeUser (id: string) =    
     (remove id <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(id)
@@ -57,7 +57,7 @@ let removeUserData (id: string) =
 
 let updateUserAvatar id url =  
     let fr = idFilter id
-    let upd = setter "Avatar" url
+    let upd = setter "avatar" url
     (update fr upd <!> getCollection USERS_COLLECTION_NAME) 
     |> ReaderTask.mapc(true)
 
@@ -96,21 +96,21 @@ let someUserHasTrainingPhotoSet orgId config =
 
 let getUser userId config = 
     let coll = getCollection USERS_COLLECTION_NAME config
-    coll.Find<UserDocWithId>(idFilter userId)
+    coll.Find<UserDocDTO>(idFilter userId)
     |> firstOrException (USERS_COLLECTION_NAME, userId)
     |> Task.map(
-        fun (x: UserDocWithId) -> 
+        fun (x: UserDocDTO) -> 
         ({
-            Id = bsonId2String x.Id
-            OrgId = x.OrgId
-            Role = roleFromString x.Role
-            FirstName = x.FirstName
-            MidName = x.MidName
-            LastName = x.LastName
-            Email = x.Email
-            Phone = x.Phone
-            Ancestors = x.Ancestors
-            Avatar = x.Avatar
+            Id = bsonId2String x.id
+            OrgId = x.orgId
+            Role = roleFromString x.role
+            FirstName = x.firstName
+            MidName = x.midName
+            LastName = x.lastName
+            Email = x.email
+            Phone = x.phone
+            Ancestors = x.ancestors
+            Avatar = x.avatar
         }: User)
     )
 
