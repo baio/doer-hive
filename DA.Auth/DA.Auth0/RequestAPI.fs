@@ -48,7 +48,7 @@ let createUser: CreateUser = fun userInfo token { Config = env } ->
             {
                 // Name and Picture parameters couldn't be set for profile directly
                 // https://auth0.com/docs/user-profile/normalized/auth0 (Fields that are always generated)
-                user_id = sprintf "doer|%s" userInfo.UserId
+                user_id = userInfo.UserId
                 connection = "Username-Password-Authentication"
                 email = userInfo.Email
                 password = userInfo.Password

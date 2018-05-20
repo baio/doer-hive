@@ -22,7 +22,10 @@ let getDataAccess config = {
 }
 
 let getAuth config = {
-    RegisterUser = fun userInfo -> registerUser userInfo config
+    RegisterUser = fun userInfo ->
+        // prefix domain for auth0
+        let userInfo = { userInfo with UserId = AuthId.domain2auth userInfo.UserId }
+        registerUser userInfo config
 }
 
 let mapContext = fun (api: RegisterOrgApi) ->
