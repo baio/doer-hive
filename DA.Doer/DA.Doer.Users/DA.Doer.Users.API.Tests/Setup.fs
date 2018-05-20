@@ -48,4 +48,5 @@ let mongoApi = {
 
 let blobApi = {
     Container = blobStorageConfig |> getBlobClient |> getBlobContainer "user-photos"
+    NormalizeUrl = id
 }

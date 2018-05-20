@@ -17,6 +17,25 @@ type BlobStorageConfig = {
 
 type BlobApi = {
     Container: CloudBlobContainer
+    (*
+        Remote devices can't access localhost, so we need special local address to where such devices
+        could do requests.
+        When image url returned, for such devices, it must have correct local address.
+        Also proxy for this local address must be set 192.168.0.100:778 -> localhost:10000.
+        Now device could access images by 192.168.0.100:778...
+        All these addressess must be well known and correct.
+        + localhost:10000 - address of local storage emulator
+        + 192.168.0.100:778 - proxy to local storage emulator (must be set by nginx for example)
+        For tests or if there is no use for local devices debugging jsu use NormalizeUrl = id
+        Or something like this
+#if DEBUG
+    NormalizeUrl = fun x -> x.Replace("localhost:10000", "192.168.0.100:778")
+#else 
+    NormalizeUrl x = id
+#endif
+
+    *)
+    NormalizeUrl: string -> string
 }
 
 let getBlobClient config = 
@@ -51,24 +70,6 @@ let getBlobContainer config =
     blobClient.GetContainerReference(config.ContainerName)
 *)
 
-let private normalizeUri (uri:string) =
-    (*
-        Remote devices can't access localhost, so we need special local address to where such devices
-        could do requests.
-        When image url returned, for such devices, it must have correct local address.
-        Also proxy for this local address must be set 192.168.0.100:778 -> localhost:10000.
-        Now device could access images by 192.168.0.100:778...
-        All these addressess must be well known and correct.
-        + localhost:10000 - address of local storage emulator
-        + 192.168.0.100:778 - proxy to local storage emulator (must be set by nginx for example)
-    *)
-
-    #if DEBUG
-        uri.Replace("localhost:10000", "192.168.0.100:778")
-    #else 
-        uri
-    #endif
-
 let uploadStreamToStorage blobName stream (api: BlobApi) =
 
         // Get the reference to the block blob from the container
@@ -77,7 +78,7 @@ let uploadStreamToStorage blobName stream (api: BlobApi) =
         // Upload the file
         blockBlob.UploadFromStreamAsync(stream).ContinueWith(fun _ -> 
             stream.Position <- (int64)0
-            blockBlob.Uri.ToString() |> normalizeUri
+            blockBlob.Uri.ToString() |> api.NormalizeUrl
         )
 
 let getDateTimeFileName dir = sprintf "%s/%s" dir (DateTime.UtcNow.ToString("yyyyMMddHmmssfffff"))

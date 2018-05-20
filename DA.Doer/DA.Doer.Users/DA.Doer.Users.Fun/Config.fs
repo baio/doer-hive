@@ -56,8 +56,15 @@ let mongoApi = {
     Db = getDb mongoConfig
 }
 
+
+
 let blobApi = {
     Container = blobConfig |> getBlobClient |> getBlobContainer "user-photos"
+#if DEBUG
+    NormalizeUrl = fun x -> x.Replace("localhost:10000", "192.168.0.100:778")
+#else 
+    NormalizeUrl x = id
+#endif
 }
 
 let auth0Api = createAuth0Api request authConfig
