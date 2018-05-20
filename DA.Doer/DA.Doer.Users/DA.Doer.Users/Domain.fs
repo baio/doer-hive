@@ -8,3 +8,15 @@ module AuthId =
     let domain2auth = 
         sprintf "doer|%s"
 
+
+[<AutoOpen>]
+module Utils = 
+    open DA.Doer.Domain.Auth
+    open DA.FSX.ReaderTask
+    
+    let private trimBearer (x: string) = x.Split([|' '|]).[1]
+
+    let getPrincipal = 
+        trimBearer >> DA.JWT.getClaims >> map(
+            principalFromClaims >> (fun x -> {x with Id = AuthId.auth2domain x.Id } )
+        )

@@ -1,60 +1,45 @@
 ﻿module DA.Doer.Users.EnlistToVerify
 
-(*
 open DA.Doer.Users.API.EnlistToVerify
 open DA.Doer.Mongo
 open DA.FSX.Task
 open Microsoft.WindowsAzure.Storage.Blob
 open DA.HTTP
-open Microsoft.Cognitive.CustomVision
 open System
-open DA.VisionAPI
+open DA.HTTP.Blob
+open DA.FacePlusPlus
 
-type Config = {
-    mongo        : MongoConfig
-    blobContainer: CloudBlobContainer
-    trainingApi  : TrainingApi
+type EnlistToVerifyContext = {
+    Mongo : DA.Doer.Mongo.MongoApi
+    Blob  : DA.HTTP.Blob.BlobApi
+    FacePP: FacePlusPlusApi
 }
 
-let VISION_API_PROJECT_ID = Guid.Parse("test")
-
-let mapUploadToTrainingResult (tagId: Guid, summary: Models.CreateImageSummaryModel, photosCount: int) = 
+let mapContext = fun (context: EnlistToVerifyContext) ->
     {
-        TagId            = tagId.ToString()
-        TotalPhotosCount = photosCount
-        Results          =     summary.Images 
-            |> Seq.map(fun x -> 
-                if x.Status = "OK" then UploadStatusOk else UploadStatusFail
-            ) |> List.ofSeq
+        IsPrincipalAncestor = fun principalId userId -> returnM true
+
+        GetUserPhotos = fun userId -> getDirectoryBlobs (Some 3) userId context.Blob
+
+        IsPhotoSetExists = fun orgId -> orgHasPhotoLink orgId context.Mongo
+        
+        CreatePhotoSet = fun setId -> 
+            createFaceSet setId context.FacePP |> ``const`` true
+            //returnM true
+
+        AddPhotosToSet = fun setId streams -> 
+            detectAndAddSinglePersonFaces setId streams context.FacePP |> map( fun (x, _, _) -> x )
+            //returnM ["100"]
+
+        MarkAsUploaded = fun x -> 
+            addUserPhotoLinks' x.OrgId x.UserId x.FaceTokenIds context.Mongo
+
     }
+
+// Expects user photos already loaded to storage
+let enlistToVerify principal userId = 
+    mapContext >> enlistToVerify principal userId
     
-
-let getApi config = 
-    {
-        getLatestUserPhotos = fun userId -> 
-           (List.map(fun x -> x.PhotoId)) <!> (getTopUserPhotoLinks 5 userId config.mongo)           
-
-        getUserPhotoTrainingTag = fun userId -> 
-            getTrainingPhotoTag userId config.mongo
-
-        getBlob = fun photoId ->
-            Blob.getBlob photoId config.blobContainer
-
-        uploadToTraining = fun userId tagId streams ->
-            let tag = 
-                match tagId with 
-                | Some x -> x |> CreateImageNewTag 
-                | None -> CreateImageNewTag userId
-            createImages tag streams VISION_API_PROJECT_ID config.trainingApi
-            |> map mapUploadToTrainingResult
-                                
-        markAsReadyForTraining = fun x ->
-            markAsReadyForTraining x.UserId x.TagId x.Count config.mongo            
-    }
-
-
-let enlistToVerify userId = 
-    getApi >> enlistToVerify userId
 
 module Errors =
     
@@ -64,6 +49,7 @@ module Errors =
 
     let inline private map f x = Option.map f x
 
+    (*
     let matchUserMustHaveAtLeast5PhotosException (e: exn) = 
         match e with
         | :? UserMustHaveAtLeast5PhotosException as ex -> Some ex.currentLength
@@ -72,14 +58,14 @@ module Errors =
     let userMustHaveAtLeast5PhotosException (currentLength: int) = 
         let message = sprintf "Unexpected number of photos to train in storage %i. Must be at least 5" currentLength
         new System.Exception(message) |> unexepcted       
+    *)
     
     
     let getHttpError (ex: exn) =  
         [
             matchConnectionError >> (map connectionFail)
-            matchUserMustHaveAtLeast5PhotosException >> (map userMustHaveAtLeast5PhotosException)
+            // matchUserMustHaveAtLeast5PhotosException >> (map userMustHaveAtLeast5PhotosException)
             unexepcted >> Some
         ] 
         |> List.choose(fun x -> x ex)
         |> List.head
-*)

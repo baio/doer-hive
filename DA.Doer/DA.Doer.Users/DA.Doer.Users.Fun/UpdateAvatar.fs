@@ -10,7 +10,8 @@ module UpdateAvatar =
     open Microsoft.Azure.WebJobs.Extensions.Http
     open Microsoft.Extensions.Logging
     open DA.Doer.Users
-    open DA.FSX.ReaderTask
+    open DA.FSX.Task
+   
     open DA.Doer.Users.UpdateAvatar
     open DA.Doer.Users.UpdateAvatar.Errors
     open Config
@@ -24,24 +25,23 @@ module UpdateAvatar =
             request: HttpRequest,
             log: ILogger
         ) =            
-            readerTask {
-                let! authToken  = readAuthHeader'        request
-                #if DEBUG_POSTMAN
-                let! fileStream = readFirstFileContentDebug'  request                
-                #else
-                let! fileStream = readFirstFileContent'  request
-                #endif
-                let! result     = updateAvatar authToken fileStream
-                return result200 result
-            }
-            |> bindError (getHttpError >> mapResultStr >> returnM)
-            <| 
-            {
+            let context = {
                 Mongo = mongoApi
                 Auth0 = auth0Api
                 Blob = blobApi
-                JWT  = jwtConfig
             }
+            task {                
+                #if DEBUG_POSTMAN
+                let! fileStream = readFirstFileContentDebug  request                
+                #else
+                let! fileStream = readFirstFileContent  request
+                #endif
+                let authToken = readAuthHeader request
+                let! prinipal = getPrincipal authToken jwtConfig
+                let! result   = updateAvatar prinipal fileStream context
+                return result200 result
+            }
+            |> bindError (getHttpError >> mapResultStr >> returnM)
 
             
 

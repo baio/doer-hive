@@ -12,7 +12,6 @@ open DA.Doer.Domain.Auth
 open System.IO
 
 type AuthApi = {
-    GetPrincipalId: string -> Task<string>
     UpdateAvatar: string -> string -> Task<bool>
 }
 
@@ -46,10 +45,8 @@ let private updateAvatars userId path api =
         fun () -> api.Auth.UpdateAvatar      userId path
     ]  |> FSharpx.Task.Parallel
 
-let private normalize (x: string) = x.Replace('|', '_')
-
 let private resizeAndUpload stream userId = fun api ->
-    let getName = sprintf "%s-%s" userId >> normalize
+    let getName = sprintf "%s-%s" userId
     resizes
     |> ListPair.map (api.ImageResizer.ResizeImage stream)
     |> fun x -> x@["orig", stream]
@@ -57,13 +54,10 @@ let private resizeAndUpload stream userId = fun api ->
     |> ListPair.crossApply
     |> sequence
 
-let private getPrincipal token = fun api -> 
-    token |> api.Auth.GetPrincipalId
-
-let updateAvatar (token: string) (stream: Stream): API<string> = 
+let updateAvatar (principal: Principal) (stream: Stream): API<string> = 
     readerTask {
         // get principal from access token
-        let! principalId = getPrincipal token
+        let principalId = principal.Id
         // resize original stream and upload them all
         let! uploadResult = resizeAndUpload stream principalId
         // take smallest image and update user profile's avatar with it

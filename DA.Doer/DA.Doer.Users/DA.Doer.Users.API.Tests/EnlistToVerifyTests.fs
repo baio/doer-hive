@@ -39,6 +39,7 @@ let ``Enlist to verify with mock api must work`` () =
     let principal: Principal = {
         Id = "test-principal"
         OrgId = "test-org"
+        Role = "Owner"
     }
     enlistToVerify principal "test-user" mockApi
 
@@ -157,6 +158,7 @@ let ``Enlist to verify with mongo and blob api must work`` () =
         let principal = {
                 Id    = user1Id
                 OrgId = orgId
+                Role = "Owner"
             }
 
         return! task {                

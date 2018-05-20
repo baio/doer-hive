@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Config.fs" />
+    <Compile Include="EnlistToVerify.fs" />
     <Compile Include="UpdateAvatar.fs" />
     <Compile Include="RefreshToken.fs" />
     <Compile Include="Login.fs" />
@@ -34,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\DA.Config\DA.Config.fsproj" />
+    <ProjectReference Include="..\..\..\DA.FacePlusPlus\DA.FacePlusPlus.fsproj" />
     <ProjectReference Include="..\..\..\DA.FSX\DA.FSX.fsproj" />
     <ProjectReference Include="..\..\..\DA.HTTP\DA.HTTP.fsproj" />
     <ProjectReference Include="..\DA.Doer.Users.API\DA.Doer.Users.API.fsproj" />

@@ -54,14 +54,14 @@ let authorizationHeaderNotFoundException uri method =
 
 let readAuthHeader (request: HttpRequest) = 
     if request.Headers.Item("Authorization").Count = 1 then
-        request.Headers.Item("Authorization").Item(0) |> Ok
+        request.Headers.Item("Authorization").Item(0)
     else 
-        wrapError authorizationHeaderNotFoundException request |> Error
+        wrapError authorizationHeaderNotFoundException request |> raise
 
 
 // Utility, since all of the time these functions will be part of the TaskReader flow
 
-let readAuthHeader'       x = x |> readAuthHeader |> ReaderTask.ofResult
+let readAuthHeader'       x = x |> readAuthHeader |> ReaderTask.ofTask
 
 let readFirstFileContent' x = x |> readFirstFileContent |> ReaderTask.ofTask
 

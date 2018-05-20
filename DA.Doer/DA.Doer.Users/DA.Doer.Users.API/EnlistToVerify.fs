@@ -6,6 +6,10 @@ open FSharpx.Task
 open DA.FSX.Task
 open System
 open DA.Doer.Domain.Auth
+open DA.Doer.Domain
+open DA.Doer.Domain
+open DA.Doer.Domain
+open DA.Doer.Domain
 
 ///
 type OrgId            = string
@@ -78,4 +82,11 @@ let enlistToVerify (principal: Principal) userId api =
         // return total number of photos for user
         return totalUserFacesCount
     }
-        
+
+
+let validateUserId str = 
+    str 
+    |> DA.Doer.Domain.Validators.isGuid
+    |> Result.mapError (fun x -> Errors.validationException ["UserId", x])
+    
+

@@ -18,7 +18,6 @@ let trimBearer (x: string) = x.Split([|' '|]).[1]
 
 let userGuid (x: string) = x.Split([|'|'|]).[2]
 
-let getUserProfile = trimBearer >> getClaims >> map(profileFromClaims)
 
 // collide the worlds!
 
@@ -26,7 +25,6 @@ type RegisterOrgApi = {
     Mongo: DA.Doer.Mongo.MongoApi
     Auth0: DA.Auth0.API.Auth0Api
     Blob : DA.HTTP.Blob.BlobApi
-    JWT  : DA.JWT.Config
 }
 
 let getDataAccess mongoApi blobApi = {
@@ -38,11 +36,7 @@ let getDataAccess mongoApi blobApi = {
         Users.updateUserAvatar (userGuid userId) url mongoApi
 }
 
-
-let getAuth (api: Auth0Api) (jwt: DA.JWT.Config) = {
-
-    GetPrincipalId = fun token ->
-        jwt |> getUserProfile token |> Task.map(fun x -> x.Id)
+let getAuth (api: Auth0Api) = {
 
     UpdateAvatar = fun userId url -> 
         api |> updateUserAvatar (userId, url) |> Task.``const`` true
@@ -55,11 +49,11 @@ let imageResizer = {
 let mapContext = fun (config: RegisterOrgApi) ->
     {
         DataAccess = getDataAccess config.Mongo config.Blob
-        Auth = getAuth config.Auth0 config.JWT
+        Auth = getAuth config.Auth0
         ImageResizer = imageResizer
     }
 
-let updateAvatar token stream = mapContext >> updateAvatar token stream
+let updateAvatar principal stream = mapContext >> updateAvatar principal stream
 
 module Errors =
     

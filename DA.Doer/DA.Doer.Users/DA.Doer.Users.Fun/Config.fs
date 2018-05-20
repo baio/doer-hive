@@ -1,12 +1,10 @@
 ﻿module Config
 
 open DA.Auth0
-
 open DA.Doer.Mongo
-
 open DA.JWT
-
 open DA.HTTP.Blob
+open DA.FacePlusPlus
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
@@ -25,6 +23,8 @@ let getConfig () =
         "blob:accountName"
         "blob:accountKey"
         "blob:containerName"
+        "facepp:apiKey"
+        "facepp:apiSecret"
     ] 
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
@@ -48,23 +48,31 @@ let getConfig () =
             AccountName = x.[10]
             AccountKey = x.[11]
             ContainerName = x.[12]
+        },
+        {
+            ApiKey =    x.[13]
+            ApiSecret = x.[14]
         }
+
    
-let authConfig, jwtConfig, mongoConfig, blobConfig = getConfig()
+let authConfig, jwtConfig, mongoConfig, blobConfig, facePPConfig = getConfig()
 
 let mongoApi = {
     Db = getDb mongoConfig
 }
 
-
-
 let blobApi = {
     Container = blobConfig |> getBlobClient |> getBlobContainer "user-photos"
-#if DEBUG
+#if DEBUG_LOCAL_DEVICE
     NormalizeUrl = fun x -> x.Replace("localhost:10000", "192.168.0.100:778")
 #else 
-    NormalizeUrl x = id
+    NormalizeUrl = id
 #endif
+}
+
+let faceppApi = {
+    Config = facePPConfig
+    Http = request
 }
 
 let auth0Api = createAuth0Api request authConfig
