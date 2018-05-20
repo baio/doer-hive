@@ -14,9 +14,9 @@ open DA.Auth.Domain
 
 type HttpRequest = Request -> Task<string>
 
-type Auth0APIConfig = HttpRequest * Auth0Config
+type Auth0Api = HttpRequest * Auth0Config
 
-type API<'a> = ReaderTask<Auth0APIConfig, 'a>
+type API<'a> = ReaderTask<Auth0Api, 'a>
 
 // Response DTOs
 

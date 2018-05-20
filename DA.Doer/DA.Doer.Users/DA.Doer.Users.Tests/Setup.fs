@@ -56,7 +56,7 @@ let mongoApi = {
 
 let context = (mongoApi, (request, authConfig))
 
-let andRemove (result: RegisterOrgResult) (mongo: MongoAPI, auth: Auth0APIConfig) = 
+let andRemove (result: RegisterOrgResult) (mongo: MongoAPI, auth: Auth0Api) = 
     [
         Orgs.removeOrg result.orgId mongo
         Users.removeUser result.userId mongo       

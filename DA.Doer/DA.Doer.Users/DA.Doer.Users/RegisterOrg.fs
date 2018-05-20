@@ -11,7 +11,7 @@ let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig
+    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0Api
 
 let getDataAccess config = {
     InsertDoc = function

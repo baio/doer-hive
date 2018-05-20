@@ -23,7 +23,7 @@ let getUserProfile = trimBearer >> getClaims >> map(profileFromClaims)
 // collide the worlds!
 
 type RegisterOrgConfig = 
-    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0APIConfig * DA.HTTP.Blob.BlobStorageConfig
+    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0Api * DA.HTTP.Blob.BlobStorageConfig
 
 
 let getDataAccess mongoConfig blobConfig = {
@@ -36,7 +36,7 @@ let getDataAccess mongoConfig blobConfig = {
 }
 
 
-let getAuth ((http, config): Auth0APIConfig) (jwt: DA.JWT.Config) = {
+let getAuth ((http, config): Auth0Api) (jwt: DA.JWT.Config) = {
 
     GetPrincipalId = fun token ->
         jwt |> getUserProfile token |> Task.map(fun x -> x.Id)
