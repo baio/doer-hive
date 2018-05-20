@@ -15,8 +15,13 @@ open DA.Auth.Domain
 type HttpRequest = Request -> Task<string>
 
 type Auth0Api = {
-    Request: HttpRequest
-    Config : Auth0Config
+    HttpRequest: HttpRequest
+    Request    : RequestApi
+}
+
+let createAuth0Api http config = {
+    HttpRequest = http
+    Request     = { Config = config }
 }
 
 type API<'a> = ReaderTask<Auth0Api, 'a>
@@ -44,8 +49,8 @@ type ManagementTokenResponse = {
 
 // Domain 
 
-type FoldRequest<'a> = (HttpRequest -> ReaderTask<Auth0Config, 'a>) -> ReaderTask<Auth0Api, 'a>
-let fold: FoldRequest<_> = fun f api -> f api.Request api.Config
+type FoldRequest<'a> = (HttpRequest -> ReaderTask<RequestApi, 'a>) -> ReaderTask<Auth0Api, 'a>
+let fold: FoldRequest<_> = fun f api -> f api.HttpRequest api.Request
 
 let mapResponse f x = ReaderTask.map(str2json >> f) x
 

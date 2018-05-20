@@ -60,7 +60,7 @@ let blobApi = {
     Container = blobConfig |> getBlobClient |> getBlobContainer "user-photos"
 }
 
-let auth0Api = { Request = request; Config = authConfig }
+let auth0Api = createAuth0Api request authConfig
 
 (*
 let context  = (mongoApi, auth0Api)

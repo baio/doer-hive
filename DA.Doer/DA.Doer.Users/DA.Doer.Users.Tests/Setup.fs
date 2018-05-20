@@ -55,10 +55,7 @@ let mongoApi = {
     Db = getDb mongoConfig
 }
 
-let auth0Api = {
-    Request = request
-    Config = authConfig
-}
+let auth0Api = createAuth0Api request authConfig
 
 let andRemove (result: RegisterOrgResult) (api: RegisterOrgApi) = 
     [

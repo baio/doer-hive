@@ -6,8 +6,11 @@ open DA.FSX.HttpTask
 open FSharpx.Reader
 open DA.Auth.Domain
 
-type Auth0Reader<'a> = Reader<Auth0Config, 'a>
-type RequestAPI = Auth0Reader<Request>
+type RequestApi = {
+    Config: Auth0Config
+}
+type Auth0RequestAPI<'a> = Reader<RequestApi, 'a>
+type RequestAPI = Auth0RequestAPI<Request>
 
 // create user
 
@@ -37,7 +40,7 @@ type UpdateUserAvatarPayload = { user_metadata: UpdateUserAvatarMetadata }
 
 
 type CreateUser = CreateUserInfo -> string -> RequestAPI
-let createUser: CreateUser = fun userInfo token env -> 
+let createUser: CreateUser = fun userInfo token { Config = env } -> 
     {
         HttpMethod = POST
         Url = sprintf "https://%s.auth0.com/api/v2/users" (env.ClientDomain)
@@ -65,7 +68,7 @@ let createUser: CreateUser = fun userInfo token env ->
     }
 
 type UpdateUserAvatar = (string * string) -> string -> RequestAPI
-let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env -> 
+let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token { Config = env } -> 
     {
         HttpMethod = PATCH
         Url = sprintf "https://%s.auth0.com/api/v2/users/%s" (env.ClientDomain) userId
@@ -83,7 +86,7 @@ let updateUserAvatar: UpdateUserAvatar = fun (userId, avatarUrl) token env ->
 // get user
 
 type GetUser = string -> RequestAPI
-let getUser: GetUser = fun token env -> 
+let getUser: GetUser = fun token { Config = env } -> 
     {
         HttpMethod = GET
         Url = sprintf "https://%s.auth0.com/api/v2/users?fields=user_id" (env.ClientDomain)
@@ -94,7 +97,7 @@ let getUser: GetUser = fun token env ->
 
 // get management token
 
-let getManagementToken: RequestAPI = fun env -> 
+let getManagementToken: RequestAPI = fun { Config = env } -> 
     {
         HttpMethod = POST
         Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain
@@ -111,7 +114,7 @@ let getManagementToken: RequestAPI = fun env ->
 // remove user
 
 type RemoveUser = string -> string -> RequestAPI
-let removeUser: RemoveUser = fun token userId env -> 
+let removeUser: RemoveUser = fun token userId { Config = env } -> 
     {
         HttpMethod = DELETE
         Url = sprintf "https://%s.auth0.com/api/v2/users/%s" env.ClientDomain userId
@@ -157,7 +160,7 @@ let removeUser: RemoveUser = fun token userId env ->
 *)
 
 type Login = LoginInfo -> RequestAPI
-let login: Login = fun loginInfo env -> 
+let login: Login = fun loginInfo { Config = env } -> 
     {
         HttpMethod = POST
         Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain
@@ -176,7 +179,7 @@ let login: Login = fun loginInfo env ->
     }
 
 type RefreshToken = string -> RequestAPI
-let refreshToken: RefreshToken = fun token env -> 
+let refreshToken: RefreshToken = fun token { Config = env } -> 
     {
         HttpMethod = POST
         Url = sprintf "https://%s.auth0.com/oauth/token" env.ClientDomain

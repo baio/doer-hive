@@ -20,16 +20,15 @@ let getConfig () =
     ] 
     |> DA.AzureKeyVault.getConfigSync "azureKeyVault:name"
     |> fun x -> 
-        {
-            Request = request
-            Config = 
+        createAuth0Api
+            request
             {
                 ClientDomain = x.[0]
                 ClientId = x.[1]
                 ClientSecret = x.[2]
                 Audience = x.[3]
             }
-        },
+        ,
         {
             Audience = x.[3]
             Issuer = x.[4]            
