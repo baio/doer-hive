@@ -18,7 +18,6 @@ module UpdateAvatar =
     open DA.Http.ContentResult
     open DA.HTTP.Request
 
-
     [<FunctionName("update-avatar")>]
     let run(
             [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-avatar")>]
@@ -27,7 +26,11 @@ module UpdateAvatar =
         ) =            
             readerTask {
                 let! authToken  = readAuthHeader'        request
+                #if DEBUG_POSTMAN
+                let! fileStream = readFirstFileContentDebug'  request                
+                #else
                 let! fileStream = readFirstFileContent'  request
+                #endif
                 let! result     = updateAvatar authToken fileStream
                 return result200 result
             }
