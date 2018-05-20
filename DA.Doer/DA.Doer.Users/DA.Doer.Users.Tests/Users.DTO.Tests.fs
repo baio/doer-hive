@@ -29,7 +29,7 @@ let ``Register org with invalid dto must give correct error`` () =
                 "password", "NULL_ERROR"
             ]
 
-    let task = (registerOrgFromBody payload) context
+    let task = (registerOrgFromBody payload) { Mongo = mongoApi; Auth0 = auth0Api }
 
     task.ContinueWith(fun (t: Task<_>) ->
             Assert.IsType<AggregateException>(t.Exception) |> ignore
@@ -53,7 +53,7 @@ let ``Register org with correct dto must work`` () =
         }
     """
 
-    (registerOrgFromBody payload >>= andRemove) context
+    (registerOrgFromBody payload >>= andRemove) { Mongo = mongoApi; Auth0 = auth0Api }
 
 
 

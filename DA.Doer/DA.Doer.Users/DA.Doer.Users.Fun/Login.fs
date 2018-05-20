@@ -31,5 +31,5 @@ module Login =
             >>= loginFromBody
             |> map result200
             |> bindError (getHttpError >> mapResultStr >> returnM)
-            <| (context |> snd)
+            <| auth0Api 
 

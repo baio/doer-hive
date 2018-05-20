@@ -32,7 +32,7 @@ let ``Register org must work`` () =
             Password = "LastPas123"
         }
 
-    (RegisterOrg.registerOrg user >>= andRemove) context
+    (RegisterOrg.registerOrg user >>= andRemove) { Mongo = mongoApi; Auth0 = auth0Api }
 
 
 (*

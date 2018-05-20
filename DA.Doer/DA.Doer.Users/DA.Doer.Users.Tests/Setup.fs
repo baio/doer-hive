@@ -8,6 +8,7 @@ open DA.FSX.ReaderTask
 open DA.Doer.Users
 open DA.HTTP.Blob
 open DA.JWT
+open DA.Doer.Users.RegisterOrg
 
 let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
@@ -54,13 +55,16 @@ let mongoApi = {
     Db = getDb mongoConfig
 }
 
-let context = (mongoApi, { Request = request; Config = authConfig })
+let auth0Api = {
+    Request = request
+    Config = authConfig
+}
 
-let andRemove (result: RegisterOrgResult) (mongo: MongoAPI, auth: Auth0Api) = 
+let andRemove (result: RegisterOrgResult) (api: RegisterOrgConfig) = 
     [
-        Orgs.removeOrg result.orgId mongo
-        Users.removeUser result.userId mongo       
-        (API.removeUser result.authUserId *> returnM "ok") auth
+        Orgs.removeOrg result.orgId api.Mongo
+        Users.removeUser result.userId api.Mongo      
+        (API.removeUser result.authUserId *> returnM "ok") api.Auth0
     ]
     |> FSharpx.Task.sequence
 

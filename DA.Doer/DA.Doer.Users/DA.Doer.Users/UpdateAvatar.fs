@@ -22,8 +22,12 @@ let getUserProfile = trimBearer >> getClaims >> map(profileFromClaims)
 
 // collide the worlds!
 
-type RegisterOrgConfig = 
-    DA.Doer.Mongo.MongoConfig * DA.Auth0.API.Auth0Api * DA.HTTP.Blob.BlobStorageConfig
+type RegisterOrgConfig = {
+    Mongo: DA.Doer.Mongo.MongoAPI
+    Auth0: DA.Auth0.API.Auth0Api
+    Blob : DA.HTTP.Blob.BlobAPI
+    JWT  : DA.JWT.Config
+}
 
 
 let getDataAccess mongoConfig blobConfig = {
@@ -49,10 +53,10 @@ let imageResizer = {
     ResizeImage = resizeJpeg
 }
 
-let mapContext = fun (mongoConfig, authConfig, blobStorageConfig, jwtConfig) ->
+let mapContext = fun (config: RegisterOrgConfig) ->
     {
-        DataAccess = getDataAccess mongoConfig blobStorageConfig
-        Auth = getAuth authConfig jwtConfig
+        DataAccess = getDataAccess config.Mongo config.Blob
+        Auth = getAuth config.Auth0 config.JWT
         ImageResizer = imageResizer
     }
 

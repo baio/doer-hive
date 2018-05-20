@@ -62,7 +62,9 @@ let blobApi = {
 
 let auth0Api = { Request = request; Config = authConfig }
 
+(*
 let context  = (mongoApi, auth0Api)
 let context2 = (mongoApi, auth0Api, blobApi, jwtConfig)
+*)
 
 

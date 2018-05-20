@@ -27,12 +27,18 @@ module UpdateAvatar =
         ) =            
             readerTask {
                 let! authToken  = readAuthHeader'        request
-                let! fileStream = readFirstFileContent' request
+                let! fileStream = readFirstFileContent'  request
                 let! result     = updateAvatar authToken fileStream
                 return result200 result
             }
             |> bindError (getHttpError >> mapResultStr >> returnM)
-            <| context2
+            <| 
+            {
+                Mongo = mongoApi
+                Auth0 = auth0Api
+                Blob = blobApi
+                JWT  = jwtConfig
+            }
 
             
 

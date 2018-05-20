@@ -31,5 +31,5 @@ module RegitsreOrg =
             >>= registerOrgFromBody
             |> map result201
             |> bindError (getHttpError >> mapResultStr >> returnM)
-            <| context
+            <| { Mongo = mongoApi; Auth0 = auth0Api }
 
