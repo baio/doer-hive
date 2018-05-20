@@ -36,7 +36,7 @@ let auth0Config = getConfig()
 
 // context
 
-let context = request, auth0Config
+let context = { Request = request; Config = auth0Config }
 
 let andRemove f = readerTask {
         let! userId = f 

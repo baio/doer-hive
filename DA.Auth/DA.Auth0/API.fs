@@ -14,7 +14,10 @@ open DA.Auth.Domain
 
 type HttpRequest = Request -> Task<string>
 
-type Auth0Api = HttpRequest * Auth0Config
+type Auth0Api = {
+    Request: HttpRequest
+    Config : Auth0Config
+}
 
 type API<'a> = ReaderTask<Auth0Api, 'a>
 
@@ -41,6 +44,8 @@ type ManagementTokenResponse = {
 
 // Domain 
 
+type FoldRequest<'a> = (HttpRequest -> ReaderTask<Auth0Config, 'a>) -> ReaderTask<Auth0Api, 'a>
+let fold: FoldRequest<_> = fun f api -> f api.Request api.Config
 
 let mapResponse f x = ReaderTask.map(str2json >> f) x
 
@@ -52,8 +57,8 @@ let mapManagementTokenResponse = mapResponse(fun x ->
 
 let managementToken' (f: HttpRequest) = (f <!> getManagementToken) |> mapManagementTokenResponse
 
-let managementToken = managementToken' |> flat
-
+let managementToken = managementToken' |> fold
+        
 let managementTokenMem: API<string> = Task.memoize(managementToken)
 
 //
@@ -66,7 +71,7 @@ let inline withToken f = managementTokenMem |> ReaderTask.bind f
 
 let createUser'' userInfo token (f: HttpRequest) = (f <!> createUser userInfo token) |> mapUserIdResponse
 
-let createUser' userInfo token = createUser'' userInfo token |> flat
+let createUser' userInfo token = createUser'' userInfo token |> fold
 
 let createUser = createUser' >> withToken 
 
@@ -74,7 +79,7 @@ let createUser = createUser' >> withToken
 
 let updateUserAvatar'' userInfo token (f: HttpRequest) = (f <!> updateUserAvatar userInfo token) |> mapUserIdResponse
 
-let updateUserAvatar' userInfo token = updateUserAvatar'' userInfo token |> flat
+let updateUserAvatar' userInfo token = updateUserAvatar'' userInfo token |> fold
 
 let updateUserAvatar = updateUserAvatar' >> withToken 
 
@@ -84,8 +89,7 @@ let updateUserAvatar = updateUserAvatar' >> withToken
 
 let getUser' token (f: HttpRequest) = (f <!> getUser token) |> mapUserIdResponse
 
-let getUser = getUser' >> flat
-
+let getUser = getUser' >> fold
 // login
 
 let mapLoginResponse x = x |> mapResponse(fun x -> 
@@ -98,13 +102,13 @@ let mapLoginResponse x = x |> mapResponse(fun x ->
 
 let login' loginInfo (f: HttpRequest) = (f <!> login loginInfo) |> mapLoginResponse
 
-let login = login' >> flat
+let login = login' >> fold
 
 // remove user
 
 let removeUser'' userId token (f: HttpRequest) = (f <!> removeUser token userId) |> mapResponse(fun _ -> true)
 
-let removeUser' userId token = removeUser'' userId token |> flat
+let removeUser' userId token = removeUser'' userId token |> fold
 
 let removeUser = removeUser' >> withToken
 
@@ -121,4 +125,4 @@ let registerUser userInfo =
 
 let refreshToken' token (f: HttpRequest) = (f <!> refreshToken token) |> mapLoginResponse
 
-let refreshToken = refreshToken' >> flat
+let refreshToken = refreshToken' >> fold

@@ -36,13 +36,13 @@ let getDataAccess mongoConfig blobConfig = {
 }
 
 
-let getAuth ((http, config): Auth0Api) (jwt: DA.JWT.Config) = {
+let getAuth (api: Auth0Api) (jwt: DA.JWT.Config) = {
 
     GetPrincipalId = fun token ->
         jwt |> getUserProfile token |> Task.map(fun x -> x.Id)
 
     UpdateAvatar = fun userId url -> 
-        updateUserAvatar (userId, url) (http, config) |> Task.``const`` true
+        api |> updateUserAvatar (userId, url) |> Task.``const`` true
 }
 
 let imageResizer = {

@@ -60,7 +60,9 @@ let blobApi = {
     Container = blobConfig |> getBlobClient |> getBlobContainer "user-photos"
 }
 
-let context  = (mongoApi, (request, authConfig))
-let context2 = (mongoApi, (request, authConfig), blobApi, jwtConfig)
+let auth0Api = { Request = request; Config = authConfig }
+
+let context  = (mongoApi, auth0Api)
+let context2 = (mongoApi, auth0Api, blobApi, jwtConfig)
 
 
