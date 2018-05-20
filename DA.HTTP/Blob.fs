@@ -15,7 +15,7 @@ type BlobStorageConfig = {
     ContainerName: string
 }
 
-type BlobAPI = {
+type BlobApi = {
     Container: CloudBlobContainer
 }
 
@@ -69,7 +69,7 @@ let private normalizeUri (uri:string) =
         uri
     #endif
 
-let uploadStreamToStorage blobName stream (api: BlobAPI) =
+let uploadStreamToStorage blobName stream (api: BlobApi) =
 
         // Get the reference to the block blob from the container
         let blockBlob = api.Container.GetBlockBlobReference(blobName)
@@ -84,13 +84,13 @@ let getDateTimeFileName dir = sprintf "%s/%s" dir (DateTime.UtcNow.ToString("yyy
 
 let uploadStreamToStorageDirectoty dir = dir |> getDateTimeFileName |> uploadStreamToStorage
     
-let removeBlobFromStorage blobName (api: BlobAPI) =
+let removeBlobFromStorage blobName (api: BlobApi) =
     api.Container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
-let removeBlobFromDirectory blobName (api: BlobAPI) =
+let removeBlobFromDirectory blobName (api: BlobApi) =
     api.Container.GetBlockBlobReference(blobName).DeleteAsync().ContinueWith(fun _ -> true)
 
-let getBlob blobName (api: BlobAPI) =
+let getBlob blobName (api: BlobApi) =
     
     // Get the reference to the block blob from the container
     let blockBlob = api.Container.GetBlockBlobReference(blobName)
@@ -110,7 +110,7 @@ open DA.FSX.Task
 let private getBlobNameFromUri (uri: Uri) = 
     uri.Segments |> Array.skip 3 |> String.concat ""
 
-let private listBlobSegments limit dirName (api: BlobAPI) =
+let private listBlobSegments limit dirName (api: BlobApi) =
     api.Container
         .GetDirectoryReference(dirName)
         .ListBlobsSegmentedAsync(
@@ -122,7 +122,7 @@ let private listBlobSegments limit dirName (api: BlobAPI) =
             null
         )
 
-let getDirectoryBlobNames limit dirName (api: BlobAPI) =
+let getDirectoryBlobNames limit dirName (api: BlobApi) =
     // blobs must be stored with names formatted as create date time 
     // https://stackoverflow.com/questions/5876519/azure-sort-order-of-list-operation-on-blob-container?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
     listBlobSegments limit dirName api

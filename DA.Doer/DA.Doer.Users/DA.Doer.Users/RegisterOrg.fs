@@ -10,8 +10,8 @@ let request = DA.Http.HttpTask.HttpClient.httpClientRequest
 
 // collide the worlds!
 
-type RegisterOrgConfig = {
-    Mongo: DA.Doer.Mongo.MongoAPI
+type RegisterOrgApi = {
+    Mongo: DA.Doer.Mongo.MongoApi
     Auth0: DA.Auth0.API.Auth0Api
 }
 
@@ -25,10 +25,10 @@ let getAuth config = {
     RegisterUser = fun userInfo -> registerUser userInfo config
 }
 
-let mapContext = fun (config: RegisterOrgConfig) ->
+let mapContext = fun (api: RegisterOrgApi) ->
     {
-        DataAccess = getDataAccess config.Mongo
-        Auth = getAuth config.Auth0
+        DataAccess = getDataAccess api.Mongo
+        Auth = getAuth api.Auth0
     }
 
 let registerOrg info = mapContext >> registerOrg info

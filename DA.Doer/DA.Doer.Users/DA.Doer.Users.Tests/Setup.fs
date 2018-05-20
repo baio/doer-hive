@@ -60,7 +60,7 @@ let auth0Api = {
     Config = authConfig
 }
 
-let andRemove (result: RegisterOrgResult) (api: RegisterOrgConfig) = 
+let andRemove (result: RegisterOrgResult) (api: RegisterOrgApi) = 
     [
         Orgs.removeOrg result.orgId api.Mongo
         Users.removeUser result.userId api.Mongo      

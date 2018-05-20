@@ -7,7 +7,7 @@ type MongoConfig = {
     DbName: string
 }
 
-type MongoAPI = {
+type MongoApi = {
     Db: IMongoDatabase
 }
 
@@ -61,7 +61,7 @@ module API =
     type DocWithId = { _id: BsonObjectId }
 
     // TODO: rename MongoApi
-    type MongoReader<'a> = Reader<MongoAPI, 'a>
+    type MongoReader<'a> = Reader<MongoApi, 'a>
 
     let inline bsonId2String (id:  BsonObjectId) = id.AsObjectId.ToString()
 
