@@ -9,6 +9,7 @@ type Principal = {
 
 [<AutoOpen>]
 module Profile = 
+    open DA.Doer.Domain.Users
     
     let principalFromClaims (claims: Map<string, string>) = 
         {
@@ -17,4 +18,10 @@ module Profile =
             Role = claims.["https://doer.auth.com/role"]
         }
 
-    
+    let principalCanCreateWorkers (principal: Principal) =     
+        let role = roleFromString principal.Role
+        if role = Owner || role = Master then
+            true
+        else 
+            false
+        

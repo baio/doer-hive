@@ -6,6 +6,7 @@ open DA.FSX.ReaderTask
 open DA.Doer.Users
 open DA.HTTP.Blob
 open DA.FacePlusPlus
+open System.IO
 
 let getConfig () = 
     [
@@ -50,3 +51,5 @@ let blobApi = {
     Container = blobStorageConfig |> getBlobClient |> getBlobContainer "user-photos"
     NormalizeUrl = id
 }
+
+let readFile path = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);    

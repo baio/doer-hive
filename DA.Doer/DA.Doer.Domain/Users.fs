@@ -1,5 +1,12 @@
 ﻿namespace DA.Doer.Domain.Users
 
+type OrgId            = string
+type UserId            = string
+type PrincipalId       = string
+type TagId             = string
+type SetId             = string
+type FaceTokenId       = string
+
 type UserRole = Owner | Master | Worker
 
 type User = {

@@ -80,7 +80,7 @@ let setupForEnlistTest () =
 
     task {
 
-        let! orgId = createOrg { Name = "test-org-enlist"; OwnerEmail = "test-org-enlist@mail.ru" } mongoApi
+        let! orgId = createOrg { Name = "test-org-enlist-to-verify"; OwnerEmail = "test-org-enlist-to-verify@mail.ru" } mongoApi
 
         let userDoc1: UserDoc =  {
             OrgId = orgId
@@ -88,7 +88,7 @@ let setupForEnlistTest () =
             FirstName = "first"
             MidName = "user"
             LastName = "name"
-            Email = "first_user_name@gmail.com"
+            Email = "first_user_name_enlist_to_verify@gmail.com"
             Phone = "+79772753595"
             Ancestors = []
             Avatar = ""
@@ -100,7 +100,7 @@ let setupForEnlistTest () =
             FirstName = "second"
             MidName = "user"
             LastName = "name"
-            Email = "second_user_name@gmail.com"
+            Email = "second_user_name_enlist_to_verify@gmail.com"
             Phone = "+79772753595"
             Ancestors = []
             Avatar = ""
@@ -113,8 +113,8 @@ let setupForEnlistTest () =
         let! user2Id = createUser userDoc2 mongoApi
 
         // upload user 1 blobs
-        let img1 = new FileStream("./assets/lev-1.jpg", FileMode.Open);    
-        let img2 = new FileStream("./assets/lev-2.jpg", FileMode.Open);    
+        use img1 = readFile "./assets/lev-1.jpg"    
+        use img2 = readFile "./assets/lev-2.jpg"
         let! _ = 
             [
                 uploadStreamToStorageDirectoty user1Id img1 blobApi
@@ -122,7 +122,7 @@ let setupForEnlistTest () =
             ] |> DA.FSX.Task.sequence
 
         // upload user 2 blobs
-        let img3 = new FileStream("./assets/max-1.jpg", FileMode.Open);    
+        let img3 = readFile "./assets/max-1.jpg"
         let! _ = uploadStreamToStorageDirectoty user2Id img3 blobApi
 
         return (orgId, user1Id, user2Id)
@@ -165,23 +165,23 @@ let ``Enlist to verify with mongo and blob api must work`` () =
 
             let! _ = enlistToVerify principal user1Id semiMockApi
             
-            let! _ = enlistToVerify principal user2Id semiMockApi
-       
-            let imgUser1 = new FileStream("./assets/lev-3.jpg", FileMode.Open);    
+            let! _ = enlistToVerify principal user2Id semiMockApi            
+            
+            use imgUser1 = readFile "./assets/lev-3.jpg"
 
             let! (conf1, user1) = identifyPhoto principal imgUser1 identPhotoApi
 
-            let imgUser2 = new FileStream("./assets/max-2.png", FileMode.Open);    
+            use imgUser2 = readFile "./assets/max-2.png"
 
             let! (conf2, user2) = identifyPhoto principal imgUser2 identPhotoApi
-
+            
             // image for user must be correctly identified as image for user with high confidency
             user1.Id |> should equal user1Id
             conf1 |> should equal High
 
             user2.Id |> should equal user2Id
             conf2 |> should equal Medium
-
+                       
         } 
         |> tryFinally (fun () -> cleanForEnlistTest (orgId, user1Id, user2Id))
                

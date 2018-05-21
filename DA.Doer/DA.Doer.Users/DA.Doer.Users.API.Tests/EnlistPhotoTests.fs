@@ -77,14 +77,14 @@ let identPhotoApi  =
                     // TODO : throw exception if nothing found ?
                     (x.results.[0].confidence, x.results.[0].face_token)
                  )
-        FindUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
+        FindUser = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
     }
 
 let setupForEnlistTest () =    
 
     task {
 
-        let! orgId = createOrg { Name = "test-org-photo-enlist"; OwnerEmail = "test-org-photo-enlist@mail.ru" } mongoApi
+        let! orgId = createOrg { Name = "test-org-enlist-photo"; OwnerEmail = "test-org-enlist-photo@mail.ru" } mongoApi
 
         let userDoc1: UserDoc =  {
             OrgId = orgId
@@ -92,7 +92,7 @@ let setupForEnlistTest () =
             FirstName = "first"
             MidName = "user"
             LastName = "name"
-            Email = "first_user_name@gmail.com"
+            Email = "first_user_name_enlist_photo@gmail.com"
             Phone = "+79772753595"
             Ancestors = []
             Avatar = ""
@@ -104,7 +104,7 @@ let setupForEnlistTest () =
             FirstName = "second"
             MidName = "user"
             LastName = "name"
-            Email = "second_user_name@gmail.com"
+            Email = "second_user_name_enlist_photo@gmail.com"
             Phone = "+79772753595"
             Ancestors = []
             Avatar = ""
@@ -152,9 +152,9 @@ let ``Enlist photo with real api must work`` () =
                 Role = "Owner"
             }
 
-        let user1Photo = new FileStream("./assets/lev-1.jpg", FileMode.Open)    
+        use user1Photo = readFile "./assets/lev-1.jpg"
         
-        let user2Photo = new FileStream("./assets/max-1.jpg", FileMode.Open)    
+        use user2Photo = readFile "./assets/max-1.jpg"
 
         return! task {                
 
@@ -162,11 +162,11 @@ let ``Enlist photo with real api must work`` () =
             
             let! _ = enlistPhoto principal user2Id user2Photo semiMockApi
         
-            let imgUser1 = new FileStream("./assets/lev-3.jpg", FileMode.Open);    
+            use imgUser1 = readFile "./assets/lev-3.jpg"
 
             let! (conf1, user1) = identifyPhoto principal imgUser1 identPhotoApi
 
-            let imgUser2 = new FileStream("./assets/max-2.png", FileMode.Open);    
+            use imgUser2 = readFile "./assets/max-2.png"
 
             let! (conf2, user2) = identifyPhoto principal imgUser2 identPhotoApi
             
@@ -194,7 +194,7 @@ let ``Enlist foto with 2 pepople must throw exception`` () =
                 Role = "Owner"
             }
 
-        let userPhoto = new FileStream("./assets/max-lev.jpg", FileMode.Open)    
+        use userPhoto = readFile "./assets/max-lev.jpg"
         
         return! task {                
 
@@ -223,7 +223,7 @@ let ``Enlist foto with no person must throw exception`` () =
                 Role = "Owner"
             }
 
-        let userPhoto = new FileStream("./assets/ford.jpeg", FileMode.Open)    
+        use userPhoto = readFile "./assets/ford.jpeg"
         
         return! task {                
 

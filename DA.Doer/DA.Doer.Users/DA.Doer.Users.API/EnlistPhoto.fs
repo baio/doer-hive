@@ -23,7 +23,7 @@ type FaceTokenId       = string
 type UploadedPhotoParams = {
     OrgId            : OrgId
     UserId           : UserId
-    FaceTokenId     : FaceTokenId
+    FaceTokenId      : FaceTokenId
 }
        
 type Api = {    

@@ -13,6 +13,7 @@
     <Compile Include="RefreshTokenDTO.fs" />
     <Compile Include="Login.fs" />
     <Compile Include="LoginDTO.fs" />
+    <Compile Include="CreateWorker.fs" />
     <Compile Include="RegisterOrg.fs" />
     <Compile Include="RegisterOrgDTO.fs" />
     <Compile Include="IdentifyPhoto.fs" />
