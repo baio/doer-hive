@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Domain.fs" />
     <Compile Include="Config.fs" />
     <Compile Include="EnlistToVerify.fs" />
     <Compile Include="UpdateAvatar.fs" />

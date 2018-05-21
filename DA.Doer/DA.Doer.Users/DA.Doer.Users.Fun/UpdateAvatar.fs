@@ -35,13 +35,12 @@ module UpdateAvatar =
                 let! fileStream = readFirstFileContentDebug  request                
                 #else
                 let! fileStream = readFirstFileContent  request
-                #endif
-                let authToken = readAuthHeader request
-                let! prinipal = getPrincipal authToken jwtConfig
+                #endif                
+                let! prinipal = getPrincipal request jwtConfig
                 let! result   = updateAvatar prinipal fileStream context
                 return result200 result
             }
-            |> bindError (getHttpError >> mapResultStr >> returnM)
+            |> bindHttpError getHttpError
 
             
 

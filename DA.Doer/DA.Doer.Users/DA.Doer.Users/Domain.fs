@@ -9,7 +9,6 @@ module AuthId =
         sprintf "doer|%s"
 
 
-[<AutoOpen>]
 module Utils = 
     open DA.Doer.Domain.Auth
     open DA.FSX.ReaderTask
