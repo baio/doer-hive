@@ -1,4 +1,4 @@
-﻿module DA.Doer.Users.API.EnlistToVerify
+﻿module DA.Doer.Users.API.EnlistPhoto
 
 open System.IO
 open System.Threading.Tasks
@@ -23,28 +23,20 @@ type FaceTokenId       = string
 type UploadedPhotoParams = {
     OrgId            : OrgId
     UserId           : UserId
-    FaceTokenIds     : FaceTokenId list
+    FaceTokenId     : FaceTokenId
 }
-
-///
-
-type UserPhotosMinimalLimitException (requiredLength, currentLength) =
-    inherit Exception()
-    member this.requiredLength = requiredLength
-    member this.currentLength = currentLength
-
        
 type Api = {    
     IsPrincipalAncestor     : PrincipalId -> UserId -> Task<bool>
-    GetUserPhotos           : UserId -> Task<Stream list>
     IsPhotoSetExists        : OrgId -> Task<bool>
     CreatePhotoSet          : SetId -> Task<bool>
-    AddPhotosToSet          : SetId -> Stream list -> Task<FaceTokenId list>
-    // must return total number of user faces in system
+    AddPhotoToSet           : SetId -> Stream -> Task<FaceTokenId>
+    StorePhoto              : UploadedPhotoParams -> Stream -> Task<bool>
     MarkAsUploaded          : UploadedPhotoParams -> Task<int>
 }
 
-let enlistToVerify (principal: Principal) userId api = 
+// TODO : Check same user as on perv, reset enlisted photos
+let enlistPhoto (principal: Principal) userId stream api = 
     
     let principalId = principal.Id
 
@@ -58,13 +50,6 @@ let enlistToVerify (principal: Principal) userId api =
         if not isPrincipalAncestor then
             raise (new AccessDeniedException())
                     
-        // read user photos
-        let! userPhotos = api.GetUserPhotos userId
-
-        // validate minimal required user photos quantity
-        if userPhotos.Length < 1 then
-            raise (new UserPhotosMinimalLimitException(1, userPhotos.Length))
-
         // get photo set (by principalId) and if it is already exists
         let! photoSetExists = api.IsPhotoSetExists principal.OrgId
 
@@ -72,17 +57,19 @@ let enlistToVerify (principal: Principal) userId api =
         let! _ = if not photoSetExists then api.CreatePhotoSet orgId else returnM true       
 
         // add photos to set
-        let! faceTokenIds = api.AddPhotosToSet orgId userPhotos
+        let! faceTokenId = api.AddPhotoToSet orgId stream
+
+        let uploadResult = { OrgId = orgId; UserId = userId; FaceTokenId = faceTokenId }
+
+        // add photos to storage 
+        let! _ = api.StorePhoto uploadResult stream 
 
         // mark user - photos added to set
-        let! totalUserFacesCount = api.MarkAsUploaded({ OrgId = orgId; UserId = userId; FaceTokenIds = faceTokenIds })
+        let! totalUserFacesCount = api.MarkAsUploaded uploadResult
 
         // return total number of photos for user
         return totalUserFacesCount
     }
 
-// Not used since with az functions, route could define route arg type guid.
-let validateUserId str = 
-    str 
-    |> DA.Doer.Domain.Validators.isGuid
-    |> Result.mapError (fun x -> Errors.validationException ["UserId", x])
+    
+

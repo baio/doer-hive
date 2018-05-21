@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Setup.fs" />
+    <Compile Include="EnlistPhotoTests.fs" />
     <Compile Include="EnlistToVerifyTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
