@@ -1,4 +1,5 @@
-﻿module DA.FacePlusPlus
+﻿[<AutoOpen>]
+module DA.FacePlusPlus.Api
 
 open DA.FSX
 open DA.FSX.HttpTask
@@ -104,17 +105,21 @@ let detectAndAddFace faceSetId stream =
 
 
 // Detect user faces, if more than just single person face detected on photo throw exception
-
+(*
 type PhotoWithMultiFacesException (detectFaceResponse: DetectFaceResponse list) =
     inherit System.Exception()
     member this.detectFaceResponse = detectFaceResponse
+*)
 
-let detectAndAddFaces' failWhenPhotoHaveMultiFaces faceSetId streams = 
+let detectAndAddFaces' findSingle faceSetId streams = 
     readerTask {
-        let! detectResult = streams |> List.map detectFace |> sequence 
-        let multiFaces = detectResult |> List.exists(fun x -> x.faces.Length > 1)
-        if failWhenPhotoHaveMultiFaces && multiFaces then raise (PhotoWithMultiFacesException detectResult)
+        let! detectResult = streams |> List.map detectFace |> sequence         
         let faceTokens = detectResult |> List.collect(fun x -> x.faces |> List.map(fun x -> x.face_token) )
+        if findSingle then
+            if faceTokens.Length = 0 then 
+                raise (FaceNotFoundException())
+            if faceTokens.Length > 1 then 
+                raise (MultipleFacesFoundException())        
         let! addResult = addFaces faceSetId faceTokens
         return (faceTokens, detectResult, addResult)
     }

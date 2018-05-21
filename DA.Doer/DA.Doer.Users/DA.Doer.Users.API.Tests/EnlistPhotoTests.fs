@@ -140,7 +140,7 @@ let cleanForEnlistTest (orgId, user1Id, user2Id) =
 
 // Paid or Limited !
 [<Fact>]
-let ``Enlist photo with mongo and blob api must work`` () =
+let ``Enlist photo with real api must work`` () =
            
     task {
 
@@ -177,6 +177,64 @@ let ``Enlist photo with mongo and blob api must work`` () =
             user2.Id |> should equal user2Id
             conf2 |> should equal Medium
         } 
+        |> tryFinally (fun () -> cleanForEnlistTest (orgId, user1Id, user2Id))
+               
+    }
+
+[<Fact>]
+let ``Enlist foto with 2 pepople must throw exception`` () =
+           
+    task {
+
+        let! orgId, user1Id, user2Id = setupForEnlistTest()
+
+        let principal = {
+                Id    = user1Id
+                OrgId = orgId
+                Role = "Owner"
+            }
+
+        let userPhoto = new FileStream("./assets/max-lev.jpg", FileMode.Open)    
+        
+        return! task {                
+
+            let! _ = enlistPhoto principal user1Id userPhoto semiMockApi
+                    
+            true |> should equal false
+        } 
+        |> bindError(fun err -> 
+            Assert.IsType(typeof<MultipleFacesFoundException>, err)
+            returnM ()
+        )
+        |> tryFinally (fun () -> cleanForEnlistTest (orgId, user1Id, user2Id))
+               
+    }
+
+[<Fact>]
+let ``Enlist foto with no person must throw exception`` () =
+           
+    task {
+
+        let! orgId, user1Id, user2Id = setupForEnlistTest()
+
+        let principal = {
+                Id    = user1Id
+                OrgId = orgId
+                Role = "Owner"
+            }
+
+        let userPhoto = new FileStream("./assets/ford.jpeg", FileMode.Open)    
+        
+        return! task {                
+
+            let! _ = enlistPhoto principal user1Id userPhoto semiMockApi
+                    
+            true |> should equal false
+        } 
+        |> bindError(fun err -> 
+            Assert.IsType(typeof<FaceNotFoundException>, err)
+            returnM ()
+        )
         |> tryFinally (fun () -> cleanForEnlistTest (orgId, user1Id, user2Id))
                
     }
