@@ -46,27 +46,46 @@ module Errors =
     open DA.Doer.Users.Errors
     open DA.Doer.Domain.Errors
     open DA.Doer.Mongo.Errors
+    open FSharp.Data
 
     let inline private map f x = Option.map f x
-
-    (*
-    let matchUserMustHaveAtLeast5PhotosException (e: exn) = 
-        match e with
-        | :? UserMustHaveAtLeast5PhotosException as ex -> Some ex.currentLength
-        | _ -> None
-
-    let userMustHaveAtLeast5PhotosException (currentLength: int) = 
-        let message = sprintf "Unexpected number of photos to train in storage %i. Must be at least 5" currentLength
-        new System.Exception(message) |> unexepcted       
-    *)
     
+    let matchFaceNotFoundException (e: exn) = 
+        match e with
+        | :? FaceNotFoundException as ex -> Some ()
+        | _ -> None    
+
+    let matchMultipleFacesFoundException (e: exn) = 
+        match e with
+        | :? MultipleFacesFoundException as ex -> Some ()
+        | _ -> None   
+
+    let mapFaceNotFoundException () = 
+        401, 
+        (
+            [|
+                ("code", JsonValue.String "FACE_NOT_FOUND") 
+                ("message", JsonValue.String "FACE_NOT_FOUND") 
+            |]
+            |> JsonValue.Record
+        ).ToString()
+
+    let mapMultipleFacesFoundException () = 
+        401, 
+        (
+            [|
+                ("code", JsonValue.String "MULTIPLE_FACES_FOUND") 
+                ("message", JsonValue.String "MULTIPLE_FACES_FOUND") 
+            |]
+            |> JsonValue.Record
+        ).ToString()
+
     
     let getHttpError (ex: exn) =  
         [
             matchConnectionError >> (map connectionFail)
-            // face not found
-            // multiple faces found
-            // matchUserMustHaveAtLeast5PhotosException >> (map userMustHaveAtLeast5PhotosException)
+            matchFaceNotFoundException >> (map mapFaceNotFoundException)
+            matchMultipleFacesFoundException >> (map mapMultipleFacesFoundException)
             unexepcted >> Some
         ] 
         |> List.choose(fun x -> x ex)
