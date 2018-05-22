@@ -21,9 +21,8 @@ module UpdateAvatar =
 
     [<FunctionName("update-avatar")>]
     let run(
-            [<HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "/users/avatar")>]
+            [<HttpTrigger(AuthorizationLevel.Anonymous, "patch", Route = "users/avatar")>]
             request: HttpRequest,
-            userId: string,
             log: ILogger
         ) =            
             let context = {

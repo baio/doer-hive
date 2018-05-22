@@ -26,7 +26,7 @@ open DA.HTTP.Request
 let run(
         [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/{userId:guid}/enlist-photo")>]
         request: HttpRequest,
-        userId : string,
+        userId : Guid,
         log: ILogger
     ) =            
         let context = {
@@ -41,7 +41,7 @@ let run(
             #else
             let! fileStream = readFirstFileContent  request
             #endif                
-            let! result   = enlistPhoto principal userId fileStream context
+            let! result   = enlistPhoto principal (userId.ToString()) fileStream context
             return result200 result
         }
         |> bindHttpError getHttpError

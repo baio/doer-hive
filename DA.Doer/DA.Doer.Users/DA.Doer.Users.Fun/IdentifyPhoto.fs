@@ -25,7 +25,6 @@ open Config
 let run(
         [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/identify-photo")>]
         request: HttpRequest,
-        userId : string,
         log: ILogger
     ) =            
         let context = {

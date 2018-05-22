@@ -30,7 +30,7 @@ See function `enlist-photo`
 let run(
         [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "users/{userId:guid}/enlist-to-verify")>]
         request: HttpRequest,
-        userId : string,
+        userId : Guid,
         log: ILogger
     ) =            
         let context = {
@@ -40,7 +40,7 @@ let run(
         }
         task {                
             let! principal = getPrincipal request jwtConfig
-            let! result   = enlistToVerify principal userId context
+            let! result   = enlistToVerify principal (userId.ToString()) context
             return result200 result
         }
         |> bindHttpError getHttpError
