@@ -78,6 +78,7 @@ let identPhotoApi  =
                     (x.results.[0].confidence, x.results.[0].face_token)
                  )
         FindUser = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
+        StorePhoto = fun x stream -> returnM ()
     }
 
 let setupForEnlistTest () =    

@@ -111,13 +111,15 @@ type PhotoWithMultiFacesException (detectFaceResponse: DetectFaceResponse list) 
     member this.detectFaceResponse = detectFaceResponse
 *)
 
-let checkSingleFace detectResult = 
-    let fotoHasNoFace = detectResult |> List.exists(fun x -> x.faces.Length = 0)
+let checkSingleFace' (faces: DetectFace list list) = 
+    let fotoHasNoFace = faces |> List.exists(fun x -> x.Length = 0)
     if fotoHasNoFace then 
         raise (FaceNotFoundException())
-    let fotoHasManyFaces = detectResult |> List.exists(fun x -> x.faces.Length > 1)
+    let fotoHasManyFaces = faces |> List.exists(fun x -> x.Length > 1)
     if fotoHasManyFaces then 
         raise (MultipleFacesFoundException())                    
+
+let checkSingleFace = List.map(fun x -> x.faces) >> checkSingleFace'
 
 let detectAndAddFaces' findSingle faceSetId streams = 
     readerTask {
@@ -160,6 +162,13 @@ let searchFace faceSetId stream: API<SearchFaceResponse> = fun api ->
         QueryString = []
     }
     |> http api
+
+let searchSingleFace faceSetId stream: API<_> = 
+    readerTask {
+        let! searchFace = searchFace faceSetId stream
+        checkSingleFace' [ searchFace.faces ]
+        return searchFace.results.[0] |> fun x -> (x.confidence, x.face_token)
+    }
 
 type RemoveFacesResponse = {
     request_id: string

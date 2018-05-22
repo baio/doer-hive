@@ -67,13 +67,9 @@ let semiMockApi =
 
 let identPhotoApi  = 
     {
-        IdentifyPhoto = fun orgId stream -> 
-            searchFace orgId stream faceppApi 
-                |> map(fun x -> 
-                    // TODO : throw exception if nothing found ?
-                    (x.results.[0].confidence, x.results.[0].face_token)
-                 )
-        FindUser      = fun faceTokenId -> getUserByPhotoId faceTokenId mongoApi
+        IdentifyPhoto = fun orgId stream -> searchSingleFace orgId stream faceppApi 
+        FindUser      = fun faceTokenId  -> getUserByPhotoId faceTokenId mongoApi
+        StorePhoto    = fun x stream     -> returnM ()
     }
 
 let setupForEnlistTest () =    
