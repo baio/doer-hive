@@ -6,6 +6,10 @@
     <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>TRACE;DEBUG;NETSTANDARD2_0;</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="Domain.fs" />
     <Compile Include="Config.fs" />

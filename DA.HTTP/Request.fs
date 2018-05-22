@@ -66,4 +66,4 @@ let readAuthHeader'       x = x |> readAuthHeader |> ReaderTask.ofTask
 let readFirstFileContent' x = x |> readFirstFileContent |> ReaderTask.ofTask
 
 // Quick fallback to override POSTMAN bug: https://github.com/postmanlabs/postman-app-support/issues/576            
-let readFirstFileContentDebug' (x: HttpRequest) = x.Body |> ReaderTask.returnM
+let readFirstFileContentDebug (x: HttpRequest) = x.Body

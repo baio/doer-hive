@@ -37,7 +37,7 @@ let run(
         task {                
             let! principal = getPrincipal request jwtConfig
             #if DEBUG_POSTMAN
-            let! fileStream = readFirstFileContentDebug  request                
+            let fileStream = readFirstFileContentDebug request                
             #else
             let! fileStream = readFirstFileContent  request
             #endif                
