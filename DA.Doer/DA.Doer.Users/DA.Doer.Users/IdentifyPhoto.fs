@@ -19,8 +19,10 @@ let mapContext = fun (context: Context) ->
     {
         IdentifyPhoto = fun orgId stream -> 
             searchSingleFace orgId stream context.FacePP
+
         FindUser = fun faceTokenId -> 
             getUserByPhotoId faceTokenId context.Mongo
+
         StorePhoto = fun userId stream -> 
             uploadStreamToStorageDirectoty userId stream context.Blob |> ``const`` ()
     }
@@ -31,7 +33,9 @@ let identifyPhoto principal stream =
 module Errors =
         
     let getHttpError e =  
-        [
-            matchFaceNotFoundException >> (mapOpt mapFaceNotFoundException)
-            matchMultipleFacesFoundException >> (mapOpt mapMultipleFacesFoundException)
-        ] |> getHttpErrorWithDefaults e 
+        e |>
+        getHttpErrorWithDefaults 
+            [
+                matchFaceNotFoundException >> (mapOpt mapFaceNotFoundException)
+                matchMultipleFacesFoundException >> (mapOpt mapMultipleFacesFoundException)
+            ]

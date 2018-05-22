@@ -17,9 +17,11 @@ type Context = {
 
 let mapContext = fun (context: Context) ->
     {
-        IsPrincipalAncestor = fun principalId userId -> returnM true
+        IsPrincipalAncestor = fun principalId userId -> 
+            Auth.isPrincipalAncestor principalId userId context.Mongo
 
-        IsPhotoSetExists = fun orgId -> orgHasPhotoLink orgId context.Mongo
+        IsPhotoSetExists = fun orgId -> 
+            orgHasPhotoLink orgId context.Mongo
         
         CreatePhotoSet = fun setId -> 
             createFaceSet setId context.FacePP |> ``const`` true

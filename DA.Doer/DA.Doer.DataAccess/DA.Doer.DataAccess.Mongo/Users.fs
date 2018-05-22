@@ -42,6 +42,8 @@ let createInsDoc (doc: UserDoc) =
         avatar = doc.Avatar
     }
 
+let getColl config = getCollection USERS_COLLECTION_NAME config
+
 let createUser doc =    
     let insDoc = createInsDoc doc
     (insert insDoc <!> getCollection USERS_COLLECTION_NAME) |> ReaderTask.mapc(insDoc.id.AsObjectId.ToString())
@@ -119,3 +121,9 @@ let getUserByPhotoId photoId =
         let! userId = getUserIdByPhotoId photoId   
         return! getUser userId
     }
+
+let getUserAncestors userId config = 
+    let coll = getColl config
+    coll.Find<UserDocDTO>(idFilter userId).Project(fun x -> x.ancestors)
+    |> firstOrException (USERS_COLLECTION_NAME, userId)
+    |> Task.map(List.ofSeq)

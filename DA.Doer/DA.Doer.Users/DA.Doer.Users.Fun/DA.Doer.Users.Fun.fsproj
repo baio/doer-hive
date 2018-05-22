@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Domain.fs" />
     <Compile Include="Config.fs" />
+    <Compile Include="CreateWorker.fs" />
     <Compile Include="IdentifyPhoto.fs" />
     <Compile Include="EnlistPhoto.fs" />
     <Compile Include="EnlistToVerify.fs" />

@@ -42,7 +42,7 @@ module internal DA.Doer.Users.Exceptions
 
     let getHttpError (ex: exn) =  List.choose(fun x -> x ex) >> List.head
 
-    let getHttpErrorWithDefaults (ex: exn) l =  
+    let getHttpErrorWithDefaults l (ex: exn)  =  
         l@[
             matchConnectionError >> (mapOpt connectionFail)
             unexepcted >> Some

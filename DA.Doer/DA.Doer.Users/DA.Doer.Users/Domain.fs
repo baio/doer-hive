@@ -1,5 +1,15 @@
 ﻿namespace DA.Doer.Users
 
+module Auth =
+    open DA.Doer.Mongo
+    open DA.FSX.ReaderTask
+    
+    let isPrincipalAncestor principalId userId = 
+        readerTask {
+            let! ancestors = getUserAncestors userId
+            return ancestors |> List.contains principalId
+        }
+
 module AuthId = 
     
     let auth2domain (x: string) = 
@@ -10,6 +20,7 @@ module AuthId =
 
 
 module Utils = 
+    
     open DA.Doer.Domain.Auth
     open DA.FSX.ReaderTask
     

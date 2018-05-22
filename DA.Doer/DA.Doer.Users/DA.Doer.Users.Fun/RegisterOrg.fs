@@ -21,7 +21,7 @@ module RegitsreOrg =
 
     [<FunctionName("register-org")>]
     let run(
-            [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register-org")>]
+            [<HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "orgs/register")>]
             request: HttpRequest,
             log: ILogger
         ) =

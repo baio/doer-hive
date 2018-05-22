@@ -1,4 +1,4 @@
-﻿namespace DA.Doer.Users.CreateWorker
+﻿namespace DA.Doer.Users.API.CreateWorker
 
 type WorkerInfo = {
     FirstName: string
@@ -56,6 +56,7 @@ module Payload =
     open DA.FSX.ValidationResult
     open FSharpx.Reader
     open DA.Doer.Domain
+    open System.IO
     
     type private DTO = { 
         firstName: obj
@@ -74,7 +75,7 @@ module Payload =
             Phone = dto.phone :?> string |> norm
         }
 
-    let fromPayload = 
+    let private fromPayload'' = 
         [
             "firstName", fun x -> x.firstName |> isMidStr 
             "lastName", fun x ->  x.lastName |> isMidStr 
@@ -83,4 +84,9 @@ module Payload =
             "phone", fun x -> x.phone |> isPhone
         ]
         |> validatePayload mapPayload
-        //|> Result.mapError(Errors.validationException)
+
+    let fromPayload' = 
+        fromPayload'' >> Result.mapError(Errors.validationException)
+
+    let fromPayload x = 
+        x |> DA.FSX.IO.readString |> DA.FSX.Task.bind (fromPayload' >> DA.FSX.Task.ofResult)
